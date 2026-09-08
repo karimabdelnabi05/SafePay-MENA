@@ -9,7 +9,7 @@ BASE = os.getenv("SAFEPAY_BROWSER_URL")
 pytestmark = pytest.mark.skipif(not BASE, reason="Set SAFEPAY_BROWSER_URL for browser acceptance")
 
 
-@pytest.mark.parametrize("width,height", [(1440, 1000), (375, 812)])
+@pytest.mark.parametrize("width,height", [(1440, 1000), (375, 812), (812, 375)])
 def test_tester_can_complete_a_routine_payment_without_layout_overflow(width, height):
     with sync_playwright() as p:
         browser = p.chromium.launch()
