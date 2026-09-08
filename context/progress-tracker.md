@@ -57,6 +57,22 @@
 - [x] Editorial SVG system architecture schematic generated ([safepay_architecture_diagram.html](file:///C:/Users/karee/Desktop/Mena_Ignite_hackathon/docs_and_presentations/safepay_architecture_diagram.html)).
 - [x] 15-slide master pitch deck compiled to PDF ([SafePay_MENA_Phase2_Pitch_Deck.pdf](file:///C:/Users/karee/Desktop/Mena_Ignite_hackathon/docs_and_presentations/SafePay_MENA_Phase2_Pitch_Deck.pdf)) and interactive HTML ([SafePay_MENA_Phase2_Slides.html](file:///C:/Users/karee/Desktop/Mena_Ignite_hackathon/docs_and_presentations/SafePay_MENA_Phase2_Slides.html)).
 - [x] 3-minute video walkthrough second-by-second recording script ([SAFEPAY_DEMO_VIDEO_WALKTHROUGH_SCRIPT.md](file:///C:/Users/karee/Desktop/Mena_Ignite_hackathon/docs_and_presentations/SAFEPAY_DEMO_VIDEO_WALKTHROUGH_SCRIPT.md)).
+- [x] Public GitHub repository published at [karimabdelnabi05/SafePay-MENA](https://github.com/karimabdelnabi05/SafePay-MENA).
 - [ ] Record 3-minute high-impact walkthrough video (Loom / OBS).
-- [ ] Polish README documentation and submit to HackerEarth.
+- [ ] Submit Phase 2 deliverables to HackerEarth.
+
+---
+
+## GitHub Issues Status (`/to-issues`)
+
+- [x] **#1: Routine Instant Payment Silent Approval Flow** (US #1, #2, #8, #9, #10, #15, #17, #19) - *Closed & Verified*
+- [x] **#2: SIM Swap Account Takeover Defense & Statutory Hard Block** (US #3, #4, #7, #8, #10, #12, #18, #19, #20) - *Closed & Verified*
+- [x] **#3: Active Call Vishing Interception & Anti-Coercion Biometric Step-Up** (US #5, #6, #10, #11, #16, #19) - *Closed & Verified*
+- [x] **#4: Nokia Network as Code Multi-Carrier Gateway & Circuit Breaker** (US #9, #13, #15, #18) - *Closed & Verified*
+- [x] **#5: Master Architecture Schematic & 15-Slide Presentation Deck** (US #8, #12, #13, #19, #20) - *Closed & Verified*
+- [ ] **#6: E-Commerce 3DS Online Card Checkout Simulation (Vector 2)** (US #21, #22) - *Open / Ready to Implement*
+- [ ] **#7: Immutable Supabase Audit Ledger Persistence Schema** (US #14) - *Open / Migration Ready*
+- [x] **#8: Git Repository Scaffolding, Clean Commits & Comprehensive README** (US #15) - *Closed & Verified*
+- [ ] **#9: 3-Minute Video Walkthrough Recording & HackerEarth Submission Package** (US #19, #20) - *Open / Script Ready (HITL)*
+
 
