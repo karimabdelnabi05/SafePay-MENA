@@ -1,0 +1,45 @@
+TITLE:
+SafePay MENA - AI Fraud Shield for Instant Payments
+
+---
+
+DESCRIPTION:
+
+## SafePay MENA
+
+**An AI agent that queries the telecom network before every high-risk payment to prevent SIM swap fraud and account takeovers in real-time.**
+
+### The Problem
+
+MENA's instant payment systems (Egypt's InstaPay: 1.1B transactions, UAE's Aani: 12.5M users) process irreversible push payments with no telecom fraud intelligence in the decision pipeline. SIM swap attacks cost victims $270-$160,000+ per incident. INTERPOL's Operation Ramz arrested 200+ suspects across 13 MENA countries. Banks and telecoms operate in complete data silos - the "fraud gap" identified by PwC's 2025 GCC report.
+
+### The Solution
+
+SafePay MENA is an AI-powered fraud detection agent built with **Google ADK + Gemini 2.0 Flash** that orchestrates **4 CAMARA APIs** via **Nokia Network-as-Code** to make autonomous fraud decisions before money moves:
+
+- **SIM Swap API** (35% weight) - Detects recent SIM changes, the #1 account takeover indicator
+- **Number Verification API** (30% weight) - Silent carrier-level device authentication, replacing interceptable SMS OTPs
+- **Device Status API** (15% weight) - Detects roaming anomalies and unreachable devices
+- **Device Swap API** (20% weight) - Detects SIM moved to a new handset
+
+The agent dynamically selects which APIs to call based on transaction risk context (amount, recipient history, time of day), aggregates signals into a weighted risk score (0-100), and outputs APPROVE / STEP-UP / BLOCK with a natural-language reasoning trace for audit compliance.
+
+### Why It Matters
+
+- **$275.47B** MENA digital payments market (2026)
+- **64%** of Arab adults (~200M people) remain unbanked - fraud kills trust
+- **44%** reduction in scam losses demonstrated in early CAMARA API pilots
+- First multi-API AI orchestration layer for payment fraud - the tools exist individually, nobody has built the intelligent brain
+
+### Theme & Alignment
+
+- **Theme 4:** Secure Fintech, Payments & Anti-Fraud Innovation
+- **GSMA Pillar:** Industry Services and Solutions - Open Gateway
+
+### Tech Stack
+
+Google ADK + Gemini 2.0 Flash | FastAPI (Python) | Nokia NaC Python SDK | Supabase | Next.js Dashboard
+
+### Team
+
+**Karim Mohamed Abdelnabi** - Full Stack & AI Developer

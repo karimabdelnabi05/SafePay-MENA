@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafePay MENA - Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0A1628;
+  --bg-secondary: #111D33;
+  --bg-card: #162036;
+  --accent: #00D4AA;
+  --accent-blue: #3B82F6;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --success: #22C55E;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: rgba(255,255,255,0.08);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* SLIDE SYSTEM */
+.slide {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  padding: 60px 80px;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.slide.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* NAVIGATION */
+.nav {
+  position: fixed;
+  bottom: 30px;
+  right: 40px;
+  display: flex;
+  gap: 12px;
+  z-index: 100;
+}
+
+.nav button {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav button:hover { background: var(--accent); color: var(--bg-primary); }
+
+.slide-counter {
+  position: fixed;
+  bottom: 38px;
+  left: 40px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 100;
+}
+
+/* TYPOGRAPHY */
+h1 { font-size: 56px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+h2 { font-size: 40px; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--accent); }
+p { font-size: 20px; line-height: 1.6; color: var(--text-secondary); }
+.subtitle { font-size: 22px; color: var(--text-secondary); font-weight: 400; }
+
+.accent { color: var(--accent); }
+.blue { color: var(--accent-blue); }
+.red { color: var(--danger); }
+.green { color: var(--success); }
+.yellow { color: var(--warning); }
+.big-number { font-size: 64px; font-weight: 800; color: var(--accent); }
+.huge-number { font-size: 80px; font-weight: 900; }
+
+/* LAYOUT */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.card-accent {
+  background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(59,130,246,0.05));
+  border: 1px solid rgba(0,212,170,0.2);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+/* STATS */
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+.stat-item { text-align: center; }
+.stat-value { font-size: 42px; font-weight: 800; color: var(--accent); }
+.stat-label { font-size: 14px; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.data-table th {
+  text-align: left;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--accent);
+}
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+.data-table tr:hover td { background: rgba(0,212,170,0.03); }
+
+/* FLOW DIAGRAM */
+.flow { display: flex; align-items: center; gap: 16px; margin: 20px 0; }
+.flow-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  flex: 1;
+  text-align: center;
+}
+.flow-step.danger { border-color: var(--danger); background: rgba(239,68,68,0.08); }
+.flow-arrow { color: var(--accent); font-size: 24px; font-weight: 700; }
+
+/* SCENARIO CARDS */
+.scenario {
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid var(--border);
+}
+.scenario.approve { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.3); }
+.scenario.block { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.3); }
+.scenario.stepup { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.3); }
+
+.scenario-score { font-size: 48px; font-weight: 800; margin: 12px 0; }
+.scenario-decision { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+
+/* CODE */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.badge-accent { background: rgba(0,212,170,0.15); color: var(--accent); }
+.badge-blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+
+/* QUOTE */
+.quote {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--text-primary);
+  border-left: 4px solid var(--accent);
+  padding-left: 32px;
+  margin: 40px 0;
+}
+
+/* PILL LIST */
+.pill-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* SILO DIAGRAM */
+.silo-container { display: flex; align-items: center; gap: 40px; justify-content: center; margin-top: 32px; }
+.silo {
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 300px;
+  text-align: center;
+}
+.silo-gap {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--danger);
+  text-align: center;
+}
+
+/* FOOTER */
+.slide-footer {
+  position: absolute;
+  bottom: 30px;
+  left: 80px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* BRIDGE ANIMATION */
+.bridge-line {
+  height: 4px;
+  background: linear-gradient(90deg, var(--danger), var(--accent));
+  border-radius: 2px;
+  width: 100px;
+  animation: bridgePulse 2s ease-in-out infinite;
+}
+@keyframes bridgePulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* PRINT */
+@media print {
+  .nav, .slide-counter { display: none !important; }
+  .slide { display: flex !important; page-break-after: always; height: 100vh; }
+  body { overflow: visible; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent-blue));display:flex;align-items:center;justify-content:center;margin-bottom:32px;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <h1>SafePay <span class="accent">MENA</span></h1>
+    <p class="subtitle" style="max-width:600px;margin:0 auto;">The AI Fraud Shield for Instant Payments</p>
+    <div style="margin-top:40px;display:flex;gap:16px;justify-content:center;">
+      <span class="badge badge-accent">Theme 4: Secure Fintech & Anti-Fraud</span>
+      <span class="badge badge-blue">GSMA Open Gateway</span>
+    </div>
+    <p style="margin-top:48px;font-size:16px;color:var(--text-muted);">Karim Mohamed Abdelnabi -  - </p>
+  </div>
+</div>
+
+<!-- SLIDE 2: THE HOOK -->
+<div class="slide" id="s2">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div class="quote" style="border:none;padding:0;max-width:800px;font-size:36px;">
+      "1.1 billion instant transactions in Egypt.<br><br>
+      Every single one is <span class="red" style="font-weight:700;font-style:normal;">irreversible</span>.<br><br>
+      What happens when the wrong person hits send?"
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: PROBLEM - SCALE -->
+<div class="slide" id="s3">
+  <h2>The MENA Payment Boom Has a <span class="red">Fraud Problem</span></h2>
+  <div class="stat-grid" style="grid-template-columns:repeat(5,1fr);margin-top:48px;">
+    <div class="stat-item">
+      <div class="stat-value">$275B</div>
+      <div class="stat-label">MENA Digital<br>Payments 2026</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">1.1B</div>
+      <div class="stat-label">Egypt InstaPay<br>Transactions H1'25</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">12.5M</div>
+      <div class="stat-label">UAE Aani<br>Users</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--danger);">$470M</div>
+      <div class="stat-label">Saudi Fraud<br>Detection Spend</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--warning);">64%</div>
+      <div class="stat-label">Arab Adults<br>Unbanked (200M)</div>
+    </div>
+  </div>
+  <p style="margin-top:48px;text-align:center;font-size:18px;">The market is massive. The security infrastructure hasn't kept up.</p>
+</div>
+
+<!-- SLIDE 4: THE ATTACK -->
+<div class="slide" id="s4">
+  <h2>How SIM Swap Fraud <span class="red">Destroys</span> Accounts</h2>
+  <div class="flow" style="margin-top:40px;">
+    <div class="flow-step">
+      <div style="font-size:32px;margin-bottom:8px;">📞</div>
+      <div style="font-weight:600;font-size:15px;">Fraudster calls<br>telecom provider</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">"I lost my SIM"</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div style="font-size:32px;margin-bottom:8px;">🔄</div>
+      <div style="font-weight:600;font-size:15px;">Telecom transfers<br>number to new SIM</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Victim's phone goes dead</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div style="font-size:32px;margin-bottom:8px;">💬</div>
+      <div style="font-weight:600;font-size:15px;">Fraudster receives<br>bank SMS OTP</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Full account access</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step danger">
+      <div style="font-size:32px;margin-bottom:8px;">💸</div>
+      <div style="font-weight:600;font-size:15px;color:var(--danger);">Account drained<br>via instant transfer</div>
+      <div style="font-size:13px;color:var(--danger);margin-top:4px;font-weight:600;">IRREVERSIBLE</div>
+    </div>
+  </div>
+  <div class="stat-grid" style="margin-top:48px;">
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--danger);">$270-$160K+</div>
+      <div class="stat-label">Loss per Attack</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--danger);">$1.5M</div>
+      <div class="stat-label">Stolen in Single UAE Case</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color:var(--danger);">200+</div>
+      <div class="stat-label">Arrested - INTERPOL<br>Operation Ramz (13 Countries)</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: ROOT CAUSE -->
+<div class="slide" id="s5">
+  <h2>The <span class="red">Fraud Gap</span>: Banks & Telecoms Don't Talk</h2>
+  <div class="silo-container">
+    <div class="silo">
+      <h3 style="color:var(--accent-blue);">Bank World</h3>
+      <p style="font-size:16px;"><strong>Sees:</strong> Amount, recipient, time</p>
+      <p style="font-size:16px;color:var(--danger);margin-top:12px;"><strong>Blind to:</strong> SIM swap, device change, network signals</p>
+    </div>
+    <div style="text-align:center;">
+      <div class="silo-gap">✕</div>
+      <p style="font-size:14px;color:var(--text-muted);margin-top:8px;">NO CONNECTION</p>
+    </div>
+    <div class="silo">
+      <h3 style="color:var(--accent-blue);">Telecom World</h3>
+      <p style="font-size:16px;"><strong>Sees:</strong> SIM swap, device change, roaming, network auth</p>
+      <p style="font-size:16px;color:var(--danger);margin-top:12px;"><strong>Blind to:</strong> Payment data</p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:48px;">
+    <p style="font-size:18px;font-style:italic;color:var(--text-muted);">PwC 2025: "The critical fraud gap between telecoms and financial institutions"</p>
+    <p style="margin-top:20px;font-size:22px;font-weight:600;color:var(--accent);">The intelligence exists. It's just in the wrong building.</p>
+  </div>
+</div>
+
+<!-- SLIDE 6: THE SOLUTION -->
+<div class="slide" id="s6">
+  <div style="text-align:center;">
+    <h2>SafePay MENA: <span class="accent">The Bridge</span></h2>
+    <p style="font-size:24px;max-width:700px;margin:0 auto 48px;color:var(--text-secondary);">An AI agent that asks the telecom network<br><strong style="color:var(--text-primary);">"Is this person legit?"</strong><br>before every high-risk payment.</p>
+  </div>
+  <div class="three-col">
+    <div class="card-accent" style="text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">🔍</div>
+      <h3>Detect</h3>
+      <p style="font-size:16px;">Query 4 CAMARA APIs for real-time telecom fraud signals</p>
+    </div>
+    <div class="card-accent" style="text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">🧠</div>
+      <h3>Decide</h3>
+      <p style="font-size:16px;">AI agent weighs signals into a unified risk score (0-100)</p>
+    </div>
+    <div class="card-accent" style="text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">🛡️</div>
+      <h3>Defend</h3>
+      <p style="font-size:16px;">APPROVE, STEP-UP, or BLOCK - before money moves</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: THE 4 APIs -->
+<div class="slide" id="s7">
+  <h2>4 CAMARA APIs. One <span class="accent">Intelligent</span> Decision.</h2>
+  <table class="data-table" style="margin-top:32px;">
+    <thead>
+      <tr><th>API</th><th>What It Checks</th><th>Fraud Signal</th><th>Weight</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:600;color:var(--text-primary);">SIM Swap</td>
+        <td>Was the SIM recently changed?</td>
+        <td style="color:var(--danger);">Swapped 2h ago = RED FLAG</td>
+        <td><span class="badge badge-accent">35%</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:var(--text-primary);">Number Verification</td>
+        <td>Is this device actually this phone number? (Silent, no SMS)</td>
+        <td style="color:var(--danger);">Device mismatch = CRITICAL</td>
+        <td><span class="badge badge-accent">30%</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:var(--text-primary);">Device Status</td>
+        <td>Is the phone reachable? Roaming?</td>
+        <td style="color:var(--warning);">Unknown country = SUSPICIOUS</td>
+        <td><span class="badge badge-accent">15%</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:var(--text-primary);">Device Swap</td>
+        <td>Was the SIM moved to a new handset?</td>
+        <td style="color:var(--danger);">New SIM + New device = MAX RISK</td>
+        <td><span class="badge badge-accent">20%</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="text-align:center;margin-top:28px;font-size:16px;color:var(--text-muted);">All APIs accessed via Nokia Network-as-Code platform using official Python SDK</p>
+</div>
+
+<!-- SLIDE 8: AI AGENT -->
+<div class="slide" id="s8">
+  <h2>Not a Pipeline. An <span class="accent">Agent</span>.</h2>
+  <div class="two-col" style="margin-top:32px;">
+    <div>
+      <h3 style="color:var(--text-muted);">Rule-Based Pipeline ❌</h3>
+      <div class="card" style="margin-top:16px;">
+        <p style="font-size:16px;margin-bottom:12px;">• Calls ALL APIs every time</p>
+        <p style="font-size:16px;margin-bottom:12px;">• Fixed if/else decision tree</p>
+        <p style="font-size:16px;margin-bottom:12px;">• Returns pass/fail</p>
+        <p style="font-size:16px;">• Same behavior for $10 and $50,000</p>
+      </div>
+    </div>
+    <div>
+      <h3>SafePay AI Agent ✅</h3>
+      <div class="card-accent" style="margin-top:16px;">
+        <p style="font-size:16px;margin-bottom:12px;">• <strong>Plans</strong> which APIs to call based on risk</p>
+        <p style="font-size:16px;margin-bottom:12px;">• <strong>Reasons</strong> across multiple signals</p>
+        <p style="font-size:16px;margin-bottom:12px;">• <strong>Explains</strong> decisions in natural language</p>
+        <p style="font-size:16px;">• <strong>Adapts</strong> to transaction context</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:32px;text-align:center;">
+    <div class="pill-list" style="justify-content:center;">
+      <div class="pill" style="border-color:var(--accent);">Google ADK</div>
+      <div class="pill" style="border-color:var(--accent);">Gemini 2.0 Flash</div>
+      <div class="pill" style="border-color:var(--accent);">Approved AI Tooling</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: SCENARIOS -->
+<div class="slide" id="s9">
+  <h2>Three Scenarios. Three <span class="accent">Decisions</span>.</h2>
+  <div class="three-col" style="margin-top:32px;">
+    <div class="scenario approve">
+      <h3 style="color:var(--success);">Normal Transfer</h3>
+      <p style="font-size:14px;color:var(--text-secondary);">500 EGP to Mom at 2 PM</p>
+      <div style="margin-top:16px;font-family:'JetBrains Mono';font-size:13px;color:var(--text-muted);">
+        SIM Swap: No → 0.0<br>
+        Num Verify: Match → 0.0<br>
+        Context: Known recipient → 0.05
+      </div>
+      <div class="scenario-score" style="color:var(--success);">1</div>
+      <div class="scenario-decision" style="color:var(--success);">✅ APPROVE</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Silent. User never knows.</p>
+    </div>
+    <div class="scenario block">
+      <h3 style="color:var(--danger);">SIM Swap Attack</h3>
+      <p style="font-size:14px;color:var(--text-secondary);">45,000 EGP to unknown at 4 AM</p>
+      <div style="margin-top:16px;font-family:'JetBrains Mono';font-size:13px;color:var(--text-muted);">
+        SIM Swap: 3h ago → 1.0<br>
+        Num Verify: FAILED → 1.0<br>
+        Roaming: Nigeria → 0.7
+      </div>
+      <div class="scenario-score" style="color:var(--danger);">93</div>
+      <div class="scenario-decision" style="color:var(--danger);">🛑 BLOCK</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Blocked + Alert to user & bank.</p>
+    </div>
+    <div class="scenario stepup">
+      <h3 style="color:var(--warning);">Ambiguous</h3>
+      <p style="font-size:14px;color:var(--text-secondary);">8,000 EGP to new contact at 11 AM</p>
+      <div style="margin-top:16px;font-family:'JetBrains Mono';font-size:13px;color:var(--text-muted);">
+        SIM Swap: 5 days ago → 0.5<br>
+        Num Verify: Match → 0.0<br>
+        Context: New recipient → 0.3
+      </div>
+      <div class="scenario-score" style="color:var(--success);">24</div>
+      <div class="scenario-decision" style="color:var(--success);">✅ APPROVE</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Legit SIM change. Smart enough to know.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: ARCHITECTURE -->
+<div class="slide" id="s10">
+  <h2>Technical <span class="accent">Architecture</span></h2>
+  <div style="display:flex;gap:24px;margin-top:32px;align-items:stretch;">
+    <div class="card" style="flex:1;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">💳</div>
+      <h3 style="font-size:16px;">Payment Platform</h3>
+      <p style="font-size:13px;">InstaPay / Aani / stc pay</p>
+    </div>
+    <div style="display:flex;align-items:center;color:var(--accent);font-size:24px;font-weight:700;">→</div>
+    <div class="card-accent" style="flex:2;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🧠</div>
+      <h3 style="font-size:16px;">SafePay Backend + AI Agent</h3>
+      <p style="font-size:13px;">FastAPI + Google ADK + Gemini Flash</p>
+      <p style="font-size:13px;margin-top:4px;">Risk Scoring Engine (0-100)</p>
+    </div>
+    <div style="display:flex;align-items:center;color:var(--accent);font-size:24px;font-weight:700;">→</div>
+    <div class="card" style="flex:1;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">📡</div>
+      <h3 style="font-size:16px;">Nokia NaC</h3>
+      <p style="font-size:13px;">4 CAMARA APIs<br>Simulator Environment</p>
+    </div>
+  </div>
+  <div style="display:flex;gap:24px;margin-top:24px;">
+    <div class="card" style="flex:1;text-align:center;">
+      <div style="font-size:24px;margin-bottom:4px;">🗄️</div>
+      <h3 style="font-size:14px;">Supabase</h3>
+      <p style="font-size:12px;">Audit Log + Profiles</p>
+    </div>
+    <div class="card" style="flex:1;text-align:center;">
+      <div style="font-size:24px;margin-bottom:4px;">📊</div>
+      <h3 style="font-size:14px;">Next.js Dashboard</h3>
+      <p style="font-size:12px;">Live Risk Gauge + Agent Trace</p>
+    </div>
+  </div>
+  <div class="pill-list" style="justify-content:center;margin-top:28px;">
+    <div class="pill">Python 3.11+</div>
+    <div class="pill">FastAPI</div>
+    <div class="pill">Google ADK</div>
+    <div class="pill">Gemini 2.0 Flash</div>
+    <div class="pill">Nokia NaC SDK</div>
+    <div class="pill">Supabase</div>
+    <div class="pill">Next.js</div>
+  </div>
+</div>
+
+<!-- SLIDE 11: MARKET -->
+<div class="slide" id="s11">
+  <h2>Market <span class="accent">Opportunity</span></h2>
+  <div class="three-col" style="margin-top:40px;">
+    <div class="card" style="text-align:center;border-color:rgba(0,212,170,0.15);">
+      <p style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">TAM</p>
+      <div style="font-size:48px;font-weight:800;color:var(--accent);margin:16px 0;">$275B</div>
+      <p style="font-size:15px;color:var(--text-secondary);">MENA Digital Payments (2026)</p>
+    </div>
+    <div class="card" style="text-align:center;border-color:rgba(59,130,246,0.15);">
+      <p style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">SAM</p>
+      <div style="font-size:48px;font-weight:800;color:var(--accent-blue);margin:16px 0;">$6.35B</div>
+      <p style="font-size:15px;color:var(--text-secondary);">MENA Fintech Market (2026)</p>
+    </div>
+    <div class="card-accent" style="text-align:center;">
+      <p style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">SOM</p>
+      <div style="font-size:48px;font-weight:800;color:var(--accent);margin:16px 0;">$44M</div>
+      <p style="font-size:15px;color:var(--text-secondary);">Egypt InstaPay alone at $0.02/check</p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:36px;">
+    <p style="font-size:18px;color:var(--text-secondary);">22 MENA countries · 80+ operators moving to Open Gateway · Carrier-agnostic by design</p>
+  </div>
+</div>
+
+<!-- SLIDE 12: BUSINESS MODEL -->
+<div class="slide" id="s12">
+  <h2>Business <span class="accent">Model</span></h2>
+  <div class="three-col" style="margin-top:40px;">
+    <div class="card" style="text-align:center;">
+      <h3 style="font-size:18px;">Per-Transaction</h3>
+      <div style="font-size:36px;font-weight:700;color:var(--accent);margin:16px 0;">$0.01-0.05</div>
+      <p style="font-size:14px;color:var(--text-muted);">Per fraud check<br>Banks & fintechs pay</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3 style="font-size:18px;">Subscription</h3>
+      <div style="font-size:36px;font-weight:700;color:var(--accent);margin:16px 0;">$500-5K</div>
+      <p style="font-size:14px;color:var(--text-muted);">Monthly, tiered by volume<br>Mid-size banks & wallets</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3 style="font-size:18px;">Enterprise</h3>
+      <div style="font-size:36px;font-weight:700;color:var(--accent);margin:16px 0;">$50-200K</div>
+      <p style="font-size:14px;color:var(--text-muted);">Annual license<br>Central banks, large banks</p>
+    </div>
+  </div>
+  <div class="card-accent" style="text-align:center;margin-top:32px;">
+    <p style="font-size:18px;">Cost of fraud: <span class="red" style="font-weight:700;">$270-$160,000+</span> per incident &nbsp;|&nbsp; Cost of SafePay: <span class="accent" style="font-weight:700;">&lt;$0.01</span> per API call</p>
+    <p style="font-size:16px;color:var(--text-muted);margin-top:8px;">Pays for itself if it prevents 1 fraud case per 10,000 transactions</p>
+  </div>
+</div>
+
+<!-- SLIDE 13: IMPACT -->
+<div class="slide" id="s13">
+  <h2>Impact & <span class="accent">Scalability</span></h2>
+  <div class="two-col" style="margin-top:32px;">
+    <div>
+      <h3>Quantified Impact</h3>
+      <div class="card" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <span style="font-size:16px;">Scam losses reduced</span>
+          <span style="font-size:24px;font-weight:700;color:var(--success);">-44%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <span style="font-size:16px;">False positive declines</span>
+          <span style="font-size:24px;font-weight:700;color:var(--success);">-55%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <span style="font-size:16px;">Cost per check</span>
+          <span style="font-size:24px;font-weight:700;color:var(--accent);">&lt;$0.01</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:16px;">Attack prevention</span>
+          <span style="font-size:24px;font-weight:700;color:var(--success);">$270-160K saved</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Scalability</h3>
+      <div class="card" style="margin-top:16px;">
+        <p style="font-size:16px;margin-bottom:16px;">✅ <strong>Carrier-agnostic:</strong> Standardized CAMARA APIs work across all participating operators</p>
+        <p style="font-size:16px;margin-bottom:16px;">✅ <strong>22 MENA markets:</strong> Every Arab League country + Turkiye</p>
+        <p style="font-size:16px;margin-bottom:16px;">✅ <strong>Payment-agnostic:</strong> Works with InstaPay, Aani, stc pay, Fawry, any rail</p>
+        <p style="font-size:16px;">✅ <strong>200M unbanked:</strong> Fraud prevention → trust → financial inclusion</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: COMPETITIVE -->
+<div class="slide" id="s14">
+  <h2>Why SafePay <span class="accent">Wins</span></h2>
+  <table class="data-table" style="margin-top:32px;">
+    <thead>
+      <tr><th>What Exists</th><th>What's Missing</th><th style="color:var(--accent);">SafePay</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Individual CAMARA API deployments</td>
+        <td style="color:var(--danger);">No intelligent orchestration</td>
+        <td style="color:var(--accent);font-weight:600;">Multi-API AI agent</td>
+      </tr>
+      <tr>
+        <td>Bank transaction monitoring</td>
+        <td style="color:var(--danger);">Zero telecom signals</td>
+        <td style="color:var(--accent);font-weight:600;">Bridges the fraud gap</td>
+      </tr>
+      <tr>
+        <td>SMS OTP authentication</td>
+        <td style="color:var(--danger);">Interceptable, weak</td>
+        <td style="color:var(--accent);font-weight:600;">Carrier-level Number Verify</td>
+      </tr>
+      <tr>
+        <td>GSMA + FICO Scam Signal</td>
+        <td style="color:var(--danger);">Spec stage, not deployed</td>
+        <td style="color:var(--accent);font-weight:600;">Working prototype</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="text-align:center;margin-top:40px;">
+    <p style="font-size:22px;font-weight:600;color:var(--text-primary);">"The tools exist. Nobody has built the <span class="accent">surgeon</span>."</p>
+  </div>
+</div>
+
+<!-- SLIDE 15: CTA -->
+<div class="slide" id="s15">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-blue));display:flex;align-items:center;justify-content:center;margin-bottom:32px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="quote" style="border:none;padding:0;font-size:28px;max-width:700px;">
+      The technology exists.<br>
+      The market is screaming for it.<br><br>
+      <span style="font-style:normal;font-weight:700;color:var(--accent);font-size:32px;">SafePay is the bridge between $275 billion in payments and the network that can protect them.</span>
+    </div>
+    <div style="margin-top:48px;">
+      <p style="font-size:18px;font-weight:600;color:var(--text-primary);">Karim Mohamed Abdelnabi</p>
+      <p style="font-size:15px;color:var(--text-muted);margin-top:8px;">, </p>
+      <p style="font-size:15px;color:var(--accent);margin-top:4px;"></p>
+    </div>
+    <div style="margin-top:32px;display:flex;gap:16px;">
+      <span class="badge badge-accent">Theme 4: Secure Fintech & Anti-Fraud</span>
+      <span class="badge badge-blue">GSMA Open Gateway</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="slide-counter"><span id="current">1</span> / <span id="total">15</span></div>
+<div class="nav">
+  <button onclick="prevSlide()">← Previous</button>
+  <button onclick="nextSlide()">Next →</button>
+</div>
+
+<script>
+let currentSlide = 1;
+const totalSlides = 15;
+
+function showSlide(n) {
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
+  document.getElementById('current').textContent = n;
+  currentSlide = n;
+}
+
+function nextSlide() { if (currentSlide < totalSlides) showSlide(currentSlide + 1); }
+function prevSlide() { if (currentSlide > 1) showSlide(currentSlide - 1); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+});
+</script>
+</body>
+</html>

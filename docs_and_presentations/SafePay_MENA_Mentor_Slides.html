@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafePay MENA - Master Mentor Presentation Deck</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: #f9fafb; overflow: hidden; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .slide { display: none; height: 100vh; width: 100vw; padding: 2.5rem 4.5rem; box-sizing: border-box; }
+    .slide.active { display: flex; flex-direction: column; justify-content: space-between; }
+    .glass-box { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body class="select-none">
+
+  <!-- Slide 1: Title & Executive Briefing -->
+  <div class="slide active" id="slide-1">
+    <div class="flex items-center justify-between">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-500/30 text-indigo-400 text-xs font-semibold tracking-wider uppercase">
+        GSMA MENA Ignite Hackathon • Theme 4: Secure FinTech, Payments & Anti-Fraud
+      </div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 01 / 09</div>
+    </div>
+
+    <div class="space-y-6 max-w-5xl my-auto">
+      <h1 class="text-6xl font-extrabold tracking-tight leading-tight">
+        SafePay <span class="gradient-text">MENA</span>
+      </h1>
+      <p class="text-2xl text-slate-300 font-medium">
+        Real-Time AI Fraud Shield for Instant Payments Powered by Telecom Network Intelligence (CAMARA)
+      </p>
+      
+      <div class="grid grid-cols-3 gap-4 pt-2">
+        <div class="glass-box p-4 rounded-xl space-y-1">
+          <div class="text-xs text-indigo-400 font-bold">LEAD DEVELOPER</div>
+          <div class="text-sm font-bold text-slate-200">Karim Mohamed Abdelnabi</div>
+          <div class="text-xs text-slate-400">Solo Full-Stack & AI Engineer • Cairo, Egypt</div>
+        </div>
+        <div class="glass-box p-4 rounded-xl space-y-1">
+          <div class="text-xs text-purple-400 font-bold">ASSIGNED MENTOR</div>
+          <div class="text-sm font-bold text-slate-200">Eng. Abdullah A. Alkaoud</div>
+          <div class="text-xs text-slate-400">Saudi Telecom Company (stc) • Riyadh, KSA</div>
+        </div>
+        <div class="glass-box p-4 rounded-xl space-y-1">
+          <div class="text-xs text-emerald-400 font-bold">CONFIRMED MEETING</div>
+          <div class="text-sm font-bold text-slate-200">Monday, Sep 7 • 3:00 PM</div>
+          <div class="text-xs text-slate-400">30-Minute Technical Discussion</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>Phase 2 Mentorship Briefing Package</div>
+      <div class="mono">Use ⬅️ ➡️ Arrow Keys or Space to Navigate</div>
+    </div>
+  </div>
+
+  <!-- Slide 2: The Market Problem -->
+  <div class="slide" id="slide-2">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">01 • Market Context & Problem</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 02 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">The "Telecom-Banking Fraud Gap" in Instant Rails</h2>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-rose-500 space-y-3">
+          <div class="text-3xl font-extrabold text-rose-400">$275B+ Instant Rails</div>
+          <div class="font-bold text-slate-200 text-sm">Velocity Without Cross-Visibility</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            InstaPay Egypt (1.1B+ transactions in H1 2025 alone, EGP 2.4T volume) and Saudi Sarie / STC Bank (590M+ txs) settle payments in &lt;10 seconds, leaving zero time for traditional fraud investigation.
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-amber-500 space-y-3">
+          <div class="text-3xl font-extrabold text-amber-400">SMS OTP is Broken</div>
+          <div class="font-bold text-slate-200 text-sm">Account Takeover Epidemic</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Scammers use social-engineering SIM swaps at telco stores or forged IDs to intercept SMS codes, resetting bank PINs and draining funds at 3:00 AM while victims sleep.
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-indigo-500 space-y-3">
+          <div class="text-3xl font-extrabold text-indigo-400">The Blind Banking Silo</div>
+          <div class="font-bold text-slate-200 text-sm">Zero Real-Time Carrier Signals</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Banks operate in complete isolation from mobile carriers. They cannot detect if a SIM was swapped 45 minutes ago or if an IMEI changed before authorizing instant fund releases.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass-box p-4 rounded-xl text-xs text-slate-300 border-l-4 border-purple-500">
+        ⚖️ <strong>SAMA 2026 Mandate:</strong> The Saudi Central Bank Counter-Fraud Framework (effective April 2026) and CBE mandate real-time fraud mitigation and auditable decision explainability. SMS OTP is no longer recognized as secure MFA for high-risk transfers.
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Bridging the Telecom-Banking Gap</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 3: System Architecture -->
+  <div class="slide" id="slide-3">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">02 • System Architecture</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 03 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">3-Layer Hybrid Architecture: Deterministic Shield + AI Reasoning</h2>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-emerald-500 space-y-3">
+          <div class="font-bold text-emerald-400 text-base flex items-center gap-2">
+            <span>🛡️</span> Layer 1: Deterministic Shield (&lt;15ms)
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>E.164 Normalizer:</strong> Sanitizes Egypt (+20) and Saudi (+966) phone formats.</li>
+            <li>• <strong>In-Memory Cache (Redis):</strong> 3-min TTL serves verified SIM status in 1ms.</li>
+            <li>• <strong>Mathematical Scoring Matrix:</strong> Non-linear combinatorial scoring in pure Python.</li>
+            <li>• <strong>Hard Safety Override:</strong> Math engine locks decision to BLOCK on confirmed SIM swaps.</li>
+          </ul>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-indigo-500 space-y-3">
+          <div class="font-bold text-indigo-400 text-base flex items-center gap-2">
+            <span>🧠</span> Layer 2: AI Reasoning Brain
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>Google Gemini 2.0 Flash Agent:</strong> Intelligently orchestrates CAMARA tools in parallel.</li>
+            <li>• <strong>Behavioral Scorer:</strong> Evaluates inter-transaction interval velocities and smurfing cues.</li>
+            <li>• <strong>SAMA 2026 Audit Traces:</strong> Generates tamper-proof natural language regulatory explanations.</li>
+            <li>• <strong>Constrained Pydantic JSON:</strong> Guaranteed schema structure with zero hallucination.</li>
+          </ul>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-purple-500 space-y-3">
+          <div class="font-bold text-purple-400 text-base flex items-center gap-2">
+            <span>📡</span> Layer 3: Carrier & Audit Tier
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>Nokia Network-as-Code SDK:</strong> Aggregates 5G Core NEF APIs across stc, Vodafone, e&.</li>
+            <li>• <strong>Local Deterministic Mock:</strong> 100% offline fixture suite toggled via USE_MOCK.</li>
+            <li>• <strong>Supabase (PostgreSQL):</strong> Tamper-proof, cryptographically signed audit trail.</li>
+            <li>• <strong>Next.js 14 Dashboard:</strong> WebSocket live telemetry stream.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glass-box p-3.5 rounded-xl text-xs text-slate-300 bg-slate-900/80 text-center mono">
+        ⚡ <strong>Architectural Rule of Law:</strong> Authorization decisions (APPROVE, STEP_UP, BLOCK) resolve in &lt;15ms before or alongside asynchronous LLM trace generation.
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Architecture Deep-Dive</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 4: 4 CAMARA APIs -->
+  <div class="slide" id="slide-4">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">03 • 5G CAMARA Network APIs</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 04 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">4 Core CAMARA APIs via Nokia Network-as-Code</h2>
+      
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-box p-5 rounded-2xl border-l-4 border-emerald-500 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-emerald-400 text-base">1. SIM Swap API</div>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 mono border border-emerald-800">2-Legged Server</span>
+          </div>
+          <div class="text-xs mono text-teal-300">POST /sim-swap/v0/check &nbsp;|&nbsp; POST /sim-swap/v0/retrieve-date</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Queries carrier HSS/UDM database for SIM replacement timestamps within 24-48h. Detects recycled numbers by comparing IMSI activation date against bank account registration date. Latency: &lt;150ms.
+          </p>
+        </div>
+
+        <div class="glass-box p-5 rounded-2xl border-l-4 border-blue-500 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-blue-400 text-base">2. Number Verification API</div>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-blue-950 text-blue-300 mono border border-blue-800">3-Legged Cellular</span>
+          </div>
+          <div class="text-xs mono text-blue-300">POST /number-verification/v0/verify &nbsp;|&nbsp; GET /device-phone-number</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Silently verifies device radio session over 4G/5G cellular data bearer in 300ms. Proves the user possesses the physical registered SIM without sending SMS or typing codes.
+          </p>
+        </div>
+
+        <div class="glass-box p-5 rounded-2xl border-l-4 border-purple-500 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-purple-400 text-base">3. Device Status API (Roaming)</div>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-purple-950 text-purple-300 mono border border-purple-800">2-Legged Server</span>
+          </div>
+          <div class="text-xs mono text-purple-300">POST /device-status/v0/roaming &nbsp;|&nbsp; POST /device-status/v0/reachability</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Queries international roaming country code (MCC/MNC) and handset reachability. Flags impossible travel velocity and suspicious high-risk country roaming. Latency: &lt;120ms.
+          </p>
+        </div>
+
+        <div class="glass-box p-5 rounded-2xl border-l-4 border-pink-500 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-pink-400 text-base">4. Device Swap API (IMEI)</div>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-pink-950 text-pink-300 mono border border-pink-800">2-Legged Server</span>
+          </div>
+          <div class="text-xs mono text-pink-300">POST /device-swap/v0/check</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Detects if subscriber's SIM was inserted into a new hardware handset (IMEI change). Shuts down 72-hour sleeper SIM attacks by tracking physical device hardware upgrades. Latency: &lt;140ms.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • CAMARA Specifications</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Dynamic Scoring Formula -->
+  <div class="slide" id="slide-5">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">04 • Dynamic Risk Engine</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 05 / 09</div>
+    </div>
+
+    <div class="space-y-5 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">Dynamic Non-Linear Scoring & Compound Multipliers</h2>
+      
+      <div class="glass-box p-4 rounded-xl text-center mono font-bold text-emerald-300 text-sm border border-emerald-500/30">
+        RiskScore = min(100, max(0, [Base + SIM_Decay(t) + RelativeAmount + Multipliers] − TrustReservoir))
+      </div>
+
+      <div class="grid grid-cols-4 gap-4">
+        <div class="glass-box p-4 rounded-xl space-y-2">
+          <div class="text-xs font-bold text-emerald-400">1. SIM Time Decay</div>
+          <p class="text-xs text-slate-300">
+            SIM swaps are not binary 48h walls:<br/>
+            • &lt;1h ago: <strong class="text-rose-400">+85 pts</strong><br/>
+            • 12h ago: <strong class="text-amber-400">+50 pts</strong><br/>
+            • 24h ago: <strong class="text-amber-400">+25 pts</strong><br/>
+            • 40h ago: <strong class="text-emerald-400">+5 pts</strong>
+          </p>
+        </div>
+
+        <div class="glass-box p-4 rounded-xl space-y-2">
+          <div class="text-xs font-bold text-blue-400">2. Relative Ratio</div>
+          <p class="text-xs text-slate-300">
+            Personalized to habits:<br/>
+            • Ratio = Amount ÷ User Avg<br/>
+            • Ratio &lt; 2.0x: <strong class="text-emerald-400">+0 pts</strong><br/>
+            • Ratio 2x–10x: <strong class="text-amber-400">+10 pts</strong><br/>
+            • Ratio &gt; 20x: <strong class="text-rose-400">+25 pts</strong>
+          </p>
+        </div>
+
+        <div class="glass-box p-4 rounded-xl space-y-2">
+          <div class="text-xs font-bold text-purple-400">3. Compound Multipliers</div>
+          <p class="text-xs text-slate-300">
+            Toxic combos multiply:<br/>
+            • New IMEI Handset: <strong class="text-rose-400">1.5x</strong><br/>
+            • Burst Velocity (3tx/5m): <strong class="text-rose-400">1.4x</strong><br/>
+            • Rogue Roaming IP: <strong class="text-rose-400">1.3x</strong><br/>
+            • Dormant Hours (3 AM): <strong class="text-rose-400">1.2x</strong>
+          </p>
+        </div>
+
+        <div class="glass-box p-4 rounded-xl space-y-2">
+          <div class="text-xs font-bold text-pink-400">4. Trust Reservoir</div>
+          <p class="text-xs text-slate-300">
+            Anti-Frustration buffer:<br/>
+            • Account age &gt; 1 yr: <strong class="text-emerald-400">-25 pts</strong><br/>
+            • Known phone key: <strong class="text-emerald-400">-30 pts</strong><br/>
+            • 50+ past clean txs: <strong class="text-emerald-400">-20 pts</strong><br/>
+            Harmless travel absorbed silently.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3">
+        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-center">
+          <div class="text-xs text-emerald-400 font-bold">SCORE 0 – 25</div>
+          <div class="text-sm font-bold text-emerald-200">SILENT APPROVE</div>
+          <div class="text-[11px] text-slate-400">Instant 200ms pass</div>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-center">
+          <div class="text-xs text-amber-400 font-bold">SCORE 26 – 60</div>
+          <div class="text-sm font-bold text-amber-200">STEP-UP BIOMETRIC</div>
+          <div class="text-[11px] text-slate-400">1-sec Native Face ID</div>
+        </div>
+        <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-center">
+          <div class="text-xs text-rose-400 font-bold">SCORE 61 – 85</div>
+          <div class="text-sm font-bold text-rose-200">HARD BLOCK</div>
+          <div class="text-[11px] text-slate-400">Paused for 24h</div>
+        </div>
+        <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 text-center">
+          <div class="text-xs text-purple-400 font-bold">SCORE 86 – 100</div>
+          <div class="text-sm font-bold text-purple-200">EMERGENCY FREEZE</div>
+          <div class="text-[11px] text-slate-400">Total account lockdown</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Mathematical Risk Engine</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 6: The 95% Zero-Call Strategy -->
+  <div class="slide" id="slide-6">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">05 • Economics & Latency SLA</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 06 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">The 95% Zero-Call Strategy: Minimizing Telecom Overhead</h2>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-box p-6 rounded-2xl space-y-3">
+          <div class="text-xl font-bold text-emerald-400">1. Hardware Device Token</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            One-time cryptographic binding to Apple/Android Secure Enclave. When a user opens the app on their trusted daily phone, local device attestation approves routine transfers in 0ms.<br/>
+            ➔ <strong>Zero Telco API calls ($0.00 cost) for 90% of daily life.</strong>
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl space-y-3">
+          <div class="text-xl font-bold text-cyan-400">2. 3-Minute Redis Cache</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Verified SIM status is cached in Redis with a 3-minute TTL. Sequential checkouts (Amazon then Talabat) hit Redis in 1ms.<br/>
+            ➔ <strong>High-Value Bypass: Any transfer &gt; 5,000 EGP strictly bypasses cache and queries telco live.</strong>
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl space-y-3">
+          <div class="text-xl font-bold text-indigo-400">3. Recipient Trust Graph</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Transfers to phonebook contacts (persisted &gt; 30 days) and recurring historical payees (rent, utility bills) resolve silently with zero user friction.<br/>
+            ➔ <strong>Anti-mule engine overrides whitelist if recipient account shows abnormal inflow.</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="glass-box p-4 rounded-xl text-xs text-slate-300 bg-slate-900/80 text-center leading-relaxed">
+        📊 <strong>Production Traffic Distribution (Per 1,000 Transactions):</strong><br/>
+        • <strong>850 Tx (85%):</strong> Local Hardware Token & Whitelist ➔ <strong>0 Telco Calls ($0.00)</strong> &nbsp;|&nbsp; 
+        • <strong>100 Tx (10%):</strong> 3-Minute Redis Cache ➔ <strong>1ms Response ($0.00)</strong> &nbsp;|&nbsp; 
+        • <strong>50 Tx (5%):</strong> High-risk anomalies ➔ <strong>Live CAMARA API ($0.015)</strong>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Cost & Latency Optimization</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 7: 3 Live Demo Scenarios -->
+  <div class="slide" id="slide-7">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">06 • Prototype Validation</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 07 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">The 3 Core Live Demonstration Scenarios</h2>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-emerald-500 space-y-3">
+          <div class="text-xs font-bold text-emerald-400 uppercase">Scenario 01 • Clean Flow</div>
+          <div class="font-bold text-slate-100 text-base">Routine 200 EGP Transfer</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            • <strong>User:</strong> Karim sends 200 EGP to brother Omar.<br/>
+            • <strong>Signals:</strong> Trusted iPhone, SIM clean, contact in phonebook for 2 years.<br/>
+            • <strong>Telemetry:</strong> Silent Number Verification passes over 4G data in 280ms.<br/>
+            • <strong>Score:</strong> <strong>4 / 100</strong> (Trust buffer absorbs base risk).<br/>
+            • <strong>Decision:</strong> <strong>INSTANT APPROVE (200ms)</strong>.
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-rose-500 space-y-3">
+          <div class="text-xs font-bold text-rose-400 uppercase">Scenario 02 • Cyber Attack</div>
+          <div class="font-bold text-slate-100 text-base">35,000 SAR SIM Swap Attack</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            • <strong>Attacker:</strong> Scammer initiates 35,000 SAR at 3:00 AM to a new mule IBAN.<br/>
+            • <strong>Signals:</strong> SIM swapped 2h ago, new burner phone IMEI.<br/>
+            • <strong>Telemetry:</strong> CAMARA SIM Swap = True + Device Swap = Mismatch.<br/>
+            • <strong>Score:</strong> <strong>96 / 100</strong> (Compound Multipliers).<br/>
+            • <strong>Decision:</strong> <strong>HARD BLOCK & EMERGENCY FREEZE</strong>.
+          </p>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl border-t-4 border-amber-500 space-y-3">
+          <div class="text-xs font-bold text-amber-400 uppercase">Scenario 03 • Legitimate Travel</div>
+          <div class="font-bold text-slate-100 text-base">2,500 EGP Dubai Roaming</div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            • <strong>User:</strong> Legitimate user sends 2,500 EGP while at a conference in Dubai.<br/>
+            • <strong>Signals:</strong> Trusted phone hardware, roaming active on e& UAE network.<br/>
+            • <strong>Telemetry:</strong> CAMARA Roaming = UAE, SIM Swap = False.<br/>
+            • <strong>Score:</strong> <strong>42 / 100</strong> (Moderate anomaly).<br/>
+            • <strong>Decision:</strong> <strong>STEP-UP BIOMETRIC (Face ID passes)</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass-box p-3.5 rounded-xl text-xs text-slate-300 text-center mono">
+        🖥️ <strong>Next.js Split-Screen Demo:</strong> Left panel simulates the mobile wallet interface; right panel visualizes real-time CAMARA telemetry, live risk gauge, and streaming Gemini compliance audit traces via WebSockets.
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Live Scenarios</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Financial Model -->
+  <div class="slide" id="slide-8">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">07 • Financial Unit Economics</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 08 / 09</div>
+    </div>
+
+    <div class="space-y-6 my-auto">
+      <h2 class="text-4xl font-extrabold text-slate-100">Proven Unit Economics: The 3-Way Economic Win</h2>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-box p-6 rounded-2xl space-y-3 border-l-4 border-emerald-500">
+          <div class="text-xl font-bold text-emerald-400">1. For Banks & FinTechs</div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>$55,500 Net Monthly Savings:</strong> Eliminates $40k/mo fraud losses + $25k/mo SMS OTP carrier bills.</li>
+            <li>• <strong>693.7% Net ROI:</strong> Less than 14-day payback period on SaaS subscription.</li>
+            <li>• <strong>Zero Dispute Overhead:</strong> SAMA audit-ready tamper-proof compliance logs.</li>
+            <li>• <strong>Higher Conversion:</strong> Silent 300ms verification increases checkout success by 18%.</li>
+          </ul>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl space-y-3 border-l-4 border-purple-500">
+          <div class="text-xl font-bold text-purple-400">2. For Telcos (stc / Vodafone)</div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>92% Gross Margin:</strong> Telecoms have near-zero marginal cost for HSS/UDM database read queries.</li>
+            <li>• <strong>$1.2M+ ARR per 10M Calls:</strong> Converts cost-center network infrastructure into high-margin B2B revenue.</li>
+            <li>• <strong>Enterprise Stickiness:</strong> Critical API integration with commercial banks and payment rails.</li>
+          </ul>
+        </div>
+
+        <div class="glass-box p-6 rounded-2xl space-y-3 border-l-4 border-indigo-500">
+          <div class="text-xl font-bold text-indigo-400">3. For SafePay MENA</div>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>57.1% – 62.5% Gross Margin:</strong> Wholesale CAMARA purchased at $0.012, bundled at $0.028 retail.</li>
+            <li>• <strong>$7.8M ARR by Year 3:</strong> Scaling across Egypt, Saudi, and UAE payment rails (34.3% Net Profit Margin).</li>
+            <li>• <strong>SaaS Tiers:</strong> $1.5k/mo Starter, $6k/mo Bank Tier, $25k/mo National Rail.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glass-box p-3.5 rounded-xl text-xs text-slate-300 text-center mono bg-slate-900/80">
+        💡 <strong>The Bank Business Case:</strong> Deploying SafePay costs $8,000/mo while recapturing $63,500/mo in prevented fraud losses and eliminated SMS costs, yielding $666,000+ net annual savings.
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Financial Blueprint</div>
+      <div class="mono">Press ➡️ to Continue</div>
+    </div>
+  </div>
+
+  <!-- Slide 9: The 5 Conversational Questions for Mentor -->
+  <div class="slide" id="slide-9">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-indigo-400 uppercase tracking-wider">08 • Mentorship Discussion Agenda</div>
+      <div class="text-xs text-slate-500 mono font-semibold">Slide 09 / 09</div>
+    </div>
+
+    <div class="space-y-4 my-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-3xl font-extrabold text-slate-100">5 Practical Questions for Eng. Abdullah A. Alkaoud (stc)</h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 mono border border-emerald-700 font-bold">Engineering Topics</span>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div class="glass-box p-3.5 rounded-xl border-l-4 border-amber-500 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-amber-400">1. What matters most in the demo?</span>
+            <span class="text-[10px] mono text-slate-400">Demo Focus</span>
+          </div>
+          <p class="text-slate-200">
+            "Eng. Abdullah, what makes a prototype really stand out in Phase 2? Should I focus more on showing how the system handles network errors and delays, or on having a clean, simple user interface?"
+          </p>
+        </div>
+
+        <div class="glass-box p-3.5 rounded-xl border-l-4 border-emerald-500 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-emerald-400">2. Balancing fraud security and user convenience</span>
+            <span class="text-[10px] mono text-slate-400">User Experience</span>
+          </div>
+          <p class="text-slate-200">
+            "Since stc operates STC Bank, what is the best way to balance fraud security with user experience? We don't want to annoy legitimate customers with pop-ups every time, so when should we actually challenge the user?"
+          </p>
+        </div>
+
+        <div class="glass-box p-3.5 rounded-xl border-l-4 border-blue-500 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-blue-400">3. Speed and latency in instant payments</span>
+            <span class="text-[10px] mono text-slate-400">Real-World Speed</span>
+          </div>
+          <p class="text-slate-200">
+            "In instant payments like Sarie or InstaPay, speed is everything. In the real world, how fast do these CAMARA APIs respond, and what is the best fallback if a telecom query takes too long?"
+          </p>
+        </div>
+
+        <div class="glass-box p-3.5 rounded-xl border-l-4 border-purple-500 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-purple-400">4. Common real-world phone edge cases</span>
+            <span class="text-[10px] mono text-slate-400">Regional Realities</span>
+          </div>
+          <p class="text-slate-200">
+            "From stc's experience, what are the most common real-world phone situations in the region—like dual-SIM phones, travel, or eSIMs—that we should be careful about?"
+          </p>
+        </div>
+
+        <div class="glass-box p-3.5 rounded-xl border-l-4 border-pink-500 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-pink-400">5. Testing on the developer platform</span>
+            <span class="text-[10px] mono text-slate-400">Sandbox Fixtures</span>
+          </div>
+          <p class="text-slate-200">
+            "For testing on the developer platform, are there specific test phone numbers or scenarios you recommend we run to make sure everything works before our submission?"
+          </p>
+        </div>
+      </div>
+
+      <div class="glass-box p-3 rounded-xl text-xs text-slate-300 bg-indigo-950/40 border border-indigo-500/40 text-center">
+        🤝 <strong>Meeting Confirmed:</strong> Monday, September 7, 2026 at 3:00 PM – 3:30 PM (Cairo / Riyadh time).<br/>
+        Thank you Eng. Abdullah for your mentorship and guidance!
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-900 pt-4">
+      <div>SafePay MENA • Mentorship Discussion Agenda</div>
+      <div class="mono">Press ⬅️ to Review Slides</div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 9;
+
+    function showSlide(index) {
+      if (index < 1 || index > totalSlides) return;
+      document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+      const next = document.getElementById(`slide-${index}`);
+      if (next) {
+        next.classList.add('active');
+        currentSlide = index;
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        showSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        showSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        showSlide(1);
+      } else if (e.key === 'End') {
+        showSlide(totalSlides);
+      }
+    });
+  </script>
+</body>
+</html>

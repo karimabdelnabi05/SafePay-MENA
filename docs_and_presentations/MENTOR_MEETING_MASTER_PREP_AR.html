@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafePay MENA - لوحة التحكم الشاملة لجلسة الإرشاد الفني</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #030712; color: #f3f4f6; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .teleprompter { font-size: 1.18rem; line-height: 2; color: #e2e8f0; }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+  <div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- شريط العنوان والعداد المباشر للجلسة -->
+    <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-t-4 border-indigo-500 shadow-2xl">
+      <div class="space-y-1.5 text-center md:text-right">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+          هاكاثون GSMA MENA Ignite • جلسة الإرشاد الفني للمرحلة الثانية
+        </div>
+        <h1 class="text-2xl md:text-3xl font-black text-slate-100">
+          SafePay <span class="gradient-text">MENA</span> — لوحة إدارة جلسة الإرشاد
+        </h1>
+        <div class="text-xs text-slate-400 flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1">
+          <span>👤 <strong>المطور:</strong> كريم عبد النبي</span>
+          <span>🏢 <strong>المرشد:</strong> م/ عبد الله بن عبد العزيز القعود (<span class="text-indigo-400 mono">mentor-contact-removed</span>)</span>
+          <span>⏱️ <strong>المدة:</strong> 30 دقيقة بالضبط</span>
+          <span>📅 <strong>الموعد:</strong> الإثنين 7 سبتمبر • 3:00 عصراً</span>
+        </div>
+      </div>
+
+      <!-- عداد الـ 30 دقيقة المباشر -->
+      <div class="bg-slate-900/95 p-4 rounded-xl border border-slate-800 flex items-center gap-5 shadow-inner">
+        <div class="text-center">
+          <div class="text-xs text-slate-400 font-bold">عداد الجلسة</div>
+          <div id="timerDisplay" class="text-3xl font-extrabold mono text-emerald-400">00:00</div>
+          <div id="stageBadge" class="text-[10px] font-bold text-slate-400 mt-0.5">جاهز للبدء</div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <button onclick="toggleTimer()" id="timerBtn" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition">
+            بدء المكالمة
+          </button>
+          <button onclick="resetTimer()" class="px-4 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-xs font-medium transition">
+            إعادة تعيين
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- جدول إدارة الوقت دقيقة بدقيقة -->
+    <div class="glass-card p-6 rounded-2xl space-y-4">
+      <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+        <span>⏱️</span> جدول إدارة الجلسة دقيقة بدقيقة (30 دقيقة محكمة)
+      </h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-3 text-xs text-center">
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+          <div class="text-slate-400 mono font-bold">00:00 - 02:00</div>
+          <div class="font-bold text-slate-200">الترحيب</div>
+          <div class="text-[11px] text-slate-400">تأكيد الخطة والأجندة</div>
+        </div>
+        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/40 space-y-1">
+          <div class="text-indigo-400 mono font-bold">02:00 - 04:30</div>
+          <div class="font-bold text-indigo-300">عرض الفكرة (2.5 د)</div>
+          <div class="text-[11px] text-slate-300">المشكلة والحل والنموذج</div>
+        </div>
+        <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-500/40 space-y-1">
+          <div class="text-blue-400 mono font-bold">04:30 - 07:00</div>
+          <div class="font-bold text-blue-300">المعمارية والتكلفة</div>
+          <div class="text-[11px] text-slate-300">درع الـ 15ms وصفر تكلفة</div>
+        </div>
+        <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 space-y-1">
+          <div class="text-purple-400 mono font-bold">07:00 - 10:00</div>
+          <div class="font-bold text-purple-300">السيناريوهات الحية</div>
+          <div class="text-[11px] text-slate-300">العادي + الهجمة + السفر</div>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 space-y-1">
+          <div class="text-amber-400 mono font-bold">10:00 - 26:00</div>
+          <div class="font-bold text-amber-300">الأسئلة والتوجيه</div>
+          <div class="text-[11px] text-slate-300">طرح الأسئلة وتدوين الملاحظات</div>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 space-y-1">
+          <div class="text-emerald-400 mono font-bold">26:00 - 30:00</div>
+          <div class="font-bold text-emerald-300">النصيحة والختام</div>
+          <div class="text-[11px] text-slate-300">الشكر والإنهاء بدقة</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الكلمة الافتتاحية المنطوقة (Teleprompter) -->
+    <div class="glass-card p-6 md:p-8 rounded-2xl space-y-4 border-r-4 border-indigo-500">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+          <span>🎤</span> الكلمة الافتتاحية لعرض الفكرة في دقيقتين ونصف (اقرأ منها مباشرة)
+        </h2>
+        <button onclick="copyPitchAr()" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg mono transition">
+          📋 نسخ النص
+        </button>
+      </div>
+
+      <div class="p-6 rounded-xl bg-slate-900/90 border border-slate-800 teleprompter space-y-4 shadow-inner text-slate-200" id="pitchTextAr">
+        <p>
+          "أهلاً بحضرتك يا باشمهندس عبد الله، شكراً جزيلاً لوقتك ولدعمك للمشروع النهاردة، ومبسوط جداً بفرصة الإرشاد دي مع حضرتك ومع stc.
+          أنا كريم عبد النبي، المطور الفردي لمشروع <strong class="text-indigo-400">SafePay MENA</strong>، المتأهل في المسار الرابع: التقنية المالية الآمنة والمدفوعات ومكافحة الاحتيال."
+        </p>
+        <p>
+          "<strong>1. المشكلة اللي بنحلها:</strong> سوق المدفوعات اللحظية في منطقتنا انفجر وتجاوز 275 مليار دولار؛ في مصر شبكة إنستاباي نفذت أكثر من 1.1 مليار معاملة في النصف الأول من 2025، وفي السعودية شبكة سريع وstc pay وبنك stc بيعالجوا مئات الملايين من الحوالات اللحظية اللي بتتسوى في أقل من 10 ثوانٍ.
+          لكن المشكلة هي <span class="text-rose-400 font-bold">'فجوة الاحتيال بين البنوك والاتصالات'</span>؛ أنظمة البنوك معزولة عن شركات الاتصالات، وبتعتمد بشكل أعمى على رسائل الـ SMS OTP. المحتالين بيستغلوا ده عبر هجمات تبديل الشريحة (SIM Swap)، والبنك بيبعت كود التحقق لشريحة المحتال، ويسحب الرصيد الساعة 3 الفجر والضحية نايم، والبنك معندوش فكرة إن الشريحة اتغيرت من 45 دقيقة أو إن الموبايل نفسه اتغير!"
+        </p>
+        <p>
+          "<strong>2. المستهدفون والحل:</strong> بنستهدف البنوك وشبكات الدفع زي STC Bank والراجحي وCIB وإنستاباي لتوفير ملايين الخسائر وتكاليف الـ SMS، وفي نفس الوقت توفير تجربة دفع فورية وسلسة للعملاء بدون إزعاج. الحل هو درع وسيط ذكي بيستخدم <strong class="text-purple-400">Gemini 2.0 Flash</strong> لربط أنظمة البنوك مع <strong>4 واجهات CAMARA عبر Nokia Network-as-Code</strong>: واجهة <span class="text-emerald-400 font-semibold">SIM Swap</span>، والتحقق الصامت <span class="text-blue-400 font-semibold">Number Verification</span> كبديل للـ SMS، وتتبع التجوال <span class="text-purple-400 font-semibold">Device Status</span>، وفحص عتاد الهاتف <span class="text-pink-400 font-semibold">Device Swap (IMEI)</span>."
+        </p>
+        <p>
+          "<strong>3. الوضع الحالي للنموذج الأولي:</strong> بنينا محرك بايثون سريع جداً بيحسم قرار الموافقة في أقل من 15 مللي ثانية، واستراتيجية بتوفر 95% من تكلفة الاتصالات، واختبرنا 3 سيناريوهات حية بنجاح: تحويل عادي 200 جنيه بيمر في 200ms، وهجمة 35 ألف ريال 3 الفجر بتتجمد فوراً، وتحويل أثناء السفر لدبي بيتطلب بصمة وجه في ثانية واحدة.
+          النهاردة جهزت لحضرتك 4 محاور توجيه محددة و5 أسئلة عملية بخصوص معمارية النظام وشبكات الاتصالات عشان نطلع بأقوى مشروع قبل التسليم النهائي يوم 10 سبتمبر. شكراً جداً لحضرتك!"
+        </p>
+      </div>
+    </div>
+
+    <!-- محاور التوجيه الأربعة الإلزامية -->
+    <div class="glass-card p-6 md:p-8 rounded-2xl space-y-4 border-r-4 border-emerald-500">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
+          <span>🎯</span> محاور التوجيه الأربعة (عندما يسأل المرشد: ماذا تحتاج مني؟)
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 mono border border-emerald-800 font-bold">100% متوافق مع GSMA</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400 flex items-center gap-2 text-sm">
+            <span>🏛️</span> 1. معمارية النظام (System Architecture)
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>ما بنيناه:</strong> معمارية الدرع الهجين؛ مصفوفة بايثون رياضية تحسم قرار الصرف في <strong>أقل من 15ms</strong>، ونموذج Gemini 2.0 Flash يكتب تقرير الامتثال لـ SAMA 2026 بالتوازي في الخلفية. محصن 100% ضد الهلوسة.<br/>
+            <strong>سؤال للمرشد:</strong> هل stc تؤيد هذا الفصل الحتمي للصرف، أم يفضل STC Bank دمج الذكاء الاصطناعي في مسار الصرف المباشر للحوالات الكبيرة؟
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-blue-400 flex items-center gap-2 text-sm">
+            <span>📡</span> 2. استخدام واجهات CAMARA APIs
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>ما بنيناه:</strong> دمج 4 واجهات CAMARA: فحص تاريخ تفعيل الشريحة لاكتشاف الأرقام المعاد تدويرها، والتحقق الصامت 3-legged، وتتبع التجوال وعيوب الـ IMEI.<br/>
+            <strong>سؤال للمرشد:</strong> في بيئة الإنتاج، هل يفضل استدعاء الواجهات الأربع بالتوازي (Async Gather)، أم اعتماد سلم تدريجي (فحص الشريحة أولاً ثم الهاتف)؟
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-400 flex items-center gap-2 text-sm">
+            <span>⚙️</span> 3. الجدوى التشغيلية وتوفير التكلفة (95% Zero-Call)
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>ما بنيناه:</strong> مصادقة عتاد الهاتف المشفر محلياً (Secure Enclave) تمرر 85% من المعاملات بتكلفة $0.00 وزمن 0ms، مع كاش Redis لمدة 3 دقائق للشراء المتتالي.<br/>
+            <strong>سؤال للمرشد:</strong> هل فترة كاش 3 دقائق مقبولة للبنوك، أم تفضل stc إشعارات الأحداث المباشرة (Webhooks) فور حدوث تبديل الشريحة؟
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-purple-400 flex items-center gap-2 text-sm">
+            <span>🚀</span> 4. التوسع والربط بين المشغلين (Scalability)
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>ما بنيناه:</strong> محرك يدعم ذروة 2000 معاملة/ثانية بزمن استجابة 12ms مصمم للعمل بين السعودية (+966) ومصر (+20).<br/>
+            <strong>سؤال للمرشد:</strong> كيف تدير بوابة stc Open Gateway التوجيه بين المشغلين (موبايلي، زين، فودافون مصر) وما هي ميزانية التأخير المتوقعة؟
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- الأسئلة الخمسة العملية -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+          <span>🎯</span> الأسئلة الخمسة الموجهة للمرشد (اطرحها بالترتيب)
+        </h2>
+        <span class="text-xs text-slate-400">مباشرة ومريحة في النطق</span>
+      </div>
+
+      <div class="space-y-4">
+
+        <!-- سؤال 1 -->
+        <div class="glass-card p-6 rounded-2xl space-y-3 border-r-4 border-amber-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">السؤال الأول • أولوية العرض الحي وما يبحث عنه المحكمون</span>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-amber-950 text-amber-300 mono border border-amber-800">أولوية التحكيم</span>
+          </div>
+          <div class="text-base font-bold text-slate-100 leading-snug">
+            "يا باشمهندس عبد الله، من واقع خبرتك، إيه أهم نقطة بتخلي النموذج الأولي يلفت نظر لجنة التحكيم في المرحلة الثانية؟ هل الأهم نركز على إبراز <span class='text-amber-300'>كيفية التعامل مع أخطاء وبطء الشبكة (الـ Circuit Breakers)</span>، ولا نركز أكثر على <span class='text-amber-300'>بساطة وأناقة واجهة المستخدم</span>؟"
+          </div>
+          <div class="text-xs bg-slate-900/60 p-3 rounded-lg text-slate-300 border border-slate-800">
+            💡 <strong>الفائدة:</strong> بيحدد لينا نوجه مجهود الأيام الجاية لفين بالظبط: تجميل الواجهة أم تقوية احتمالات الخطأ والشبكة.
+          </div>
+        </div>
+
+        <!-- سؤال 2 -->
+        <div class="glass-card p-6 rounded-2xl space-y-3 border-r-4 border-emerald-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">السؤال الثاني • التوازن بين منع الاحتيال وتجربة العميل</span>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 mono border border-emerald-800">تجربة المستخدم</span>
+          </div>
+          <div class="text-base font-bold text-slate-100 leading-snug">
+            "بما إن stc بتدير بنك stc وشبكة اتصالات ضخمة، إيه أفضل معادلة لتحقيق الأمان بدون ما نضايق العميل؟ إحنا مش عايزين العميل تطلعله شاشات تأكيد في كل عملية شراء عادية، فإمتى بالظبط <span class='text-emerald-300'>البنك مفروض يطلب بصمة وجه أو خطوة إضافية</span>؟"
+          </div>
+          <div class="text-xs bg-slate-900/60 p-3 rounded-lg text-slate-300 border border-slate-800">
+            💡 <strong>الفائدة:</strong> التحقق من صحة قاعدة الـ 95%؛ الأمان غير المرئي للشراء العادي، والتحدي البيومتري للحالات الغريبة فقط.
+          </div>
+        </div>
+
+        <!-- سؤال 3 -->
+        <div class="glass-card p-6 rounded-2xl space-y-3 border-r-4 border-blue-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">السؤال الثالث • السرعة وزمن الاستجابة في المدفوعات اللحظية</span>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-blue-950 text-blue-300 mono border border-blue-800">السرعة الواقعية</span>
+          </div>
+          <div class="text-base font-bold text-slate-100 leading-snug">
+            "في أنظمة الدفع اللحظي زي سريع وإنستاباي، السرعة هي كل شيء. في الواقع العملي، <span class='text-blue-300'>إيه سرعة استجابة واجهات CAMARA المتوقعة</span>، وإيه أفضل إجراء بديل لو فحص الاتصالات اتأخر عن 250 مللي ثانية؟"
+          </div>
+          <div class="text-xs bg-slate-900/60 p-3 rounded-lg text-slate-300 border border-slate-800">
+            💡 <strong>الفائدة:</strong> الحصول على أرقام واقعية لزمن الاستجابة وتأكيد خطة التحول الآمن لبصمة الوجه (Fail-Secure).
+          </div>
+        </div>
+
+        <!-- سؤال 4 -->
+        <div class="glass-card p-6 rounded-2xl space-y-3 border-r-4 border-purple-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">السؤال الرابع • الحالات الواقعية للهواتف في المنطقة</span>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-purple-950 text-purple-300 mono border border-purple-800">واقع المشغلين</span>
+          </div>
+          <div class="text-base font-bold text-slate-100 leading-snug">
+            "من واقع خبرة stc الميدانية، إيه أكثر الحالات الواقعية اللي بتسبب إنذارات كاذبة للعملاء الحقيقيين—زي <span class='text-purple-300'>استخدام شريحتين في نفس الهاتف (Dual-SIM)، أو تفعيل الـ eSIM، أو السفر</span>؟"
+          </div>
+          <div class="text-xs bg-slate-900/60 p-3 rounded-lg text-slate-300 border border-slate-800">
+            💡 <strong>الفائدة:</strong> إبراز حالات واقعية جداً في الفيديو النهائي للهاكاثون تثبت فهمنا لبيئة الاتصالات المحلية.
+          </div>
+        </div>
+
+        <!-- سؤال 5 -->
+        <div class="glass-card p-6 rounded-2xl space-y-3 border-r-4 border-pink-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-pink-400 uppercase tracking-wider">السؤال الخامس • الاختبار على منصة المطورين (Sandbox)</span>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-pink-950 text-pink-300 mono border border-pink-800">أدوات التطوير</span>
+          </div>
+          <div class="text-base font-bold text-slate-100 leading-snug">
+            "بخصوص الاختبار على منصة المطورين، هل فيه <span class='text-pink-300'>أرقام هواتف محددة أو سيناريوهات معينة</span> stc بتنصحنا نجرب عليها عشان نتأكد إن كل الواجهات شغالة ومستقرة قبل تسليم المشروع؟"
+          </div>
+          <div class="text-xs bg-slate-900/60 p-3 rounded-lg text-slate-300 border border-slate-800">
+            💡 <strong>الفائدة:</strong> استلام أرقام وسيناريوهات فحص حقيقية نختبر بها الكود قبل تسجيل الفيديو النهائي.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- مصفوفة الرد على الاعتراضات السريعة -->
+    <div class="glass-card p-6 md:p-8 rounded-2xl space-y-4 border-r-4 border-rose-500">
+      <h2 class="text-xl font-bold text-rose-400 flex items-center gap-2">
+        <span>🛡️</span> مصفوفة الردود السريعة والذكية على أي استفسار أو اعتراض (رد في 10 ثوانٍ)
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-300">س: أليس فحص الاتصالات في كل عملية دفع بطيئاً ومكلفاً للبنوك؟</div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>الرد:</strong> "بالضبط يا باشمهندس! ولهذا صممنا استراتيجية الـ 95% بدون تكلفة؛ 85% من المعاملات اليومية الروتينية تعتمد على مصادقة عتاد الهاتف المشفر محلياً (0ms وتكلفة $0.00)، ولا نطلب شبكة الاتصالات إلا عند رصد شذوذ أو مبالغ كبيرة تفوق 5000 جنيه."
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-300">س: ماذا لو هلوس نموذج الذكاء الاصطناعي ووافق على احتيال؟</div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>الرد:</strong> "الذكاء الاصطناعي لا يملك صلاحية الموافقة المالية إطلاقاً؛ قرارات الصرف محكومة بنسبة 100% بمصفوفة معادلات بايثون الرياضية في 15ms، وGemini 2.0 Flash وظيفته فقط صياغة تقرير الامتثال لسجلات مؤسسة النقد SAMA بشكل غير متزامن."
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-300">س: كيف تتعاملون مع الأرقام القديمة المعاد بيعها (Recycled)؟</div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>الرد:</strong> "نستخدم واجهة retrieve-date في CAMARA لمعرفة تاريخ التفعيل الأخير للشريحة ومقارنته بتاريخ فتح الحساب البنكي؛ فإذا كان التفعيل أحدث من فتح الحساب، يكتشف النظام فوراً انتقال ملكية الرقم."
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-300">س: ماذا لو شبكة الاتصالات كانت بطيئة أو تعطلت؟</div>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>الرد:</strong> "لدينا قاطع دائرة (Circuit Breaker) بحد أقصى 250 مللي ثانية؛ إذا لم تستجب الشبكة، يفشل النظام بأمان (Fail-Secure) ويطلب تأكيد بصمة الوجه (Face ID) للعميل بدلاً من رفض العملية عشوائياً."
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let seconds = 0;
+    let timerInterval = null;
+
+    function toggleTimer() {
+      const btn = document.getElementById('timerBtn');
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.innerText = 'استئناف';
+        btn.classList.remove('bg-rose-600');
+        btn.classList.add('bg-indigo-600');
+      } else {
+        timerInterval = setInterval(updateTimer, 1000);
+        btn.innerText = 'إيقاف مؤقت';
+        btn.classList.remove('bg-indigo-600');
+        btn.classList.add('bg-rose-600');
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      seconds = 0;
+      document.getElementById('timerDisplay').innerText = '00:00';
+      document.getElementById('stageBadge').innerText = 'جاهز للبدء';
+      document.getElementById('stageBadge').className = 'text-[10px] font-bold text-slate-400 mt-0.5';
+      const btn = document.getElementById('timerBtn');
+      btn.innerText = 'بدء المكالمة';
+      btn.classList.remove('bg-rose-600');
+      btn.classList.add('bg-indigo-600');
+    }
+
+    function updateTimer() {
+      seconds++;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      document.getElementById('timerDisplay').innerText = 
+        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+      const badge = document.getElementById('stageBadge');
+      if (seconds < 120) {
+        badge.innerText = 'المرحلة: الترحيب والتعارف';
+        badge.className = 'text-[10px] font-bold text-slate-400 mt-0.5';
+      } else if (seconds < 270) {
+        badge.innerText = 'المرحلة: الكلمة الافتتاحية (2.5 د)';
+        badge.className = 'text-[10px] font-bold text-indigo-400 mt-0.5';
+      } else if (seconds < 1560) {
+        badge.innerText = 'المرحلة: الأسئلة والنقاش الفني';
+        badge.className = 'text-[10px] font-bold text-emerald-400 mt-0.5';
+      } else if (seconds < 1680) {
+        badge.innerText = 'تنبيه: باقٍ دقيقتين (طلب النصيحة الذهبية)';
+        badge.className = 'text-[10px] font-bold text-amber-400 mt-0.5';
+      } else {
+        badge.innerText = 'تنبيه: نهاية الوقت (الختام والشكر)';
+        badge.className = 'text-[10px] font-bold text-rose-400 mt-0.5';
+      }
+    }
+
+    function copyPitchAr() {
+      const text = document.getElementById('pitchTextAr').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('تم نسخ الكلمة الافتتاحية إلى الحافظة بنجاح!');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafePay MENA - System Architecture Schematic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070C18;
+      --paper: #0D1527;
+      --ink: #F1F5F9;
+      --muted: #94A3B8;
+      --soft: #64748B;
+      --rule: rgba(255, 255, 255, 0.08);
+      --rule-solid: rgba(255, 255, 255, 0.16);
+      --accent: #00F2FE;
+      --accent-tint: rgba(0, 242, 254, 0.08);
+      --accent-purple: #818CF8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 242, 254, 0.06) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.06) 0px, transparent 50%);
+    }
+
+    .header-block {
+      max-width: 1060px;
+      width: 100%;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--rule-solid);
+      padding-bottom: 16px;
+    }
+
+    .title-group h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-group p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .badge {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(0, 242, 254, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      font-weight: 600;
+    }
+
+    .diagram-container {
+      max-width: 1060px;
+      width: 100%;
+      background: var(--paper);
+      border-radius: 12px;
+      border: 1px solid var(--rule);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      overflow: hidden;
+      padding: 24px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .meta-bar {
+      max-width: 1060px;
+      width: 100%;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--soft);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-block">
+    <div class="title-group">
+      <h1>SafePay MENA • Architectural Schematic <span class="badge">GSMA CAMARA v0.1</span></h1>
+      <p>Deterministic Dual-Engine Middleware for Instant Payment Protection (<10ms Execution Budget)</p>
+    </div>
+    <div class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3);">
+      SAMA Sarie & CBUAE Notice 2025/3057 Compliant
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Arrow marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#94A3B8" />
+        </marker>
+        <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#00F2FE" />
+        </marker>
+        <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#818CF8" />
+        </marker>
+
+        <!-- Filters -->
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+
+      <!-- ==================== ZONES / TRUST BOUNDARIES ==================== -->
+      
+      <!-- ZONE 1: Payment Rails Ingress -->
+      <rect x="20" y="30" width="220" height="560" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+      <rect x="36" y="24" width="130" height="14" rx="2" fill="#0D1527" />
+      <text x="101" y="34" fill="#64748B" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" font-weight="600" letter-spacing="0.1em">PAYMENT RAILS (INGRESS)</text>
+
+      <!-- ZONE 2: SafePay Core Engine -->
+      <rect x="280" y="30" width="440" height="560" rx="8" fill="rgba(0, 242, 254, 0.02)" stroke="rgba(0, 242, 254, 0.2)" stroke-width="1.2" />
+      <rect x="296" y="24" width="170" height="14" rx="2" fill="#0D1527" />
+      <text x="381" y="34" fill="#00F2FE" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" font-weight="700" letter-spacing="0.1em">SAFEPAY MENA MIDDLEWARE</text>
+
+      <!-- ZONE 3: Telecom Operator Core -->
+      <rect x="760" y="30" width="220" height="560" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+      <rect x="776" y="24" width="170" height="14" rx="2" fill="#0D1527" />
+      <text x="861" y="34" fill="#818CF8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" font-weight="600" letter-spacing="0.1em">GSMA CAMARA NETWORK CORE</text>
+
+      <!-- ==================== CONNECTORS (Orthogonal r=8) ==================== -->
+
+      <!-- Rails -> API Gateway -->
+      <path d="M 210 110 H 290 Q 298 110 298 118 V 140 Q 298 148 306 148 H 320" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)" />
+      <path d="M 210 240 H 260 Q 268 240 268 230 V 165 Q 268 155 276 155 H 320" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)" />
+      <path d="M 210 370 H 250 Q 258 370 258 360 V 180 Q 258 170 266 170 H 320" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)" />
+      <path d="M 210 500 H 240 Q 248 500 248 480 V 195 Q 248 185 256 185 H 320" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)" />
+
+      <!-- Gateway -> Risk Engine (Focal Flow) -->
+      <path d="M 500 160 H 520" fill="none" stroke="#00F2FE" stroke-width="1.5" marker-end="url(#arrow-accent)" />
+      <text x="510" y="152" fill="#00F2FE" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">&lt;10ms</text>
+
+      <!-- Risk Engine -> Telecom Gateway -->
+      <path d="M 590 220 V 270 Q 590 278 582 278 H 500" fill="none" stroke="#00F2FE" stroke-width="1.2" marker-end="url(#arrow-accent)" />
+
+      <!-- Telecom Gateway -> CAMARA APIs (Parallel async) -->
+      <path d="M 500 310 H 730 Q 738 310 738 120 Q 738 110 746 110 H 780" fill="none" stroke="#818CF8" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+      <path d="M 500 320 H 720 Q 728 320 728 240 Q 728 230 736 230 H 780" fill="none" stroke="#818CF8" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+      <path d="M 500 330 H 710 Q 718 330 718 350 Q 718 360 726 360 H 780" fill="none" stroke="#818CF8" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+      <path d="M 500 340 H 700 Q 708 340 708 470 Q 708 480 716 480 H 780" fill="none" stroke="#818CF8" stroke-width="1.2" marker-end="url(#arrow-purple)" />
+
+      <!-- Risk Engine -> Gemini AI Agent (Async background) -->
+      <path d="M 600 220 V 430 Q 600 438 592 438 H 500" fill="none" stroke="#818CF8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-purple)" />
+      <text x="555" y="432" fill="#818CF8" font-size="7" font-family="'Geist Mono', monospace">Async Trace</text>
+
+      <!-- Outcome feedback back to Payment Rails (Green Approve / Red Block) -->
+      <path d="M 590 100 V 70 Q 590 60 580 60 H 220" fill="none" stroke="#10B981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)" />
+      <text x="390" y="54" fill="#10B981" font-size="7" font-family="'Geist Mono', monospace">Pre-Auth Decision: APPROVE / STEP_UP / BLOCK</text>
+
+      <!-- ==================== NODES / COMPONENTS ==================== -->
+
+      <!-- NODE 1.1: InstaPay Egypt -->
+      <rect x="40" y="80" width="170" height="60" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="54" y="104" fill="#FFF" font-size="12" font-weight="700">InstaPay Egypt (IPN)</text>
+      <text x="54" y="122" fill="#94A3B8" font-size="9">1.5B txns • EGP 2.9T volume</text>
+      <circle cx="192" cy="110" r="3" fill="#10B981" />
+
+      <!-- NODE 1.2: Sarie KSA / stc pay -->
+      <rect x="40" y="210" width="170" height="60" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="54" y="234" fill="#FFF" font-size="12" font-weight="700">Sarie / stc pay (KSA)</text>
+      <text x="54" y="252" fill="#94A3B8" font-size="9">SAMA 20k SAR Instant Rail</text>
+      <circle cx="192" cy="240" r="3" fill="#10B981" />
+
+      <!-- NODE 1.3: Aani UAE -->
+      <rect x="40" y="340" width="170" height="60" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="54" y="364" fill="#FFF" font-size="12" font-weight="700">Aani Instant (UAE)</text>
+      <text x="54" y="382" fill="#94A3B8" font-size="9">Al Etihad Payments (CBUAE)</text>
+      <circle cx="192" cy="370" r="3" fill="#10B981" />
+
+      <!-- NODE 1.4: E-Commerce Card Checkout (3DS) -->
+      <rect x="40" y="470" width="170" height="60" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="54" y="494" fill="#FFF" font-size="12" font-weight="700">Online 3DS Checkout</text>
+      <text x="54" y="512" fill="#F59E0B" font-size="9">CBUAE Notice 2025/3057</text>
+      <circle cx="192" cy="500" r="3" fill="#F59E0B" />
+
+      <!-- NODE 2.1: FastAPI Gateway + Normalizer -->
+      <rect x="320" y="125" width="180" height="70" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <text x="334" y="150" fill="#FFF" font-size="11" font-weight="700">FastAPI Pre-Auth Hook</text>
+      <text x="334" y="166" fill="#94A3B8" font-size="8.5">E.164 Phone Normalizer</text>
+      <text x="334" y="180" fill="#64748B" font-size="8">+20 / +966 / +971 Resolver</text>
+
+      <!-- NODE 2.2: FOCAL NODE 1 - Deterministic Risk Matrix -->
+      <rect x="520" y="100" width="180" height="120" rx="6" fill="rgba(0, 242, 254, 0.08)" stroke="#00F2FE" stroke-width="1.8" filter="url(#glow)" />
+      <text x="536" y="126" fill="#00F2FE" font-size="12" font-weight="800">Deterministic Engine</text>
+      <text x="536" y="142" fill="#FFF" font-size="9.5" font-weight="600">Sub-10ms Combinatorial Matrix</text>
+      <line x1="536" y1="150" x2="684" y2="150" stroke="rgba(0,242,254,0.3)" stroke-width="0.75" />
+      <text x="536" y="166" fill="#94A3B8" font-size="8">• 3-Tier Outcome (<25, 25-69, 70+)</text>
+      <text x="536" y="180" fill="#94A3B8" font-size="8">• SAMA & CBE Limit Guardrails</text>
+      <text x="536" y="194" fill="#94A3B8" font-size="8">• Benchmark: 0.0024ms / eval</text>
+      <text x="536" y="208" fill="#10B981" font-size="8.5" font-weight="600">&gt; 400,000 txns / sec capacity</text>
+
+      <!-- NODE 2.3: Telecom Signal Gateway + Cache -->
+      <rect x="320" y="260" width="180" height="100" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <text x="334" y="284" fill="#FFF" font-size="11" font-weight="700">CAMARA Signal Gateway</text>
+      <text x="334" y="302" fill="#94A3B8" font-size="8.5">• 15m SIM-Swap TTL Cache</text>
+      <text x="334" y="318" fill="#94A3B8" font-size="8.5">• 250ms Circuit Breaker</text>
+      <text x="334" y="334" fill="#94A3B8" font-size="8.5">• Nokia NaC SDK + Fallback</text>
+      <text x="334" y="348" fill="#818CF8" font-size="8">Zero Telco Cost Overhead</text>
+
+      <!-- NODE 2.4: FOCAL NODE 2 - Gemini 2.0 Flash AI Agent -->
+      <rect x="320" y="390" width="180" height="95" rx="6" fill="rgba(129, 140, 248, 0.08)" stroke="#818CF8" stroke-width="1.5" />
+      <text x="334" y="414" fill="#818CF8" font-size="11" font-weight="800">Gemini 2.0 Flash Agent</text>
+      <text x="334" y="430" fill="#FFF" font-size="9" font-weight="600">Explainable Regulatory Trace</text>
+      <line x1="334" y1="438" x2="484" y2="438" stroke="rgba(129,140,248,0.3)" stroke-width="0.75" />
+      <text x="334" y="454" fill="#94A3B8" font-size="8">• SAMA Counter-Fraud Mapping</text>
+      <text x="334" y="468" fill="#94A3B8" font-size="8">• CBUAE Notice 2025/3057 Defense</text>
+      <text x="334" y="480" fill="#10B981" font-size="8">100% Audit Shield for Banks</text>
+
+      <!-- NODE 2.5: Supabase Immutable Audit Log -->
+      <rect x="320" y="510" width="180" height="60" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="334" y="534" fill="#FFF" font-size="11" font-weight="700">Supabase Audit Store</text>
+      <text x="334" y="552" fill="#94A3B8" font-size="8.5">PostgreSQL Immutable Ledger</text>
+
+      <!-- NODE 3.1: CAMARA Number Verification -->
+      <rect x="780" y="80" width="180" height="65" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="794" y="104" fill="#FFF" font-size="11" font-weight="700">Number Verification</text>
+      <text x="794" y="120" fill="#00F2FE" font-size="8.5" font-weight="600">3-Legged Cellular Bearer</text>
+      <text x="794" y="134" fill="#94A3B8" font-size="8">Replaces SMS OTP in 300ms</text>
+
+      <!-- NODE 3.2: CAMARA SIM Swap Check -->
+      <rect x="780" y="200" width="180" height="65" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="794" y="224" fill="#FFF" font-size="11" font-weight="700">SIM Swap Check</text>
+      <text x="794" y="240" fill="#EF4444" font-size="8.5" font-weight="600">2-Legged Carrier DB</text>
+      <text x="794" y="254" fill="#94A3B8" font-size="8">Detects 24-240h swap history</text>
+
+      <!-- NODE 3.3: CAMARA Scam Signal -->
+      <rect x="780" y="325" width="180" height="65" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="794" y="349" fill="#FFF" font-size="11" font-weight="700">Scam Signal API</text>
+      <text x="794" y="365" fill="#F59E0B" font-size="8.5" font-weight="600">Active Voice Call Status</text>
+      <text x="794" y="379" fill="#94A3B8" font-size="8">Intercepts 85% vishing fraud</text>
+
+      <!-- NODE 3.4: CAMARA Device Status / Roaming -->
+      <rect x="780" y="450" width="180" height="65" rx="6" fill="#111B30" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+      <text x="794" y="474" fill="#FFF" font-size="11" font-weight="700">Device Status & Roaming</text>
+      <text x="794" y="490" fill="#818CF8" font-size="8.5" font-weight="600">HLR/VLR Network State</text>
+      <text x="794" y="504" fill="#94A3B8" font-size="8">Detects foreign travel & reachability</text>
+    </svg>
+  </div>
+
+  <div class="meta-bar">
+    <div>Protocol: GSMA Open Gateway CAMARA v0.1 • Nokia Network-as-Code</div>
+    <div>SLA: &lt;10ms Decision Matrix • Latency Budget: &lt;250ms End-to-End</div>
+    <div>Jurisdictions: KSA (SAMA) • Egypt (CBE) • UAE (CBUAE)</div>
+  </div>
+
+</body>
+</html>
