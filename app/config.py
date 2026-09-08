@@ -37,8 +37,8 @@ class Settings(BaseModel):
     PROJECT_VERSION: str = "1.0.0"
     API_PREFIX: str = "/api/v1"
     
-    # Execution mode
-    USE_MOCK_TELECOM: bool = True  # True for deterministic offline demo reliability
+    # Execution mode (defaults to False if an API key is provided, actively attempting live carrier connection)
+    USE_MOCK_TELECOM: bool = os.getenv("USE_MOCK_TELECOM", "false").lower() in ("true", "1", "yes")
     
     # External API Keys (supports both NOKIA_RAPIDAPI_KEY and Netwrok_as_code_api_key)
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
