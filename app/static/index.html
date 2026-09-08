@@ -306,11 +306,17 @@
               <div class="space-y-3">
                 <!-- Beneficiary Field -->
                 <div>
-                  <label class="text-[11px] font-medium text-slate-300 block mb-1">Payee / Beneficiary</label>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-medium text-slate-300">Payee / Beneficiary</label>
+                    <label class="flex items-center space-x-1.5 cursor-pointer">
+                      <input type="checkbox" id="chkSavedBeneficiary" checked onchange="toggleSavedBeneficiary(this.checked)" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0 h-3 w-3">
+                      <span class="text-[10px] text-slate-400">Saved Contact</span>
+                    </label>
+                  </div>
                   <div class="relative">
                     <input type="text" id="inputRecipientName" value="Fatima Mohamed (Mom)" 
                            class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium">
-                    <span id="savedBadge" class="absolute right-2.5 top-2 text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-1.5 py-0.5 rounded font-medium">SAVED</span>
+                    <span id="savedBadge" class="absolute right-2.5 top-2 text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-1.5 py-0.5 rounded font-medium">TRUSTED</span>
                   </div>
                   <input type="hidden" id="inputRecipientId" value="SA0380000000608010167519">
                   <input type="hidden" id="inputSenderPhone" value="+966501234567">
@@ -500,6 +506,46 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- NEW: Intelligent Adaptive Orchestration & Unit Economics Banner -->
+      <div class="panel-card rounded-2xl p-4 bg-gradient-to-r from-slate-900/90 via-[#0B1220] to-slate-900/90 border border-slate-800">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="git-branch" class="h-4 w-4 text-sky-400"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Adaptive API Orchestration &amp; UX Engine</span>
+          </div>
+          <span id="orchTierBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+            TIER 1: SILENT BASELINE
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px]">
+          <!-- Col 1: Selective Invocation -->
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80">
+            <div class="text-[10px] text-slate-400 font-semibold mb-1">SELECTIVE INVOCATION</div>
+            <div id="orchApisInvoked" class="text-white font-medium text-[11px] truncate">1 / 4 APIs Active (Number Verify)</div>
+            <div id="orchApisSkipped" class="text-[10px] text-slate-400 mt-0.5 truncate">SIM Swap (Cached 15m) • 2 Skipped</div>
+          </div>
+
+          <!-- Col 2: Cost Savings -->
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80">
+            <div class="text-[10px] text-slate-400 font-semibold mb-1">CARRIER COST SAVINGS</div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="orchCostActual" class="text-sm font-bold text-emerald-400 font-mono">$0.03</span>
+              <span id="orchCostNaive" class="text-[10px] text-slate-400 line-through font-mono">$0.12</span>
+              <span id="orchCostSaved" class="text-[10px] font-bold text-sky-400">75% Saved</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Zero redundant carrier queries</div>
+          </div>
+
+          <!-- Col 3: Customer Experience -->
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80">
+            <div class="text-[10px] text-slate-400 font-semibold mb-1">USER EXPERIENCE &amp; LATENCY</div>
+            <div id="orchUxExperience" class="text-white font-medium text-[11px]">Zero SMS OTP • 0s Added Friction</div>
+            <div id="orchUxImpact" class="text-[10px] text-emerald-400 mt-0.5">180ms Cellular Handshake</div>
+          </div>
         </div>
       </div>
 

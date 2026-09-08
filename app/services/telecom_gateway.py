@@ -7,7 +7,7 @@ import time
 import asyncio
 from typing import Optional, Dict
 from cachetools import TTLCache
-from app.core.models import CarrierSignalProfile, PresetScenario
+from app.core.models import CarrierSignalProfile, PresetScenario, OrchestrationMeta
 from app.services.phone_normalizer import normalize_phone_number
 from app.config import settings
 
@@ -131,6 +131,18 @@ class TelecomGateway:
                 },
                 latency_ms=12.8
             )
+            orch = OrchestrationMeta(
+                tier="TIER_1_SILENT_BASELINE",
+                apis_invoked=["CAMARA Number Verification (3-Legged)"],
+                apis_skipped_or_cached=["SIM Swap (Cached 15m TTL)", "Scam Signal (Skipped: Routine Safe Transfer)", "Device Status (Skipped)"],
+                carrier_api_calls_count=1,
+                carrier_api_calls_saved=3,
+                cost_actual_usd=0.03,
+                cost_naive_usd=0.12,
+                cost_reduction_percent=75,
+                user_friction="ZERO_FRICTION (Silent Auth)",
+                checkout_experience="Silent 180ms cellular verification. Zero OTP latency, zero checkout drop-off."
+            )
             return CarrierSignalProfile(
                 phone_number=phone,
                 carrier_name=carrier,
@@ -139,7 +151,8 @@ class TelecomGateway:
                 is_on_active_voice_call=False,
                 is_roaming=False,
                 device_match=True,
-                raw_wire_trace=wire_trace
+                raw_wire_trace=wire_trace,
+                orchestration=orch
             )
             
         if scenario == PresetScenario.SPAM_CALL_SCAM:
@@ -162,6 +175,18 @@ class TelecomGateway:
                 },
                 latency_ms=16.4
             )
+            orch = OrchestrationMeta(
+                tier="TIER_2_SELECTIVE_COERCION_SHIELD",
+                apis_invoked=["CAMARA Scam Signal (Call Status)", "CAMARA Number Verification"],
+                apis_skipped_or_cached=["SIM Swap (Cached 15m TTL)", "Device Status (Skipped)"],
+                carrier_api_calls_count=2,
+                carrier_api_calls_saved=2,
+                cost_actual_usd=0.06,
+                cost_naive_usd=0.12,
+                cost_reduction_percent=50,
+                user_friction="1-SEC STEP-UP (Face ID Anti-Coercion)",
+                checkout_experience="Call-in-progress detected. Targeted biometric challenge breaks scammer coercion control."
+            )
             return CarrierSignalProfile(
                 phone_number=phone,
                 carrier_name=carrier,
@@ -170,7 +195,8 @@ class TelecomGateway:
                 is_on_active_voice_call=True,  # Scam Signal triggered!
                 is_roaming=False,
                 device_match=True,
-                raw_wire_trace=wire_trace
+                raw_wire_trace=wire_trace,
+                orchestration=orch
             )
             
         if scenario == PresetScenario.SIM_SWAP_ATTACK:
@@ -193,6 +219,18 @@ class TelecomGateway:
                 },
                 latency_ms=14.1
             )
+            orch = OrchestrationMeta(
+                tier="TIER_3_DEEP_FORENSICS_ATO",
+                apis_invoked=["CAMARA SIM Swap (2-Legged HLR/HSS)", "CAMARA Device Swap (IMEI Check)", "CAMARA Number Verification"],
+                apis_skipped_or_cached=["Scam Signal (Skipped: Immediate Hardware Compromise)"],
+                carrier_api_calls_count=3,
+                carrier_api_calls_saved=1,
+                cost_actual_usd=0.09,
+                cost_naive_usd=0.12,
+                cost_reduction_percent=25,
+                user_friction="STATUTORY FREEZE (Zero Fund Leakage)",
+                checkout_experience="Account takeover intercepted at carrier core. Scammer blocked with $0 fund leakage."
+            )
             return CarrierSignalProfile(
                 phone_number=phone,
                 carrier_name=carrier,
@@ -202,7 +240,8 @@ class TelecomGateway:
                 is_on_active_voice_call=False,
                 is_roaming=False,
                 device_match=False,
-                raw_wire_trace=wire_trace
+                raw_wire_trace=wire_trace,
+                orchestration=orch
             )
             
         if scenario == PresetScenario.STOLEN_CARD_CNP:
@@ -225,6 +264,18 @@ class TelecomGateway:
                 },
                 latency_ms=11.9
             )
+            orch = OrchestrationMeta(
+                tier="TIER_2_CARD_POSSESSION_SHIELD",
+                apis_invoked=["CAMARA Number Verification (Silent Cellular Possession)"],
+                apis_skipped_or_cached=["SIM Swap (Skipped: Rogue Device Lacked SIM)", "Scam Signal (Skipped)"],
+                carrier_api_calls_count=1,
+                carrier_api_calls_saved=3,
+                cost_actual_usd=0.03,
+                cost_naive_usd=0.12,
+                cost_reduction_percent=75,
+                user_friction="MERCHANT 3DS REJECT (Silent Block)",
+                checkout_experience="Stolen card rejected without exposing OTP to fraudster. Zero merchant chargeback liability."
+            )
             return CarrierSignalProfile(
                 phone_number=phone,
                 carrier_name=carrier,
@@ -233,7 +284,8 @@ class TelecomGateway:
                 is_on_active_voice_call=False,
                 is_roaming=False,
                 device_match=False,
-                raw_wire_trace=wire_trace
+                raw_wire_trace=wire_trace,
+                orchestration=orch
             )
             
         # 2. Check in-memory SIM swap cache
@@ -287,6 +339,19 @@ class TelecomGateway:
             latency_ms=15.2
         )
         
+        orch = OrchestrationMeta(
+            tier="TIER_3_DEEP_FORENSICS_ATO" if sim_swapped else ("TIER_2_SELECTIVE_COERCION_SHIELD" if is_on_call else "TIER_1_SILENT_BASELINE"),
+            apis_invoked=["CAMARA SIM Swap", "CAMARA Number Verification"] if sim_swapped else (["CAMARA Scam Signal"] if is_on_call else ["CAMARA Number Verification"]),
+            apis_skipped_or_cached=["Scam Signal (Skipped)", "Device Status (Skipped)"] if sim_swapped else ["SIM Swap (Cached 15m)", "Device Status (Skipped)"],
+            carrier_api_calls_count=2 if (sim_swapped or is_on_call) else 1,
+            carrier_api_calls_saved=2 if (sim_swapped or is_on_call) else 3,
+            cost_actual_usd=0.06 if (sim_swapped or is_on_call) else 0.03,
+            cost_naive_usd=0.12,
+            cost_reduction_percent=50 if (sim_swapped or is_on_call) else 75,
+            user_friction="STATUTORY FREEZE" if sim_swapped else ("1-SEC STEP-UP" if is_on_call else "ZERO_FRICTION (Silent Auth)"),
+            checkout_experience="Account takeover blocked." if sim_swapped else ("Vishing call intercepted." if is_on_call else "Silent 180ms cellular verification. Zero OTP latency.")
+        )
+        
         return CarrierSignalProfile(
             phone_number=phone,
             carrier_name=carrier,
@@ -297,7 +362,8 @@ class TelecomGateway:
             is_roaming=is_roaming,
             roaming_country="AE" if is_roaming else None,
             device_match=not sim_swapped,
-            raw_wire_trace=wire_trace
+            raw_wire_trace=wire_trace,
+            orchestration=orch
         )
 
     async def _query_nokia_rapidapi_sim_swap(self, phone: str) -> Optional[Dict]:

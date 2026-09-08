@@ -39,6 +39,18 @@ class TransactionRequest(BaseModel):
     device_imei: Optional[str] = Field(default=None, description="Client hardware identifier")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="UTC initiation timestamp")
 
+class OrchestrationMeta(BaseModel):
+    tier: str = Field(default="TIER_1_SILENT_BASELINE", description="Intelligent dynamic orchestration tier")
+    apis_invoked: List[str] = Field(default_factory=lambda: ["Number Verification"])
+    apis_skipped_or_cached: List[str] = Field(default_factory=lambda: ["SIM Swap (Cached)", "Scam Signal (Skipped)", "Device Status (Skipped)"])
+    carrier_api_calls_count: int = 1
+    carrier_api_calls_saved: int = 3
+    cost_actual_usd: float = 0.03
+    cost_naive_usd: float = 0.12
+    cost_reduction_percent: int = 75
+    user_friction: str = "ZERO_FRICTION (Silent)"
+    checkout_experience: str = "Instant 180ms silent cellular verification. Zero OTP latency, 0% drop-off."
+
 class CarrierSignalProfile(BaseModel):
     phone_number: str = Field(..., description="Sanitized E.164 phone number")
     carrier_name: str = Field(..., description="Identified carrier (e.g. stc Saudi, Vodafone Egypt, e& UAE)")
@@ -51,6 +63,7 @@ class CarrierSignalProfile(BaseModel):
     device_match: bool = Field(default=True, description="Device Swap check: IMEI matches carrier registry")
     eval_latency_ms: float = Field(default=0.0, description="Time taken to collect telecom signals in ms")
     raw_wire_trace: Optional[dict] = Field(default=None, description="Exact CAMARA wire-level HTTP request/response payloads")
+    orchestration: OrchestrationMeta = Field(default_factory=OrchestrationMeta, description="Adaptive API routing and unit cost metadata")
 
 class RiskDecision(BaseModel):
     transaction_id: str
@@ -64,6 +77,7 @@ class RiskDecision(BaseModel):
     signals: CarrierSignalProfile
     ai_compliance_trace: Optional[str] = None
     raw_wire_trace: Optional[dict] = None
+    orchestration: Optional[OrchestrationMeta] = None
 
 class BiometricStepUpRequest(BaseModel):
     transaction_id: str

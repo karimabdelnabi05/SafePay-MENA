@@ -1,6 +1,6 @@
 /**
  * SafePay MENA - Institutional Frontend Dashboard Client
- * Enterprise SOC Controller with Real-Time CAMARA Wire Inspector & ISO 20022 Telemetry.
+ * Enterprise SOC Controller with Adaptive CAMARA Orchestration, UX Telemetry, and Wire Inspector.
  */
 
 let currentScenario = 'CLEAN_TRANSFER';
@@ -90,6 +90,25 @@ function initWebSocket() {
   };
 }
 
+// Beneficiary Trust Toggle
+function toggleSavedBeneficiary(isSaved) {
+  const badge = document.getElementById('savedBadge');
+  const trustText = document.getElementById('trustLevelText');
+  if (badge) {
+    if (isSaved) {
+      badge.innerText = 'TRUSTED';
+      badge.className = 'absolute right-2.5 top-2 text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-1.5 py-0.5 rounded font-medium';
+    } else {
+      badge.innerText = 'NEW PAYEE';
+      badge.className = 'absolute right-2.5 top-2 text-[10px] bg-amber-950 text-amber-400 border border-amber-800/60 px-1.5 py-0.5 rounded font-medium';
+    }
+  }
+  if (trustText) {
+    trustText.innerText = isSaved ? 'Trust Level: HIGH' : 'Trust Level: UNVERIFIED';
+    trustText.className = isSaved ? 'text-[10px] font-mono text-emerald-400' : 'text-[10px] font-mono text-amber-400';
+  }
+}
+
 // Preset Scenario Switcher
 function loadScenario(type) {
   currentScenario = type;
@@ -116,17 +135,18 @@ function loadScenario(type) {
   }
 
   const callBanner = document.getElementById('activeCallBanner');
-  const savedBadge = document.getElementById('savedBadge');
   const carrierTag = document.getElementById('carrierTag');
   const inputRecipient = document.getElementById('inputRecipientName');
   const inputAmount = document.getElementById('inputAmount');
   const selectCurrency = document.getElementById('selectCurrency');
   const callIndicatorDot = document.getElementById('callIndicatorDot');
   const callIndicatorText = document.getElementById('callIndicatorText');
+  const chkSaved = document.getElementById('chkSavedBeneficiary');
 
   if (type === 'CLEAN_TRANSFER') {
     callBanner.classList.add('hidden');
-    savedBadge.classList.remove('hidden');
+    if (chkSaved) chkSaved.checked = true;
+    toggleSavedBeneficiary(true);
     carrierTag.innerText = 'stc Saudi 5G';
     inputRecipient.value = 'Fatima Mohamed (Mom)';
     inputAmount.value = '200';
@@ -137,7 +157,8 @@ function loadScenario(type) {
   } 
   else if (type === 'SPAM_CALL_SCAM') {
     callBanner.classList.remove('hidden');
-    savedBadge.classList.add('hidden');
+    if (chkSaved) chkSaved.checked = false;
+    toggleSavedBeneficiary(false);
     carrierTag.innerText = 'stc Saudi (Active Voice Call)';
     inputRecipient.value = 'Unknown Payee (Scammer)';
     inputAmount.value = '15000';
@@ -148,7 +169,8 @@ function loadScenario(type) {
   } 
   else if (type === 'SIM_SWAP_ATTACK') {
     callBanner.classList.add('hidden');
-    savedBadge.classList.add('hidden');
+    if (chkSaved) chkSaved.checked = false;
+    toggleSavedBeneficiary(false);
     carrierTag.innerText = 'Rogue Handset (IMEI Mismatch)';
     inputRecipient.value = 'Mule Account Corp';
     inputAmount.value = '35000';
@@ -159,7 +181,8 @@ function loadScenario(type) {
   }
   else if (type === 'STOLEN_CARD_CNP') {
     callBanner.classList.add('hidden');
-    savedBadge.classList.add('hidden');
+    if (chkSaved) chkSaved.checked = false;
+    toggleSavedBeneficiary(false);
     carrierTag.innerText = 'Rogue Web Browser (No SIM)';
     inputRecipient.value = 'Amazon UAE (3DS Online)';
     inputAmount.value = '1200';
@@ -195,7 +218,8 @@ async function executeTransfer() {
   const amount = parseFloat(document.getElementById('inputAmount').value) || 200;
   const currency = document.getElementById('selectCurrency').value;
   const recipientName = document.getElementById('inputRecipientName').value;
-  const isSaved = currentScenario === 'CLEAN_TRANSFER';
+  const chkSaved = document.getElementById('chkSavedBeneficiary');
+  const isSaved = chkSaved ? chkSaved.checked : (currentScenario === 'CLEAN_TRANSFER');
   
   currentTransactionId = 'txn_' + Date.now().toString().slice(-6);
 
@@ -239,7 +263,7 @@ async function executeTransfer() {
   }
 }
 
-// Render Risk Decision, Wire Inspector & Telemetry to SOC Panel
+// Render Risk Decision, Orchestration, Wire Inspector & Telemetry to SOC Panel
 function renderEvaluation(decision) {
   const score = decision.risk_score;
   const tier = decision.decision;
@@ -283,7 +307,39 @@ function renderEvaluation(decision) {
   const kpiElem = document.getElementById('kpiLatency');
   if (kpiElem) kpiElem.innerText = latencyStr;
 
-  // 3. Update CAMARA Telemetry Badges
+  // 3. Update Adaptive Orchestration & UX Telemetry Banner
+  const orch = decision.orchestration || (decision.signals && decision.signals.orchestration);
+  if (orch) {
+    const tierBadge = document.getElementById('orchTierBadge');
+    const apisInvoked = document.getElementById('orchApisInvoked');
+    const apisSkipped = document.getElementById('orchApisSkipped');
+    const costActual = document.getElementById('orchCostActual');
+    const costNaive = document.getElementById('orchCostNaive');
+    const costSaved = document.getElementById('orchCostSaved');
+    const uxExp = document.getElementById('orchUxExperience');
+    const uxImp = document.getElementById('orchUxImpact');
+
+    if (tierBadge) {
+      tierBadge.innerText = orch.tier.replace(/_/g, ' ');
+      if (orch.tier.includes('BASELINE')) {
+        tierBadge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
+      } else if (orch.tier.includes('COERCION')) {
+        tierBadge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800';
+      } else {
+        tierBadge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800';
+      }
+    }
+
+    if (apisInvoked) apisInvoked.innerText = `${orch.carrier_api_calls_count} / 4 APIs Active (${orch.apis_invoked[0] || 'Targeted'})`;
+    if (apisSkipped) apisSkipped.innerText = orch.apis_skipped_or_cached.join(' • ');
+    if (costActual) costActual.innerText = `$${orch.cost_actual_usd.toFixed(2)}`;
+    if (costNaive) costNaive.innerText = `$${orch.cost_naive_usd.toFixed(2)}`;
+    if (costSaved) costSaved.innerText = `${orch.cost_reduction_percent}% Saved`;
+    if (uxExp) uxExp.innerText = orch.user_friction;
+    if (uxImp) uxImp.innerText = orch.checkout_experience;
+  }
+
+  // 4. Update CAMARA Telemetry Badges
   const sig = decision.signals;
   
   // Number Verify
@@ -351,17 +407,17 @@ function renderEvaluation(decision) {
     devIcon.className = 'h-3.5 w-3.5 text-emerald-400';
   }
 
-  // 4. Update Gemini 2.0 Flash AI Compliance Trace Log
+  // 5. Update Gemini 2.0 Flash AI Compliance Trace Log
   if (decision.ai_compliance_trace) {
     typewriterLog(decision.ai_compliance_trace);
   }
 
-  // 5. Update Raw CAMARA Wire Inspector
+  // 6. Update Raw CAMARA Wire Inspector
   if (decision.raw_wire_trace) {
     renderWireInspector(decision.raw_wire_trace);
   }
 
-  // 6. Update ISO 20022 Bank Rail Payload
+  // 7. Update ISO 20022 Bank Rail Payload
   renderBankRailPayload(decision);
 
   if (window.lucide) lucide.createIcons();

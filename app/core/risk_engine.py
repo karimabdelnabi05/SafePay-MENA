@@ -126,5 +126,6 @@ class DeterministicRiskEngine:
             recommended_action=recommended_action,
             execution_time_ms=round(exec_latency, 2),
             signals=signals,
-            raw_wire_trace=signals.raw_wire_trace
+            raw_wire_trace=signals.raw_wire_trace,
+            orchestration=signals.orchestration
         )
