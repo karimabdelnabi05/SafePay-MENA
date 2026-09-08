@@ -73,3 +73,5 @@ class PresetScenario(str, Enum):
     CLEAN_TRANSFER = "CLEAN_TRANSFER"         # 200 EGP to Mom -> Silent Approve (<200ms)
     SPAM_CALL_SCAM = "SPAM_CALL_SCAM"         # 15,000 SAR on active phone call -> Face ID Step-Up
     SIM_SWAP_ATTACK = "SIM_SWAP_ATTACK"       # 35,000 SAR swapped 2h ago -> Immediate Hard Block
+    STOLEN_CARD_CNP = "STOLEN_CARD_CNP"       # 1,200 AED online checkout on rogue device -> Silent Block (CBUAE 2025/3057)
+

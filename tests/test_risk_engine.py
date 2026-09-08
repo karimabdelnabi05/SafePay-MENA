@@ -103,6 +103,36 @@ def test_sim_swap_attack_scenario():
     assert any("CRITICAL: SIM card swapped" in r for r in decision.reasons)
     assert any("SAMA_SARIE_LIMIT_20K" in flag for flag in decision.statutory_flags)
 
+def test_stolen_card_cnp_scenario():
+    """Scenario 4: 1,200 AED online 3DS checkout on rogue device -> Silent HARD BLOCK (CBUAE Notice 2025/3057)."""
+    txn = TransactionRequest(
+        transaction_id="txn_cnp_004",
+        sender_phone="+971501234567",
+        recipient_id="merchant_amazon_ae",
+        recipient_name="Amazon UAE Checkout",
+        amount=1200.0,
+        currency=Currency.AED,
+        is_saved_beneficiary=False
+    )
+    signals = CarrierSignalProfile(
+        phone_number="+971501234567",
+        carrier_name="e& UAE",
+        number_verified=False,  # Rogue device lacked cellular connection of registered SIM
+        sim_swapped_recently=False,
+        is_on_active_voice_call=False,
+        is_roaming=False,
+        device_match=False
+    )
+    
+    decision = DeterministicRiskEngine.evaluate(txn, signals)
+    
+    assert decision.decision == RiskTier.BLOCK
+    assert decision.risk_score >= 70
+    assert decision.primary_vector == ScamVector.CARD_LEAKAGE_CNP
+    assert any("BEARER MISMATCH" in r for r in decision.reasons)
+    assert any("CBUAE_NOTICE_2025_3057_SHIELD" in flag for flag in decision.statutory_flags)
+
+
 def test_high_throughput_performance():
     """Verify 1,000 evaluations execute in under 50ms total (<0.05ms per transaction)."""
     txn = TransactionRequest(
@@ -138,8 +168,11 @@ if __name__ == "__main__":
     print("  [PASS] test_vishing_spam_call_scenario")
     test_sim_swap_attack_scenario()
     print("  [PASS] test_sim_swap_attack_scenario")
+    test_stolen_card_cnp_scenario()
+    print("  [PASS] test_stolen_card_cnp_scenario")
 
     test_high_throughput_performance()
+
     print("  [PASS] test_high_throughput_performance")
     print("ALL TESTS PASSED SUCCESSFULLY!")
 

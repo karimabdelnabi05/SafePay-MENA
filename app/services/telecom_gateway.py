@@ -102,6 +102,18 @@ class TelecomGateway:
                 device_match=False
             )
             
+        if scenario == PresetScenario.STOLEN_CARD_CNP:
+            return CarrierSignalProfile(
+                phone_number=phone,
+                carrier_name=carrier,
+                number_verified=False,  # Rogue checkout device: Cellular Possession FAILED
+                sim_swapped_recently=False,
+                is_on_active_voice_call=False,
+                is_roaming=False,
+                device_match=False
+            )
+
+            
         # 2. Check in-memory SIM swap cache
         cached_swap = self._sim_swap_cache.get(phone)
         if cached_swap is not None:

@@ -93,6 +93,9 @@ class DeterministicRiskEngine:
         # 8. CBUAE Notice 2025/3057 Compliance Verification
         if signals.number_verified and not signals.sim_swapped_recently:
             statutory_flags.append("CBUAE_NOTICE_2025_3057_COMPLIANT: Authenticated via phishing-resistant cellular bearer (Zero SMS OTP liability)")
+        elif not signals.number_verified:
+            statutory_flags.append("CBUAE_NOTICE_2025_3057_SHIELD: Rogue device lacked cellular possession of registered SIM (Declined without SMS OTP exposure)")
+
             
         # Clamp score between 0 and 100
         normalized_score = min(100, max(0, score))

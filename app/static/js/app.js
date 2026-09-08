@@ -51,7 +51,7 @@ function loadScenario(type) {
   currentScenario = type;
   
   // Highlight active preset button
-  ['Clean', 'Spam', 'Swap'].forEach(s => {
+  ['Clean', 'Spam', 'Swap', 'Card'].forEach(s => {
     const btn = document.getElementById(`btnScenario${s}`);
     if (btn) btn.classList.remove('ring-2', 'ring-cyan-400');
   });
@@ -59,7 +59,8 @@ function loadScenario(type) {
   const activeBtnMap = {
     'CLEAN_TRANSFER': 'btnScenarioClean',
     'SPAM_CALL_SCAM': 'btnScenarioSpam',
-    'SIM_SWAP_ATTACK': 'btnScenarioSwap'
+    'SIM_SWAP_ATTACK': 'btnScenarioSwap',
+    'STOLEN_CARD_CNP': 'btnScenarioCard'
   };
   const activeBtn = document.getElementById(activeBtnMap[type]);
   if (activeBtn) activeBtn.classList.add('ring-2', 'ring-cyan-400');
@@ -106,6 +107,18 @@ function loadScenario(type) {
     callIndicatorDot.className = 'h-2 w-2 rounded-full bg-rose-500 animate-pulse';
     callIndicatorText.innerText = 'SIM Alert';
   }
+  else if (type === 'STOLEN_CARD_CNP') {
+    callBanner.classList.add('hidden');
+    savedBadge.classList.add('hidden');
+    carrierTag.innerText = 'Rogue Browser (No Carrier SIM)';
+    inputRecipient.value = 'Amazon UAE (Card Stolen)';
+    inputAmount.value = '1200';
+    selectCurrency.value = 'AED';
+    updateCurrency('AED');
+    callIndicatorDot.className = 'h-2 w-2 rounded-full bg-purple-400 animate-pulse';
+    callIndicatorText.innerText = 'No SIM Carrier Match';
+  }
+
   
   if (window.lucide) lucide.createIcons();
 }

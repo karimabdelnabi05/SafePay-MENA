@@ -23,7 +23,9 @@ from app.core.models import (
 from app.core.risk_engine import DeterministicRiskEngine
 from app.services.telecom_gateway import telecom_gateway
 from app.services.ai_agent import audit_agent
+from app.services.audit_store import audit_store
 from app.config import settings
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -124,8 +126,10 @@ async def evaluate_transaction(
         "decision": decision.model_dump(mode="json")
     }
     asyncio.create_task(manager.broadcast(event_payload))
+    asyncio.create_task(audit_store.persist_audit_record(txn, decision))
     
     return decision
+
 
 @app.post("/api/v1/transfer/step-up/verify")
 async def verify_step_up(payload: BiometricStepUpRequest):
