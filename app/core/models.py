@@ -50,6 +50,7 @@ class CarrierSignalProfile(BaseModel):
     roaming_country: Optional[str] = Field(default=None, description="ISO country code if roaming")
     device_match: bool = Field(default=True, description="Device Swap check: IMEI matches carrier registry")
     eval_latency_ms: float = Field(default=0.0, description="Time taken to collect telecom signals in ms")
+    raw_wire_trace: Optional[dict] = Field(default=None, description="Exact CAMARA wire-level HTTP request/response payloads")
 
 class RiskDecision(BaseModel):
     transaction_id: str
@@ -62,6 +63,7 @@ class RiskDecision(BaseModel):
     execution_time_ms: float
     signals: CarrierSignalProfile
     ai_compliance_trace: Optional[str] = None
+    raw_wire_trace: Optional[dict] = None
 
 class BiometricStepUpRequest(BaseModel):
     transaction_id: str

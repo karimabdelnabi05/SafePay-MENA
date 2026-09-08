@@ -125,5 +125,6 @@ class DeterministicRiskEngine:
             statutory_flags=statutory_flags,
             recommended_action=recommended_action,
             execution_time_ms=round(exec_latency, 2),
-            signals=signals
+            signals=signals,
+            raw_wire_trace=signals.raw_wire_trace
         )

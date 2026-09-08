@@ -1,17 +1,55 @@
 /**
- * SafePay MENA - Frontend Dashboard Client
- * Manages WebSocket telemetry, interactive mobile simulator, and live SVG gauge.
+ * SafePay MENA - Institutional Frontend Dashboard Client
+ * Enterprise SOC Controller with Real-Time CAMARA Wire Inspector & ISO 20022 Telemetry.
  */
 
 let currentScenario = 'CLEAN_TRANSFER';
 let currentTransactionId = 'txn_clean_001';
 let socket = null;
+let activeTab = 'ai';
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   initWebSocket();
   loadScenario('CLEAN_TRANSFER');
+  switchTab('ai');
 });
+
+// Tab Switching Controller
+function switchTab(tab) {
+  activeTab = tab;
+  
+  const tabs = ['ai', 'wire', 'rail'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tabBtn${capitalize(t)}`);
+    const content = document.getElementById(`tabContent${capitalize(t)}`);
+    if (btn) {
+      if (t === tab) {
+        btn.classList.add('active');
+        btn.classList.remove('text-slate-400');
+        btn.classList.add('text-slate-200');
+      } else {
+        btn.classList.remove('active');
+        btn.classList.remove('text-slate-200');
+        btn.classList.add('text-slate-400');
+      }
+    }
+    if (content) {
+      if (t === tab) {
+        content.classList.remove('hidden');
+      } else {
+        content.classList.add('hidden');
+      }
+    }
+  });
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function capitalize(s) {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 // WebSocket Connection Management
 function initWebSocket() {
@@ -21,9 +59,12 @@ function initWebSocket() {
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
-    document.getElementById('wsStatus').innerText = 'Connected';
-    document.getElementById('wsStatus').className = 'text-emerald-400 font-bold';
-    console.log('SafePay WebSocket Connected');
+    const wsBadge = document.getElementById('wsStatus');
+    if (wsBadge) {
+      wsBadge.innerText = 'Connected';
+      wsBadge.className = 'font-semibold text-emerald-400';
+    }
+    console.log('[SafePay SOC] WebSocket Connected to Gateway');
   };
 
   socket.onmessage = (event) => {
@@ -40,8 +81,11 @@ function initWebSocket() {
   };
 
   socket.onclose = () => {
-    document.getElementById('wsStatus').innerText = 'Reconnecting...';
-    document.getElementById('wsStatus').className = 'text-amber-400 font-bold';
+    const wsBadge = document.getElementById('wsStatus');
+    if (wsBadge) {
+      wsBadge.innerText = 'Reconnecting...';
+      wsBadge.className = 'font-semibold text-amber-400';
+    }
     setTimeout(initWebSocket, 2000);
   };
 }
@@ -53,7 +97,10 @@ function loadScenario(type) {
   // Highlight active preset button
   ['Clean', 'Spam', 'Swap', 'Card'].forEach(s => {
     const btn = document.getElementById(`btnScenario${s}`);
-    if (btn) btn.classList.remove('ring-2', 'ring-cyan-400');
+    if (btn) {
+      btn.classList.remove('border-sky-500', 'bg-slate-800', 'text-sky-300');
+      btn.classList.add('border-slate-700', 'bg-slate-900/90', 'text-slate-200');
+    }
   });
 
   const activeBtnMap = {
@@ -63,7 +110,10 @@ function loadScenario(type) {
     'STOLEN_CARD_CNP': 'btnScenarioCard'
   };
   const activeBtn = document.getElementById(activeBtnMap[type]);
-  if (activeBtn) activeBtn.classList.add('ring-2', 'ring-cyan-400');
+  if (activeBtn) {
+    activeBtn.classList.remove('border-slate-700', 'bg-slate-900/90', 'text-slate-200');
+    activeBtn.classList.add('border-sky-500', 'bg-slate-800', 'text-sky-300');
+  }
 
   const callBanner = document.getElementById('activeCallBanner');
   const savedBadge = document.getElementById('savedBadge');
@@ -82,44 +132,43 @@ function loadScenario(type) {
     inputAmount.value = '200';
     selectCurrency.value = 'SAR';
     updateCurrency('SAR');
-    callIndicatorDot.className = 'h-2 w-2 rounded-full bg-slate-600';
+    callIndicatorDot.className = 'h-1.5 w-1.5 rounded-full bg-slate-600';
     callIndicatorText.innerText = 'Cellular LTE';
   } 
   else if (type === 'SPAM_CALL_SCAM') {
     callBanner.classList.remove('hidden');
     savedBadge.classList.add('hidden');
-    carrierTag.innerText = 'stc Saudi (Active Call)';
+    carrierTag.innerText = 'stc Saudi (Active Voice Call)';
     inputRecipient.value = 'Unknown Payee (Scammer)';
     inputAmount.value = '15000';
     selectCurrency.value = 'SAR';
     updateCurrency('SAR');
-    callIndicatorDot.className = 'h-2 w-2 rounded-full bg-amber-400 animate-ping';
+    callIndicatorDot.className = 'h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping';
     callIndicatorText.innerText = 'Call in Progress';
   } 
   else if (type === 'SIM_SWAP_ATTACK') {
     callBanner.classList.add('hidden');
     savedBadge.classList.add('hidden');
-    carrierTag.innerText = 'Rogue Device (IMEI Mismatch)';
+    carrierTag.innerText = 'Rogue Handset (IMEI Mismatch)';
     inputRecipient.value = 'Mule Account Corp';
     inputAmount.value = '35000';
     selectCurrency.value = 'SAR';
     updateCurrency('SAR');
-    callIndicatorDot.className = 'h-2 w-2 rounded-full bg-rose-500 animate-pulse';
+    callIndicatorDot.className = 'h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse';
     callIndicatorText.innerText = 'SIM Alert';
   }
   else if (type === 'STOLEN_CARD_CNP') {
     callBanner.classList.add('hidden');
     savedBadge.classList.add('hidden');
-    carrierTag.innerText = 'Rogue Browser (No Carrier SIM)';
-    inputRecipient.value = 'Amazon UAE (Card Stolen)';
+    carrierTag.innerText = 'Rogue Web Browser (No SIM)';
+    inputRecipient.value = 'Amazon UAE (3DS Online)';
     inputAmount.value = '1200';
     selectCurrency.value = 'AED';
     updateCurrency('AED');
-    callIndicatorDot.className = 'h-2 w-2 rounded-full bg-purple-400 animate-pulse';
+    callIndicatorDot.className = 'h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse';
     callIndicatorText.innerText = 'No SIM Carrier Match';
   }
 
-  
   if (window.lucide) lucide.createIcons();
 }
 
@@ -179,15 +228,6 @@ async function executeTransfer() {
       document.getElementById('biometricModal').classList.remove('hidden');
     } else if (decision.decision === 'BLOCK') {
       document.getElementById('blockModal').classList.remove('hidden');
-    } else if (decision.decision === 'APPROVE') {
-      // Confetti effect for instant approval
-      if (window.confetti) {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.8 }
-        });
-      }
     }
 
   } catch (err) {
@@ -199,7 +239,7 @@ async function executeTransfer() {
   }
 }
 
-// Render Risk Decision & CAMARA Telemetry to SOC Panel
+// Render Risk Decision, Wire Inspector & Telemetry to SOC Panel
 function renderEvaluation(decision) {
   const score = decision.risk_score;
   const tier = decision.decision;
@@ -214,14 +254,14 @@ function renderEvaluation(decision) {
   scoreText.innerText = score;
 
   let tierColor = '#10B981';
-  let badgeClass = 'text-lg font-black px-4 py-1.5 rounded-xl bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 tracking-wider';
+  let badgeClass = 'text-sm font-bold px-3 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800 tracking-wider font-mono';
 
   if (tier === 'STEP_UP') {
     tierColor = '#F59E0B';
-    badgeClass = 'text-lg font-black px-4 py-1.5 rounded-xl bg-amber-950/80 text-amber-400 border border-amber-700/60 tracking-wider animate-pulse';
+    badgeClass = 'text-sm font-bold px-3 py-1 rounded-lg bg-amber-950 text-amber-400 border border-amber-800 tracking-wider font-mono';
   } else if (tier === 'BLOCK') {
     tierColor = '#EF4444';
-    badgeClass = 'text-lg font-black px-4 py-1.5 rounded-xl bg-rose-950/80 text-rose-400 border border-rose-700/60 tracking-wider animate-bounce';
+    badgeClass = 'text-sm font-bold px-3 py-1 rounded-lg bg-rose-950 text-rose-400 border border-rose-800 tracking-wider font-mono';
   }
 
   circle.style.stroke = tierColor;
@@ -238,8 +278,10 @@ function renderEvaluation(decision) {
   const statText = decision.statutory_flags.length > 0 ? decision.statutory_flags.join(' • ') : 'Standard SAMA/CBE risk scoring baseline';
   document.getElementById('statutoryText').innerText = statText;
 
-  document.getElementById('engineLatency').innerText = `${decision.execution_time_ms || 2.4} ms`;
-  document.getElementById('decisionTimeBadge').innerText = `${decision.execution_time_ms || 2.4} ms`;
+  const latencyStr = `${decision.execution_time_ms || 2.1} ms`;
+  document.getElementById('engineLatency').innerText = latencyStr;
+  const kpiElem = document.getElementById('kpiLatency');
+  if (kpiElem) kpiElem.innerText = latencyStr;
 
   // 3. Update CAMARA Telemetry Badges
   const sig = decision.signals;
@@ -249,12 +291,12 @@ function renderEvaluation(decision) {
   const numIcon = document.getElementById('sigIconNum');
   if (sig.number_verified) {
     numStatus.innerText = 'VERIFIED';
-    numStatus.className = 'text-xs font-black text-emerald-400 font-mono';
+    numStatus.className = 'text-xs font-bold text-emerald-400 font-mono';
     numIcon.setAttribute('data-lucide', 'check');
     numIcon.className = 'h-3.5 w-3.5 text-emerald-400';
   } else {
     numStatus.innerText = 'FAILED (Rogue)';
-    numStatus.className = 'text-xs font-black text-rose-400 font-mono';
+    numStatus.className = 'text-xs font-bold text-rose-400 font-mono';
     numIcon.setAttribute('data-lucide', 'x');
     numIcon.className = 'h-3.5 w-3.5 text-rose-400';
   }
@@ -264,12 +306,12 @@ function renderEvaluation(decision) {
   const swapIcon = document.getElementById('sigIconSwap');
   if (sig.sim_swapped_recently) {
     swapStatus.innerText = `SWAPPED (${sig.sim_swap_hours_ago || 2.1}h)`;
-    swapStatus.className = 'text-xs font-black text-rose-400 font-mono';
+    swapStatus.className = 'text-xs font-bold text-rose-400 font-mono';
     swapIcon.setAttribute('data-lucide', 'alert-octagon');
     swapIcon.className = 'h-3.5 w-3.5 text-rose-400';
   } else {
     swapStatus.innerText = 'CLEAN (0h)';
-    swapStatus.className = 'text-xs font-black text-emerald-400 font-mono';
+    swapStatus.className = 'text-xs font-bold text-emerald-400 font-mono';
     swapIcon.setAttribute('data-lucide', 'check');
     swapIcon.className = 'h-3.5 w-3.5 text-emerald-400';
   }
@@ -279,12 +321,12 @@ function renderEvaluation(decision) {
   const scamIcon = document.getElementById('sigIconScam');
   if (sig.is_on_active_voice_call) {
     scamStatus.innerText = 'CALL ACTIVE';
-    scamStatus.className = 'text-xs font-black text-amber-400 font-mono animate-pulse';
+    scamStatus.className = 'text-xs font-bold text-amber-400 font-mono';
     scamIcon.setAttribute('data-lucide', 'phone-incoming');
     scamIcon.className = 'h-3.5 w-3.5 text-amber-400';
   } else {
     scamStatus.innerText = 'NO CALL';
-    scamStatus.className = 'text-xs font-black text-emerald-400 font-mono';
+    scamStatus.className = 'text-xs font-bold text-emerald-400 font-mono';
     scamIcon.setAttribute('data-lucide', 'phone-off');
     scamIcon.className = 'h-3.5 w-3.5 text-emerald-400';
   }
@@ -294,17 +336,17 @@ function renderEvaluation(decision) {
   const devIcon = document.getElementById('sigIconDevice');
   if (sig.is_roaming) {
     devStatus.innerText = `ROAMING (${sig.roaming_country})`;
-    devStatus.className = 'text-xs font-black text-amber-400 font-mono';
+    devStatus.className = 'text-xs font-bold text-amber-400 font-mono';
     devIcon.setAttribute('data-lucide', 'globe');
     devIcon.className = 'h-3.5 w-3.5 text-amber-400';
   } else if (!sig.device_match) {
     devStatus.innerText = 'IMEI MISMATCH';
-    devStatus.className = 'text-xs font-black text-rose-400 font-mono';
+    devStatus.className = 'text-xs font-bold text-rose-400 font-mono';
     devIcon.setAttribute('data-lucide', 'smartphone-nfc');
     devIcon.className = 'h-3.5 w-3.5 text-rose-400';
   } else {
     devStatus.innerText = 'HOME NETWORK';
-    devStatus.className = 'text-xs font-black text-emerald-400 font-mono';
+    devStatus.className = 'text-xs font-bold text-emerald-400 font-mono';
     devIcon.setAttribute('data-lucide', 'signal');
     devIcon.className = 'h-3.5 w-3.5 text-emerald-400';
   }
@@ -314,15 +356,92 @@ function renderEvaluation(decision) {
     typewriterLog(decision.ai_compliance_trace);
   }
 
+  // 5. Update Raw CAMARA Wire Inspector
+  if (decision.raw_wire_trace) {
+    renderWireInspector(decision.raw_wire_trace);
+  }
+
+  // 6. Update ISO 20022 Bank Rail Payload
+  renderBankRailPayload(decision);
+
   if (window.lucide) lucide.createIcons();
+}
+
+// Render Wire Inspector Frame
+function renderWireInspector(wire) {
+  const methodEl = document.getElementById('wireMethod');
+  const urlEl = document.getElementById('wireUrl');
+  const statusEl = document.getElementById('wireStatus');
+  const latencyEl = document.getElementById('wireLatency');
+  const reqJsonEl = document.getElementById('wireRequestJson');
+  const resJsonEl = document.getElementById('wireResponseJson');
+  const carrierTagEl = document.getElementById('wireCarrierTag');
+
+  if (methodEl) methodEl.innerText = wire.method || 'POST';
+  if (urlEl) urlEl.innerText = wire.url || 'https://network-as-code.p.rapidapi.com...';
+  if (statusEl) {
+    statusEl.innerText = `${wire.response_status || 200} OK`;
+    statusEl.className = wire.response_status < 400 
+      ? 'px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-800'
+      : 'px-2 py-0.5 rounded bg-rose-950 text-rose-400 font-bold border border-rose-800';
+  }
+  if (latencyEl) latencyEl.innerText = `${wire.latency_ms || 12.8} ms`;
+  if (carrierTagEl) carrierTagEl.innerText = `${wire.carrier_gateway || 'stc'} HSS/HLR`;
+
+  if (reqJsonEl) {
+    reqJsonEl.innerText = JSON.stringify(wire.request_payload || {}, null, 2);
+  }
+  if (resJsonEl) {
+    resJsonEl.innerText = JSON.stringify(wire.response_payload || {}, null, 2);
+  }
+}
+
+// Render ISO 20022 Banking Payload
+function renderBankRailPayload(decision) {
+  const bankRailEl = document.getElementById('bankRailJson');
+  if (!bankRailEl) return;
+
+  const recipientName = document.getElementById('inputRecipientName').value;
+  const amount = document.getElementById('inputAmount').value;
+  const currency = document.getElementById('selectCurrency').value;
+
+  const isoPayload = {
+    GrpHdr: {
+      MsgId: `SAFEPAY/SARIE/${new Date().toISOString().slice(0,10).replace(/-/g,'')}/${decision.transaction_id.slice(-6)}`,
+      CreDtTm: new Date().toISOString(),
+      NbOfTxs: "1",
+      InitgPty: {
+        Nm: "SafePay MENA Telecom Pre-Auth Shield"
+      }
+    },
+    CdtTrfTxInf: {
+      PmtId: { EndToEndId: decision.transaction_id },
+      IntrBkSttlmAmt: { Ccy: currency, Value: `${parseFloat(amount).toFixed(2)}` },
+      Dbtr: {
+        Nm: "Karim Abdelnabi",
+        CtctDtls: { MobNb: decision.signals.phone_number }
+      },
+      Cdtr: { Nm: recipientName },
+      RgltryRptg: {
+        Dtls: {
+          Cd: decision.decision === 'APPROVE' ? 'CAMARA_PASSKEY_VERIFIED' : 'CAMARA_CHALLENGE_FLAGGED',
+          Prtry: decision.statutory_flags[0] || 'SAMA_INSTANT_TRANSFER_STANDARD_RULE',
+          AuthrtyNm: currency === 'SAR' ? 'SAMA' : (currency === 'EGP' ? 'CBE' : 'CBUAE')
+        }
+      }
+    }
+  };
+
+  bankRailEl.innerText = JSON.stringify(isoPayload, null, 2);
 }
 
 // Typewriter effect for AI Audit Log
 function typewriterLog(text) {
   const logElem = document.getElementById('aiTraceLog');
+  if (!logElem) return;
   logElem.innerText = '';
   let idx = 0;
-  const speed = 8; // ms per char
+  const speed = 6; // ms per char
   
   function type() {
     if (idx < text.length) {
@@ -349,14 +468,6 @@ async function confirmBiometricStepUp() {
         success: true
       })
     });
-    
-    if (window.confetti) {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
   } catch (e) {
     console.error('Step up confirmation failed:', e);
   }
@@ -374,6 +485,6 @@ function dismissBlockModal() {
 function renderStepUpResolved(data) {
   const decisionBadge = document.getElementById('decisionBadge');
   decisionBadge.innerText = 'APPROVED (POST-BIOMETRIC)';
-  decisionBadge.className = 'text-sm font-black px-3 py-1.5 rounded-xl bg-emerald-950/80 text-emerald-300 border border-emerald-600 tracking-wider';
+  decisionBadge.className = 'text-xs font-bold px-3 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-700 tracking-wider font-mono';
   document.getElementById('actionText').innerText = data.message;
 }
