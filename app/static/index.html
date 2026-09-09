@@ -39,6 +39,7 @@
           <fieldset><legend>Market</legend><div class="segments" id="countrySegments"></div></fieldset>
           <div class="mode-row"><label for="modeSelect">Evidence mode</label><select class="mode-select" id="modeSelect"><option value="FIXTURE">Repeatable fixture</option></select></div>
           <div class="field"><label for="scenarioSelect">Scenario</label><select id="scenarioSelect" required></select><span class="helper" id="scenarioHelp">Loading scenarios...</span></div>
+          <div class="field"><label for="channelSelect">Payment channel</label><select id="channelSelect"><option value="INSTANT_PAYMENT">Instant account transfer</option><option value="CARD_CHECKOUT">Card checkout</option><option value="WALLET_TRANSFER">Wallet transfer</option></select></div>
           <div class="field-row">
             <div class="field"><label for="amountInput">Amount</label><input id="amountInput" type="number" min="1" max="1000000" step="1" value="200" required><span class="helper" id="currencyHelp">EGP</span></div>
             <div class="field"><label for="recipientSelect">Recipient relationship</label><select id="recipientSelect"><option value="family">Family / known</option><option value="new_payee">New payee</option><option value="merchant">Merchant</option><option value="wallet">Wallet</option></select></div>
@@ -58,7 +59,7 @@
         <div class="metrics" aria-label="Decision metrics">
           <div class="metric"><span>Pre-call score</span><strong id="preScore">-</strong></div>
           <div class="metric"><span>Final risk score</span><strong id="finalScore">-</strong></div>
-          <div class="metric"><span>Agent + API calls</span><strong id="externalCalls">0</strong></div>
+          <div class="metric"><span>Agent turns + CAMARA tools</span><strong id="externalCalls">0</strong></div>
         </div>
         <div class="reason-block"><h3>Why this happened</h3><ul class="reason-list" id="reasonList"><li>The review has not started.</li></ul></div>
         <div class="actions" id="resultActions" hidden><button class="danger-button" id="cancelButton" type="button">Cancel review</button></div>

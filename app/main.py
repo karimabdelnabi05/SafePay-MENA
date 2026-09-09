@@ -9,7 +9,6 @@ from fastapi.staticfiles import StaticFiles
 from app.api import create_app
 from app.config import settings
 
-
 STATIC_DIR = Path(__file__).parent / "static"
 DATABASE = os.getenv("SAFEPAY_DATABASE", ":memory:")
 LIVE_REQUESTED = os.getenv("SAFEPAY_ENABLE_LIVE", "false").lower() in {"1", "true", "yes"}

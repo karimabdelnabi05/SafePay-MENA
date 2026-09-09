@@ -17,7 +17,7 @@ TOOL_DESCRIPTIONS = {
 }
 
 
-async def investigate(context, gateway, subjects, client, key, model="gemini-3.5-flash-lite"):
+async def investigate(context, gateway, subjects, client, key, model="gemini-3.5-flash-lite", should_stop=None):
     evidence, trace, calls, proposal = [], [], 0, None
     tools = [{"name": name, "description": description, "parameters": {
         "type": "OBJECT", "properties": {"reason": {"type": "STRING"}}, "required": ["reason"]}}
@@ -44,6 +44,11 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
     try:
         async with asyncio.timeout(45):
             for _ in range(7):
+                if should_stop and should_stop():
+                    failure = "Cancelled"
+                    trace.append({"actor": "POLICY", "tool": "stop",
+                                  "reason": "The review was cancelled; no further external calls were made"})
+                    break
                 calls += 1
                 response = await client.post(
                     f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
@@ -60,15 +65,26 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
                     raise ValueError("One tool per decision is required")
                 call = parts[0]["functionCall"]
                 name, args = call["name"], call.get("args", {})
+                if not isinstance(args, dict):
+                    raise TypeError("Tool arguments must be an object")
                 if name == "finish":
-                    if args.get("decision") not in {"APPROVE", "HOLD", "BLOCK", "RETRY"}:
+                    if (set(args) != {"decision", "reason"}
+                            or args.get("decision") not in {"APPROVE", "HOLD", "BLOCK", "RETRY"}
+                            or not isinstance(args.get("reason"), str) or not args["reason"].strip()):
                         raise ValueError("Invalid disposition")
                     proposal = args["decision"]
                     trace.append({"actor": "GEMINI", "tool": "finish", "reason": str(args.get("reason", ""))[:300]})
                     break
-                if name not in TOOL_DESCRIPTIONS or set(args) - {"reason"} or any(e["tool"] == name for e in evidence):
+                if (name not in TOOL_DESCRIPTIONS or set(args) != {"reason"}
+                        or not isinstance(args.get("reason"), str) or not args["reason"].strip()
+                        or any(e["tool"] == name for e in evidence)):
                     raise ValueError("Unsupported, repeated, or invalid tool call")
-                observation = await gateway.check(name, subjects[name])
+                if should_stop and should_stop():
+                    failure = "Cancelled"
+                    trace.append({"actor": "POLICY", "tool": "stop",
+                                  "reason": "The review was cancelled before the selected tool could start"})
+                    break
+                observation = await gateway.check(name, subjects[name], should_stop=should_stop)
                 evidence.append(observation)
                 trace.append({"actor": "GEMINI", "tool": name, "reason": str(args.get("reason", ""))[:300],
                               "status": observation["status"]})
@@ -86,12 +102,14 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
         failure = type(exc).__name__
         trace.append({"actor": "POLICY", "tool": "stop", "reason": "Agent unavailable or invalid tool request; no automatic release"})
     decision, score, reasons = assess(context, evidence)
-    if proposal == "BLOCK" and decision != "BLOCK":
-        decision = "BLOCK"
-        reasons.append("Agent requested protective fraud review")
-    elif failure and decision != "BLOCK":
+    if failure and decision != "BLOCK":
         decision = "RETRY"
         reasons.append("Agent investigation did not complete")
+    elif proposal == "BLOCK" and decision == "APPROVE":
+        decision = "HOLD"
+        reasons.append("Agent requested protective review; deterministic policy limited the action to HOLD")
+    elif proposal == "BLOCK" and decision != "BLOCK":
+        reasons.append("Agent requested protective review; deterministic policy retained its disposition")
     elif proposal in {"HOLD", "RETRY"} and decision == "APPROVE":
         decision = proposal
         reasons.append("Agent requested additional review")

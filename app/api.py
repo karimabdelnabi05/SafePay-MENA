@@ -1,19 +1,21 @@
 """Session-scoped SafePay demonstration API. No real payment execution."""
 
+import json
 import secrets
 import sqlite3
-import json
 import time
+from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Request, Response
-from pydantic import BaseModel, ConfigDict, Field
-from app.services.fixtures import FixtureGateway
-from app.core.demo import SCENARIOS, COUNTRIES, context_for, signals_for
-from app.core.policy import screen, assess
-from app.services.nokia import NokiaGateway
-from app.services.investigator import investigate
 import httpx
+from fastapi import FastAPI, HTTPException, Request, Response
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.core.demo import COUNTRIES, SCENARIOS, context_for, signals_for
+from app.core.policy import assess, screen
+from app.services.fixtures import FixtureGateway
+from app.services.investigator import investigate
+from app.services.nokia import NokiaGateway
 
 
 class SessionInput(BaseModel):
@@ -28,18 +30,52 @@ class PaymentInput(BaseModel):
     request_id: str = Field(min_length=1, max_length=80)
     amount: float = Field(gt=0, le=1000000)
     recipient: Literal["family", "new_payee", "merchant", "wallet"] = "family"
+    channel: Literal["INSTANT_PAYMENT", "CARD_CHECKOUT", "WALLET_TRANSFER"] = "INSTANT_PAYMENT"
+
+    @field_validator("request_id")
+    @classmethod
+    def validate_request_id(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError("Request ID cannot be blank")
+        return value
+
+    @field_validator("amount", mode="before")
+    @classmethod
+    def require_numeric_amount(cls, value):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            # Pydantic v2 propagates TypeError instead of producing an HTTP 422.
+            raise ValueError("Amount must be a JSON number")  # noqa: TRY004
+        return value
 
 
 class EnrollmentInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     request_id: str = Field(min_length=1, max_length=80)
 
+    @field_validator("request_id")
+    @classmethod
+    def validate_request_id(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError("Request ID cannot be blank")
+        return value
+
 
 def create_app(database=":memory:", allow_live=False, external_transport=None, nokia_key="", gemini_key=""):
-    app = FastAPI(title="SafePay MENA", version="2.0")
     db = sqlite3.connect(database, check_same_thread=False)
     db.execute("CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, data TEXT NOT NULL)")
     db.execute("CREATE TABLE IF NOT EXISTS runs (session TEXT, id TEXT, payload TEXT, result TEXT, PRIMARY KEY(session,id))")
+
+    @asynccontextmanager
+    async def lifespan(app):
+        app.state.db = db
+        try:
+            yield
+        finally:
+            db.close()
+
+    app = FastAPI(title="SafePay MENA", version="2.0", lifespan=lifespan)
 
     @app.get("/api/v1/catalog")
     async def catalog():
@@ -79,6 +115,13 @@ def create_app(database=":memory:", allow_live=False, external_transport=None, n
                    (json.dumps(result), request.cookies["safepay_session"], result["id"]))
         db.commit()
         return result
+
+    def run_cancelled(request, run_id):
+        row = db.execute(
+            "SELECT result FROM runs WHERE session=? AND id=?",
+            (request.cookies["safepay_session"], run_id),
+        ).fetchone()
+        return bool(row and json.loads(row[0]).get("decision") == "CANCELLED")
 
     @app.get("/api/v1/runs/{run_id}")
     async def get_run(run_id: str, request: Request):
@@ -136,12 +179,9 @@ def create_app(database=":memory:", allow_live=False, external_transport=None, n
         db.commit()
         context["recent_attempts"] = len(recent)
         pre_score, reasons = screen(context, body.amount, body.recipient)
-        channel = {"merchant": "CARD_CHECKOUT", "wallet": "WALLET_TRANSFER"}.get(
-            body.recipient, "INSTANT_PAYMENT"
-        )
         investigation_context = {**context,
             "transaction": {"amount": body.amount, "recipient_relationship": body.recipient,
-                            "country": data["country"], "channel": channel},
+                            "country": data["country"], "channel": body.channel},
             "pre_call_score": pre_score, "pre_call_reasons": reasons}
         result = {"id": body.request_id, "decision": "APPROVE" if data["trusted_device"] else "VERIFY_DEVICE",
                   "pre_call_score": pre_score, "final_risk_score": pre_score, "telecom_calls": 0,
@@ -152,7 +192,8 @@ def create_app(database=":memory:", allow_live=False, external_transport=None, n
                 subjects = {tool: "+99999991000" if value else "+99999991001" for tool, value in values.items()}
                 async with httpx.AsyncClient(transport=external_transport) as external:
                     result.update(await investigate(investigation_context, NokiaGateway(nokia_key, external), subjects,
-                                                    external, gemini_key))
+                                                    external, gemini_key,
+                                                    should_stop=lambda: run_cancelled(request, body.request_id)))
                 return finish(request, result)
             gateway = FixtureGateway(values)
             tools = ["sim_swap", "number_verification"]
@@ -161,7 +202,9 @@ def create_app(database=":memory:", allow_live=False, external_transport=None, n
             if context["travel_expected"]:
                 tools.append("roaming")
             result["evidence"] = [await gateway.check(tool) for tool in tools]
-            result["decision"], result["final_risk_score"], result["reasons"] = assess(context, result["evidence"])
+            result["decision"], result["final_risk_score"], result["reasons"] = assess(
+                investigation_context, result["evidence"]
+            )
             result["decision_source"] = "DETERMINISTIC_FIXTURE"
         return finish(request, result)
 
@@ -174,15 +217,25 @@ def create_app(database=":memory:", allow_live=False, external_transport=None, n
         if data["mode"] == "NOKIA_SANDBOX":
             async with httpx.AsyncClient(transport=external_transport) as external:
                 gateway = NokiaGateway(nokia_key, external)
-                evidence = [await gateway.check(tool, phone) for tool, phone in
-                            (("number_verification", "+99999991000"), ("sim_swap", "+99999991001"))]
+                evidence = []
+                for tool, phone in (("number_verification", "+99999991000"),
+                                    ("sim_swap", "+99999991001")):
+                    if run_cancelled(request, body.request_id):
+                        return await get_run(body.request_id, request)
+                    evidence.append(await gateway.check(
+                        tool,
+                        phone,
+                        should_stop=lambda: run_cancelled(request, body.request_id),
+                    ))
         else:
             gateway = FixtureGateway(signals_for(data["scenario"]))
             evidence = [await gateway.check(tool) for tool in ("number_verification", "sim_swap")]
         current = await get_run(body.request_id, request)
         if current["decision"] == "CANCELLED":
             return current
-        data["trusted_device"] = all(e["status"] == "SUCCESS" for e in evidence) and evidence[0]["data"].get("devicePhoneNumberVerified") is True and evidence[1]["data"].get("swapped") is False
+        trusted_device = all(e["status"] == "SUCCESS" for e in evidence) and evidence[0]["data"].get("devicePhoneNumberVerified") is True and evidence[1]["data"].get("swapped") is False
+        data = session(request)
+        data["trusted_device"] = trusted_device
         db.execute("UPDATE sessions SET data=? WHERE id=?", (json.dumps(data), request.cookies["safepay_session"]))
         db.commit()
         return finish(request, {"id": body.request_id, "decision": "TRUST_ESTABLISHED" if data["trusted_device"] else "RETRY",

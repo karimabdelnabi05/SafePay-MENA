@@ -1,799 +1,241 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafePay MENA - Phase 2 Master Presentation Deck</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafePay MENA - Phase 2 Pitch</title>
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #070C18; color: #F1F5F9; overflow: hidden; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    .slide { display: none; height: 100vh; width: 100vw; padding: 2.5rem 4.5rem; box-sizing: border-box; }
-    .slide.active { display: flex; flex-direction: column; justify-content: space-between; }
-    .glass-box { background: rgba(13, 21, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .glass-box:hover { border-color: rgba(0, 242, 254, 0.25); }
-    .gradient-text { background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 50%, #818CF8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .glow-cyan { box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); }
+    :root {
+      --ink: #17211b;
+      --muted: #536158;
+      --line: #cad4cd;
+      --paper: #ffffff;
+      --soft: #f2f5f2;
+      --green: #086c4f;
+      --green-soft: #e6f3ed;
+      --amber: #b77900;
+      --amber-soft: #fff4d7;
+      --red: #a52c2c;
+      --red-soft: #fbeaea;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #dfe4e0; color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+    .slide {
+      position: relative;
+      width: 13.333in;
+      height: 7.5in;
+      margin: 0 auto 20px;
+      padding: .48in .58in .42in;
+      overflow: hidden;
+      background: var(--paper);
+      page-break-after: always;
+    }
+    .slide:last-child { page-break-after: auto; }
+    .topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: .24in; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .mark { width: 30px; height: 30px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 5px; }
+    .phase { color: var(--muted); font-size: 13px; font-weight: 700; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 9.7in; margin-bottom: .18in; font-size: 48px; line-height: 1.04; letter-spacing: 0; }
+    h2 { margin-bottom: .24in; font-size: 31px; line-height: 1.1; letter-spacing: 0; }
+    h3 { margin-bottom: 8px; font-size: 18px; letter-spacing: 0; }
+    p, li, td, th { font-size: 16px; line-height: 1.38; }
+    .lede { max-width: 10.7in; color: var(--muted); font-size: 23px; line-height: 1.35; }
+    .eyebrow { margin-bottom: 10px; color: var(--green); font-size: 13px; font-weight: 800; text-transform: uppercase; }
+    .band { margin: .25in -.58in 0; padding: .28in .58in; background: var(--ink); color: white; }
+    .band p { margin: 0; font-size: 21px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .24in; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .18in; }
+    .panel { border: 1px solid var(--line); border-radius: 6px; padding: .2in; background: var(--paper); }
+    .panel.soft { background: var(--soft); }
+    .panel.green { border-left: 6px solid var(--green); background: var(--green-soft); }
+    .panel.amber { border-left: 6px solid var(--amber); background: var(--amber-soft); }
+    .panel.red { border-left: 6px solid var(--red); background: var(--red-soft); }
+    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+    .number { color: var(--green); font-size: 34px; font-weight: 850; line-height: 1; }
+    .label { margin-top: 7px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    .flow { display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr 36px 1fr; align-items: stretch; margin-top: .25in; }
+    .node { min-height: 1.55in; border: 1px solid var(--line); border-top: 5px solid var(--green); padding: .18in; background: white; }
+    .arrow { display: grid; place-items: center; color: var(--green); font-size: 28px; font-weight: 800; }
+    .split { display: grid; grid-template-columns: .95fr 1.2fr; gap: .28in; align-items: center; }
+    .product-shot { width: 100%; max-height: 5.5in; object-fit: contain; object-position: top; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 9px 10px; background: var(--ink); color: white; text-align: left; }
+    td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:nth-child(even) td { background: var(--soft); }
+    .tag { display: inline-block; padding: 4px 7px; border-radius: 3px; background: var(--green-soft); color: var(--green); font-size: 12px; font-weight: 800; }
+    .tag.amber { background: var(--amber-soft); color: #735000; }
+    .tag.red { background: var(--red-soft); color: var(--red); }
+    ul.clean { margin: 8px 0 0; padding-left: 20px; }
+    ul.clean li { margin-bottom: 6px; }
+    .callout { margin-top: .2in; padding: .14in .18in; border-left: 5px solid var(--amber); background: var(--amber-soft); font-weight: 650; }
+    .footer { position: absolute; left: .58in; right: .58in; bottom: .18in; display: flex; justify-content: space-between; color: #6b776f; font-size: 11px; }
+    .hero { display: flex; min-height: 5.55in; flex-direction: column; justify-content: center; }
+    .closing .hero { min-height: 4.85in; }
+    .hero .proof { display: flex; gap: 10px; margin-top: .22in; }
+    .proof span { padding: 7px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--soft); font-size: 13px; font-weight: 750; }
+    .market { min-height: 2.15in; }
+    .market strong { display: block; margin-bottom: 5px; font-size: 22px; }
+    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: .16in; margin-bottom: .22in; }
+    .metric { min-height: 1.18in; border-top: 5px solid var(--green); padding: .16in; background: var(--soft); }
+    .small { color: var(--muted); font-size: 13px; }
+    @page { size: 13.333in 7.5in; margin: 0; }
+    @media print {
+      body { background: white; }
+      .slide { margin: 0; }
+    }
   </style>
 </head>
-<body class="select-none bg-[#070C18] text-slate-100">
-
-  <!-- ==================== SLIDE 1: COVER ==================== -->
-  <div class="slide active" id="slide-1">
-    <div class="flex items-center justify-between">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 text-xs font-semibold tracking-wider uppercase">
-        GSMA MENA Ignite Hackathon 2026 • Theme 4: Secure FinTech, Payments & Anti-Fraud
-      </div>
-      <div class="text-xs text-slate-400 mono font-semibold">Slide 01 / 15</div>
+<body>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">GSMA MENA Ignite - Phase 2</div></div>
+    <div class="hero">
+      <div class="eyebrow">Adaptive telecom evidence for payment decisions</div>
+      <h1>Keep routine payments instant. Investigate risk before money moves.</h1>
+      <p class="lede">SafePay adds CAMARA network observations to bank context only when risk warrants it, using bounded AI tool orchestration and deterministic release policy.</p>
+      <div class="proof"><span>Working FastAPI prototype</span><span>Nokia sandbox verified</span><span>Egypt - Saudi Arabia - UAE</span></div>
     </div>
+    <div class="footer"><span>Prototype: synthetic bank context and simulator subscribers</span><span>1 / 10</span></div>
+  </section>
 
-    <div class="space-y-6 max-w-5xl my-auto">
-      <div class="inline-block px-3 py-1 rounded-md bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 text-xs mono">
-        OFFICIAL PHASE 2 SUBMISSION DOSSIER
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">The decision gap</div></div>
+    <h2>Payment systems and mobile networks see different pieces of the same attack</h2>
+    <div class="grid-2">
+      <div class="panel amber">
+        <h3>The payment provider sees</h3>
+        <ul class="clean"><li>Amount and recipient relationship</li><li>Payment channel and customer history</li><li>Session and transaction anomalies</li><li>Customer-reported scam context</li></ul>
       </div>
-      <h1 class="text-6xl font-extrabold tracking-tight leading-tight">
-        SafePay <span class="gradient-text">MENA</span>
-      </h1>
-      <p class="text-2xl text-slate-300 font-medium leading-relaxed">
-        Real-Time AI Telecom Fraud Shield for Instant Payments Powered by Network Intelligence
-      </p>
-      
-      <div class="grid grid-cols-3 gap-4 pt-4">
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-cyan-400 font-bold mono">LEAD DEVELOPER</div>
-          <div class="text-base font-bold text-slate-100">Karim Mohamed Abdelnabi</div>
-          <div class="text-xs text-slate-400">Solo Full-Stack & AI Engineer • Cairo, Egypt</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-indigo-400 font-bold mono">ASSIGNED MENTOR</div>
-          <div class="text-base font-bold text-slate-100">Eng. Abdullah A. Alkaoud</div>
-          <div class="text-xs text-slate-400">Saudi Telecom Company (stc) • Riyadh, KSA</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-emerald-400 font-bold mono">PLATFORMS & STANDARDS</div>
-          <div class="text-base font-bold text-slate-100">GSMA CAMARA • Nokia NaC</div>
-          <div class="text-xs text-slate-400">Google Gemini 2.0 Flash • FastAPI</div>
-        </div>
+      <div class="panel green">
+        <h3>The mobile network can observe</h3>
+        <ul class="clean"><li>Recent SIM change</li><li>Number association through supported authorization</li><li>Recent device change</li><li>Roaming and reachability status</li></ul>
       </div>
     </div>
+    <div class="band"><p>SafePay orchestrates those observations as evidence. It does not treat any single signal as proof of fraud or payment intent.</p></div>
+    <div class="footer"><span>No active-call or Scam Signal API is claimed</span><span>2 / 10</span></div>
+  </section>
 
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>SafePay MENA • AI Telecom-Banking Security Middleware</div>
-      <div class="mono">Use ⬅️ ➡️ Keys or Space to Navigate • Press [F] for Fullscreen</div>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">How it works</div></div>
+    <h2>Decision-first orchestration avoids unnecessary calls</h2>
+    <div class="flow">
+      <div class="node"><div class="eyebrow">1 - Context</div><h3>Payment intent</h3><p>Amount, channel, recipient relationship, session anomalies, and market.</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="eyebrow">2 - Screen</div><h3>Local pre-check</h3><p>Routine traffic approves without Gemini or CAMARA calls.</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="eyebrow">3 - Investigate</div><h3>Bounded agent</h3><p>Gemini selects relevant allowlisted CAMARA tools and inspects results.</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="eyebrow">4 - Decide</div><h3>Deterministic policy</h3><p>APPROVE, HOLD, BLOCK, or RETRY with an inspectable trace.</p></div>
     </div>
-  </div>
+    <div class="callout">Mandatory exception: first setup and a new phone always require fresh Number Verification and SIM Swap checks before device trust.</div>
+    <div class="footer"><span>Fixture mode repeats the paths without external requests</span><span>3 / 10</span></div>
+  </section>
 
-  <!-- ==================== SLIDE 2: THE EXECUTIVE HOOK ==================== -->
-  <div class="slide" id="slide-2">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">02 / EXECUTIVE HOOK</span>
-      <span class="text-xs text-slate-400 mono">Slide 02 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">The Instant Payment Boom Has a 3-Second Blind Spot</h2>
-      
-      <div class="glass-box p-6 rounded-2xl border-l-4 border-l-cyan-400 space-y-3">
-        <p class="text-2xl text-slate-200 font-semibold italic">
-          "1.5 Billion instant transactions in Egypt worth EGP 2.9 Trillion in 2024.<br/>
-          Saudi Arabia's Sarie and UAE's Aani settle transfers in under 3 seconds.<br/>
-          Every single one is irreversible. Once money moves, it is gone."
-        </p>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Working prototype</div></div>
+    <div class="split">
+      <div>
+        <h2>A focused payment-review workspace</h2>
+        <ul class="clean"><li>Market, use case, channel, amount, and recipient context</li><li>Separate pre-call and final risk scores</li><li>Visible source labels for fixtures and Nokia sandbox evidence</li><li>Expandable agent and policy trace</li><li>Built-in 36-case acceptance evaluation</li></ul>
+        <div class="callout">No payment is executed. The interface demonstrates the decision layer that a bank or payment provider would call.</div>
       </div>
-
-      <div class="grid grid-cols-3 gap-6 pt-4">
-        <div class="glass-box p-5 rounded-xl border border-red-500/20 bg-red-950/10">
-          <div class="text-3xl font-black text-red-400">AED 4.99</div>
-          <div class="text-xs font-bold text-slate-300 mt-1">Lost per AED 1 Stolen</div>
-          <div class="text-xs text-slate-400 mt-1">LexisNexis 2024: UAE financial institutions incur AED 4.99 in recovery, legal, and operational costs for every dirham stolen.</div>
-        </div>
-        <div class="glass-box p-5 rounded-xl border border-amber-500/20 bg-amber-950/10">
-          <div class="text-3xl font-black text-amber-400">85% of Fraud</div>
-          <div class="text-xs font-bold text-slate-300 mt-1">Vishing & Social Engineering</div>
-          <div class="text-xs text-slate-400 mt-1">Authorized Push Payment (APP) scams coerce victims on active phone calls into sending funds voluntarily.</div>
-        </div>
-        <div class="glass-box p-5 rounded-xl border border-indigo-500/20 bg-indigo-950/10">
-          <div class="text-3xl font-black text-indigo-400">Zero Visibility</div>
-          <div class="text-xs font-bold text-slate-300 mt-1">The Telecom-Banking Divide</div>
-          <div class="text-xs text-slate-400 mt-1">Banks cannot see if a user is currently on a scam call or if their SIM card was swapped 2 hours ago.</div>
-        </div>
-      </div>
+      <img class="product-shot" src="../artifacts/safepay-desktop.png" alt="SafePay MENA payment review interface">
     </div>
+    <div class="footer"><span>Responsive Chromium coverage: desktop, portrait, and landscape</span><span>4 / 10</span></div>
+  </section>
 
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>The settlement velocity of modern payment rails has outpaced legacy fraud controls.</div>
-      <div class="mono">SafePay MENA</div>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Fraud and trust journeys</div></div>
+    <h2>One decision layer, multiple payment risks</h2>
+    <table>
+      <thead><tr><th>Journey</th><th>Why SafePay acts</th><th>Expected disposition</th></tr></thead>
+      <tbody>
+        <tr><td>Everyday payment</td><td>Known recipient, usual amount, established device</td><td><span class="tag">APPROVE - zero calls</span></td></tr>
+        <tr><td>First setup / new phone</td><td>Device trust has not been established</td><td><span class="tag amber">VERIFY, then continue</span></td></tr>
+        <tr><td>Suspicious transfer</td><td>Customer reports bank-transfer instructions from a caller</td><td><span class="tag amber">HOLD</span></td></tr>
+        <tr><td>SIM / device takeover</td><td>Network changes combine with session and payment anomalies</td><td><span class="tag red">BLOCK</span></td></tr>
+        <tr><td>Card leakage / CNP</td><td>Checkout cannot verify the expected number and device context</td><td><span class="tag red">BLOCK</span></td></tr>
+        <tr><td>Planned travel</td><td>Roaming is expected and identity evidence is clean</td><td><span class="tag">APPROVE</span></td></tr>
+        <tr><td>Provider unavailable</td><td>Required evidence is missing or rate-limited</td><td><span class="tag amber">RETRY - never fail open</span></td></tr>
+      </tbody>
+    </table>
+    <div class="footer"><span>Payment channels: instant account transfer, card checkout, wallet transfer</span><span>5 / 10</span></div>
+  </section>
+
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Open Gateway implementation</div></div>
+    <h2>Five Nokia Network as Code tools behind one restricted gateway</h2>
+    <table>
+      <thead><tr><th>CAMARA capability</th><th>Prototype use</th><th>Verified boundary</th></tr></thead>
+      <tbody>
+        <tr><td>SIM Swap</td><td>Observe a change inside the requested window</td><td>Boolean only; exact age is not invented</td></tr>
+        <tr><td>Number Verification</td><td>Check the expected number association</td><td>Bound OAuth state and allowlisted redirects</td></tr>
+        <tr><td>Device Swap</td><td>Add device-change evidence for anomalous sessions</td><td>Not equivalent to app-device ownership</td></tr>
+        <tr><td>Roaming</td><td>Add travel context when relevant</td><td>Roaming alone is not fraud</td></tr>
+        <tr><td>Reachability</td><td>Retrieve availability when selected</td><td>Unreachability alone is not fraud</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">Live checks use only Nokia's documented <code>+99999991000</code> and <code>+99999991001</code> simulator subjects. Production MENA operator coverage is not claimed.</div>
+    <div class="footer"><span>Observed through network-as-code.p.rapidapi.com</span><span>6 / 10</span></div>
+  </section>
+
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Agentic AI</div></div>
+    <h2>The agent chooses evidence; policy controls consequences</h2>
+    <div class="grid-3">
+      <div class="panel green"><h3>Context-aware selection</h3><p>The model receives transaction facts and pre-screen reasons, never the canned scenario label.</p></div>
+      <div class="panel amber"><h3>Bounded execution</h3><p>Five allowlisted tools, fixed schemas, no model-selected phone or URL, no repeat calls, and a hard evidence budget.</p></div>
+      <div class="panel red"><h3>Fail-closed policy</h3><p>Missing required evidence prevents release. Independently supported blocks remain blocked; the model cannot fabricate an observation.</p></div>
     </div>
-  </div>
+    <div class="band"><p>Accepted tool calls, evidence status, summarized failures, and the final policy source are exposed in the result trace.</p></div>
+    <div class="footer"><span>Model: Gemini function calling; network: Nokia sandbox</span><span>7 / 10</span></div>
+  </section>
 
-  <!-- ==================== SLIDE 3: TWO ATTACK VECTORS ==================== -->
-  <div class="slide" id="slide-3">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">03 / REGIONAL THREAT REALITY</span>
-      <span class="text-xs text-slate-400 mono">Slide 03 / 15</span>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Quality evidence</div></div>
+    <h2>Tests verify decisions, orchestration, failure handling, and experience</h2>
+    <div class="metric-row">
+      <div class="metric"><div class="number">36</div><div class="label">In-product cases</div></div>
+      <div class="metric"><div class="number">3</div><div class="label">MENA market contexts</div></div>
+      <div class="metric"><div class="number">60</div><div class="label">Parallel isolated reviews</div></div>
+      <div class="metric"><div class="number">5</div><div class="label">CAMARA tools</div></div>
     </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">The Real MENA Fraud Landscape: Two Distinct Vectors</h2>
-      
-      <div class="grid grid-cols-2 gap-6">
-        <!-- Vector 1 -->
-        <div class="glass-box p-6 rounded-2xl border-t-4 border-t-red-500 space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold px-2.5 py-1 rounded bg-red-950 text-red-300 border border-red-800">VECTOR 1: 85% OF LOSSES</span>
-            <span class="text-xs text-slate-400 mono">Instant Push Rails</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">Active Phone Vishing & Coercion</h3>
-          <p class="text-sm text-slate-300 leading-relaxed">
-            <b>InstaPay, Sarie, Aani:</b> Transfers use an on-device PIN, not SMS OTP. Fraudsters impersonate government portals (Sadad, Musaned, CIB) and keep victims on the phone for 20+ minutes coercing transfers.
-          </p>
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-xs space-y-1 text-slate-300">
-            <div class="text-cyan-400 font-bold">SafePay Network Solution:</div>
-            <div><b>CAMARA Scam Signal API:</b> Queries carrier core to detect active voice call in real time. Triggers Face ID biometric challenge with mandatory anti-coercion modal.</div>
-          </div>
-        </div>
-
-        <!-- Vector 2 -->
-        <div class="glass-box p-6 rounded-2xl border-t-4 border-t-amber-500 space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold px-2.5 py-1 rounded bg-amber-950 text-amber-300 border border-amber-800">VECTOR 2: CARD-NOT-PRESENT</span>
-            <span class="text-xs text-slate-400 mono">E-Commerce & Wallets</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">Stolen Card Credentials & OTP Theft</h3>
-          <p class="text-sm text-slate-300 leading-relaxed">
-            <b>Online Checkouts & 3DS:</b> Leaked card details (PAN, CVV) drained via intercepted SMS OTPs, rogue SIM swaps, or malware. Banned under CBUAE Notice 2025/3057.
-          </p>
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-xs space-y-1 text-slate-300">
-            <div class="text-cyan-400 font-bold">SafePay Network Solution:</div>
-            <div><b>CAMARA Number Verification API:</b> Silently verifies mobile data session matches registered SIM in 300ms. Eliminates readable OTP code from handset screen entirely.</div>
-          </div>
-        </div>
-      </div>
+    <div class="grid-2">
+      <div class="panel"><h3>Automated boundaries</h3><ul class="clean"><li>HTTP API and idempotency</li><li>Nokia response validation and OAuth state</li><li>Agent call budgets and invalid tool requests</li><li>Rate limits, timeouts, and malformed providers</li></ul></div>
+      <div class="panel"><h3>Browser acceptance</h3><ul class="clean"><li>All major scenario outcomes</li><li>Enrollment continuation and retry</li><li>Cancellation and stale-state clearing</li><li>Desktop, mobile portrait, and landscape overflow</li></ul></div>
     </div>
+    <div class="callout">Measured behavior is software QA against fixtures and sandbox APIs, not a claim of real-world fraud detection accuracy.</div>
+    <div class="footer"><span>Evidence and tests are included in the public repository</span><span>8 / 10</span></div>
+  </section>
 
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Targeting both Authorized Push Payment (APP) coercion and Unauthorized Card-Not-Present (CNP) fraud.</div>
-      <div class="mono">SafePay MENA</div>
+  <section class="slide">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Scale and commercial path</div></div>
+    <h2>Deploy once per payment provider; configure by market and operator</h2>
+    <div class="grid-3">
+      <div class="panel market"><strong>Egypt</strong><span class="tag">EGP</span><p>Prototype context for InstaPay / IPN payment journeys.</p></div>
+      <div class="panel market"><strong>Saudi Arabia</strong><span class="tag">SAR</span><p>Prototype context for sarie payment journeys.</p></div>
+      <div class="panel market"><strong>United Arab Emirates</strong><span class="tag">AED</span><p>Prototype context for Aani and card-checkout journeys.</p></div>
     </div>
-  </div>
-
-  <!-- ==================== SLIDE 4: REGULATORY TSUNAMI ==================== -->
-  <div class="slide" id="slide-4">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">04 / REGULATORY MANDATE</span>
-      <span class="text-xs text-slate-400 mono">Slide 04 / 15</span>
+    <div class="grid-2" style="margin-top:.2in">
+      <div class="panel green"><h3>Buyer</h3><p>Banks, wallets, processors, and instant-payment applications integrate a decision API before release.</p></div>
+      <div class="panel amber"><h3>Commercial model to validate</h3><p>Platform fee plus usage-based investigated transactions, aligned to operator API economics and measured pilot value.</p></div>
     </div>
+    <div class="footer"><span>Pricing, operator coverage, and savings require pilot validation</span><span>9 / 10</span></div>
+  </section>
 
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">The Regulatory Tsunami: 100% Liability Shift</h2>
-      
-      <div class="grid grid-cols-2 gap-6">
-        <div class="glass-box p-6 rounded-2xl border-l-4 border-l-indigo-400 space-y-3">
-          <div class="text-xs font-bold text-indigo-400 mono">UNITED ARAB EMIRATES</div>
-          <h3 class="text-xl font-bold text-white">CBUAE Notice 2025/3057</h3>
-          <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside">
-            <li><b>Mandatory SMS OTP Retirement:</b> Complete phaseout by <b>March 31, 2026</b> for high-value transactions.</li>
-            <li><b>100% Liability Shift:</b> Banks must immediately reimburse customers if fraud occurs where an SMS OTP was used.</li>
-            <li><b>Silent Possession Required:</b> Requires carrier-grade cellular bearer authentication.</li>
-          </ul>
-        </div>
-
-        <div class="glass-box p-6 rounded-2xl border-l-4 border-l-emerald-400 space-y-3">
-          <div class="text-xs font-bold text-emerald-400 mono">SAUDI ARABIA</div>
-          <h3 class="text-xl font-bold text-white">SAMA & CST Regulatory Framework</h3>
-          <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside">
-            <li><b>Sarie 20k SAR Instant Cap:</b> Strict transaction ceilings with mandatory secondary verification.</li>
-            <li><b>CST Biometric SIM Caps:</b> 10 SIMs for citizens, 2 for expats; automated flags for unregistered multi-SIM spikes.</li>
-            <li><b>AI Explainability Mandate:</b> All automated transaction holds must generate court-admissible audit traces.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="glass-box p-4 rounded-xl bg-red-950/20 border border-red-500/30 text-center">
-        <span class="text-sm font-semibold text-red-200">
-          Banks can no longer blame customers for falling for phone scams. SafePay provides the technical shield to eliminate institutional liability.
-        </span>
+  <section class="slide closing">
+    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Pilot ask</div></div>
+    <div class="hero">
+      <div class="eyebrow">What we need next</div>
+      <h1>Validate SafePay with one operator and one payment provider.</h1>
+      <div class="grid-3">
+        <div class="panel green"><h3>1 - Connect</h3><p>Confirm available APIs, consent flow, simulator-to-production differences, and operator coverage.</p></div>
+        <div class="panel amber"><h3>2 - Pilot</h3><p>Replay consented, labeled fraud and legitimate cases in a bank sandbox with agreed controls.</p></div>
+        <div class="panel red"><h3>3 - Measure</h3><p>API latency, intervention rate, false positives, prevented loss, customer friction, and unit economics.</p></div>
       </div>
     </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Regulatory compliance is no longer optional; it is an existential balance sheet protection for GCC banks.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 5: THE SOLUTION ==================== -->
-  <div class="slide" id="slide-5">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">05 / THE SOLUTION</span>
-      <span class="text-xs text-slate-400 mono">Slide 05 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">SafePay MENA: The AI Telecom-Banking Middleware</h2>
-      <p class="text-lg text-slate-300">Synchronous pre-authorization gateway integrating banking rails with carrier mobile cores.</p>
-
-      <div class="grid grid-cols-3 gap-6 pt-2">
-        <div class="glass-box p-5 rounded-xl border-t-2 border-t-cyan-400 space-y-3">
-          <div class="text-cyan-400 text-sm font-bold mono">SHIELD 1</div>
-          <h3 class="text-lg font-bold text-white">Silent Carrier Auth</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            CAMARA Number Verification matches the cellular data session in 300ms. Zero OTP on the handset screen; fraudsters have nothing to steal.
-          </p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl border-t-2 border-t-amber-400 space-y-3">
-          <div class="text-amber-400 text-sm font-bold mono">SHIELD 2</div>
-          <h3 class="text-lg font-bold text-white">Scam Signal Shield</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Real-time active voice call detection directly intercepts vishing coercion. Enforces Face ID challenge with anti-coercion warning modal.
-          </p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl border-t-2 border-t-red-400 space-y-3">
-          <div class="text-red-400 text-sm font-bold mono">SHIELD 3</div>
-          <h3 class="text-lg font-bold text-white">SIM Swap Freeze</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Instantly detects SIM replacements within 24 to 240 hours. Enforces sub-10ms hard block before funds leave the victim's account.
-          </p>
-        </div>
-      </div>
-
-      <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-cyan-200 flex justify-between items-center">
-        <span><b>3-Tier Outcome Architecture:</b> Score &lt;25 = Instant APPROVE (200ms) • 25-69 = STEP-UP Face ID • &ge;70 = HARD BLOCK</span>
-        <span class="mono text-cyan-400">0% SMS Friction</span>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>SafePay acts as an intelligent pre-auth gatekeeper before transactions are committed to instant settlement rails.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 6: DUAL-ENGINE ARCHITECTURE ==================== -->
-  <div class="slide" id="slide-6">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">06 / DUAL-ENGINE ARCHITECTURE</span>
-      <span class="text-xs text-slate-400 mono">Slide 06 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Engineered for Sub-10ms Latency: Dual-Engine Design</h2>
-      <p class="text-base text-slate-300">Decoupling deterministic mathematical authorization from asynchronous LLM compliance traces.</p>
-
-      <div class="grid grid-cols-2 gap-6">
-        <div class="glass-box p-6 rounded-2xl border-2 border-cyan-400/60 glow-cyan space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-cyan-400 mono">INLINE CRITICAL PATH</span>
-            <span class="text-xs text-emerald-400 font-bold mono">&lt; 10ms SLA</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">1. Deterministic Risk Engine</h3>
-          <p class="text-xs text-slate-300">Evaluates carrier signals through a non-linear combinatorial scoring matrix with regional limit guardrails (SAMA 20k SAR, CBE 70k EGP).</p>
-          <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300 space-y-1">
-            <div>• Benchmark: <b>0.0024 ms / evaluation</b></div>
-            <div>• Capacity: <b>&gt; 400,000 txns / second</b></div>
-            <div>• Immediate: APPROVE / STEP_UP / BLOCK</div>
-          </div>
-        </div>
-
-        <div class="glass-box p-6 rounded-2xl border-2 border-indigo-400/60 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-400 mono">BACKGROUND ASYNC PATH</span>
-            <span class="text-xs text-indigo-400 font-bold mono">&lt; 500ms</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">2. Gemini 2.0 Flash Compliance Agent</h3>
-          <p class="text-xs text-slate-300">Ingests decision metadata to generate natural-language regulatory traces citing SAMA Counter-Fraud and CBUAE Notice 2025/3057.</p>
-          <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-indigo-300 space-y-1">
-            <div>• Eliminates 100% bank liability in audits</div>
-            <div>• Persisted to Supabase tamper-proof ledger</div>
-            <div>• Deterministic fallback for offline demo safety</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>LLMs belong in the compliance audit loop, not blocking the sub-second instant payment path.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 7: CAMARA NETWORK APIS ==================== -->
-  <div class="slide" id="slide-7">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">07 / TELECOM INTEGRATION</span>
-      <span class="text-xs text-slate-400 mono">Slide 07 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Standardized GSMA CAMARA Network APIs</h2>
-      <p class="text-base text-slate-300">Direct integration with carrier registries via Nokia Network as Code and Open Gateway standards.</p>
-
-      <div class="glass-box rounded-xl overflow-hidden border border-slate-800">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-900/90 text-slate-400 mono uppercase border-b border-slate-800">
-            <tr>
-              <th class="p-3">CAMARA API</th>
-              <th class="p-3">Protocol</th>
-              <th class="p-3">Carrier Registry</th>
-              <th class="p-3">Anti-Fraud Value</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800/60 text-slate-200">
-            <tr>
-              <td class="p-3 font-bold text-cyan-400">Number Verification</td>
-              <td class="p-3 mono">3-Legged OAuth</td>
-              <td class="p-3">Cellular Data Bearer</td>
-              <td class="p-3">Silently validates device holds registered SIM. Replaces SMS OTPs in 300ms.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold text-red-400">SIM Swap Check</td>
-              <td class="p-3 mono">2-Legged Server</td>
-              <td class="p-3">Carrier HLR / HSS</td>
-              <td class="p-3">Queries SIM replacement timestamp (24-240h). Hard-blocks account takeovers.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold text-amber-400">Scam Signal</td>
-              <td class="p-3 mono">2-Legged Server</td>
-              <td class="p-3">Mobile Core Voice State</td>
-              <td class="p-3">Checks for active, unverified phone calls. Intercepts 85% of vishing scams.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold text-indigo-400">Device Status / Roaming</td>
-              <td class="p-3 mono">2-Legged Server</td>
-              <td class="p-3">VLR Network Location</td>
-              <td class="p-3">Identifies foreign travel anomalies and unreachable handsets.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="glass-box p-3 rounded-lg border border-slate-800 text-xs text-slate-400 flex justify-between">
-        <span><b>Zero PII Principle:</b> Bank balances, account numbers, and payee names are NEVER transmitted to telecom operators.</span>
-        <span class="mono text-cyan-400">15m TTL Cache + 250ms Circuit Breaker</span>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Universal compatibility with stc, e&, and Vodafone via GSMA Open Gateway specifications.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 8: 3 DEMO SCENARIOS ==================== -->
-  <div class="slide" id="slide-8">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">08 / PROTOTYPE DEMONSTRATION</span>
-      <span class="text-xs text-slate-400 mono">Slide 08 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Three Live Demonstration Scenarios</h2>
-      <p class="text-base text-slate-300">High-production split-screen simulator testing everyday MENA payment situations.</p>
-
-      <div class="grid grid-cols-3 gap-6">
-        <!-- Scenario 1 -->
-        <div class="glass-box p-5 rounded-xl border border-emerald-500/30 bg-emerald-950/10 space-y-3">
-          <div class="text-emerald-400 font-bold text-xs mono">SCENARIO 1: CLEAN FLOW</div>
-          <div class="text-lg font-bold text-white">200 EGP to Mother</div>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• InstaPay Egypt transfer</li>
-            <li>• Number Verified: <b>PASS</b></li>
-            <li>• SIM Swapped: <b>NO</b></li>
-            <li>• Active Call: <b>NO</b></li>
-          </ul>
-          <div class="pt-2 border-t border-slate-800 text-xs text-emerald-400 font-bold mono">
-            Score: 8/100 → APPROVE (200ms)
-          </div>
-        </div>
-
-        <!-- Scenario 2 -->
-        <div class="glass-box p-5 rounded-xl border border-amber-500/30 bg-amber-950/10 space-y-3">
-          <div class="text-amber-400 font-bold text-xs mono">SCENARIO 2: VISHING SCAM</div>
-          <div class="text-lg font-bold text-white">15,000 SAR on Call</div>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• Sarie KSA instant transfer</li>
-            <li>• Scam Signal: <b>ACTIVE CALL</b></li>
-            <li>• Unknown Payee at 3:00 AM</li>
-            <li>• Number Verified: <b>PASS</b></li>
-          </ul>
-          <div class="pt-2 border-t border-slate-800 text-xs text-amber-400 font-bold mono">
-            Score: 52/100 → STEP-UP Face ID
-          </div>
-        </div>
-
-        <!-- Scenario 3 -->
-        <div class="glass-box p-5 rounded-xl border border-red-500/30 bg-red-950/10 space-y-3">
-          <div class="text-red-400 font-bold text-xs mono">SCENARIO 3: SIM SWAP ATO</div>
-          <div class="text-lg font-bold text-white">35,000 SAR Mule Drain</div>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• Aani / stc pay rail</li>
-            <li>• SIM Swapped: <b>2.1h ago</b></li>
-            <li>• Device Match: <b>FAIL</b></li>
-            <li>• Exceeds 20k SAR Threshold</li>
-          </ul>
-          <div class="pt-2 border-t border-slate-800 text-xs text-red-400 font-bold mono">
-            Score: 94/100 → HARD BLOCK
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Live dashboard running locally on http://127.0.0.1:8000 with real-time WebSocket telemetry.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 9: EXPLAINABLE AI AUDIT TRACE ==================== -->
-  <div class="slide" id="slide-9">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">09 / AI EXPLAINABILITY</span>
-      <span class="text-xs text-slate-400 mono">Slide 09 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Explainable AI Audit Traces (Gemini 2.0 Flash)</h2>
-      <p class="text-base text-slate-300">Turning raw microsecond carrier signals into court-admissible regulatory protection.</p>
-
-      <div class="glass-box p-6 rounded-2xl border-l-4 border-l-indigo-400 space-y-3">
-        <div class="flex items-center justify-between text-xs mono">
-          <span class="text-indigo-400 font-bold">REGULATORY AUDIT RECORD: SAMA-AML-2023-SEC4.2 & CBUAE-NOTICE-2025-3057</span>
-          <span class="text-red-400 font-bold">ACTION: HARD_BLOCK_ENFORCED</span>
-        </div>
-        <p class="text-sm font-mono text-slate-200 leading-relaxed bg-slate-900/90 p-4 rounded-xl border border-slate-800">
-          "Transaction of 35,000 SAR blocked. SAMA Sarie 20,000 SAR instant threshold exceeded without secondary factor.<br/>
-          Telecom intelligence confirms physical SIM was reissued 2.1 hours ago on carrier stc Saudi.<br/>
-          Hardware IMEI check returned device mismatch.<br/>
-          Automated block completely eliminates institutional liability under CBUAE Notice 2025/3057."
-        </p>
-      </div>
-
-      <div class="grid grid-cols-3 gap-4 text-xs text-slate-300">
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-cyan-400 font-bold mono">IMMEDIATE PROOF</div>
-          <div>Gives bank fraud operations plain-language evidence to resolve customer inquiries in seconds.</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-emerald-400 font-bold mono">ZERO HALLUCINATIONS</div>
-          <div>Deterministic regulatory fallback ensures 100% trace reliability even during API rate limits.</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-purple-400 font-bold mono">IMMUTABLE LOGS</div>
-          <div>Stored directly into Supabase PostgreSQL with cryptographic timestamps for central bank inspections.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Transforming automated risk decisions into legally defensible audit trails.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 10: BUSINESS MODEL & UNIT ECONOMICS ==================== -->
-  <div class="slide" id="slide-10">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">10 / UNIT ECONOMICS</span>
-      <span class="text-xs text-slate-400 mono">Slide 10 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Business Model & Unit Economics: 693% Bank ROI</h2>
-      <p class="text-base text-slate-300">High-margin API software monetization aligned with massive fraud savings.</p>
-
-      <div class="grid grid-cols-3 gap-6">
-        <div class="glass-box p-5 rounded-xl space-y-2 border-t-2 border-t-cyan-400">
-          <div class="text-cyan-400 text-xs font-bold mono">CARRIER REVENUE</div>
-          <div class="text-3xl font-black text-white">$0.07</div>
-          <div class="text-xs text-slate-300 font-semibold">Metered Telco Wholesale</div>
-          <p class="text-xs text-slate-400">Paid directly to stc, e&, or Vodafone for CAMARA query bundles. Converts 5G network capex into recurring software ARR.</p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-2 border-t-2 border-t-indigo-400">
-          <div class="text-indigo-400 text-xs font-bold mono">SAFEPAY FEE</div>
-          <div class="text-3xl font-black text-white">$0.20</div>
-          <div class="text-xs text-slate-300 font-semibold">Per Evaluated Transaction</div>
-          <p class="text-xs text-slate-400">Billed to financial institutions. Yields a <b>65% gross software margin</b> ($0.13 net) while replacing vulnerable $0.04 SMS OTP costs.</p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-2 border-t-2 border-t-emerald-400">
-          <div class="text-emerald-400 text-xs font-bold mono">BANK ROI</div>
-          <div class="text-3xl font-black text-emerald-400">693%</div>
-          <div class="text-xs text-slate-300 font-semibold">Net First-Year Return</div>
-          <p class="text-xs text-slate-400">Tier-1 bank saving $8.5M in fraud and $1.8M in SMS costs against $1.2M SafePay deployment expenditure.</p>
-        </div>
-      </div>
-
-      <div class="glass-box p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-200">
-        <b>The Compelling Sell:</b> Banks spend $0.20 per high-risk transfer to prevent an average loss of $4,500 + avoid the AED 4.99 fraud recovery multiplier.
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Telecom operators monetize idle network intelligence; banks eliminate devastating scam write-offs.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 11: COMPETITIVE ADVANTAGE ==================== -->
-  <div class="slide" id="slide-11">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">11 / COMPETITIVE MOAT</span>
-      <span class="text-xs text-slate-400 mono">Slide 11 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Why SafePay MENA Wins Against Incumbents</h2>
-
-      <div class="glass-box rounded-xl overflow-hidden border border-slate-800">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-900/90 text-slate-400 mono uppercase border-b border-slate-800">
-            <tr>
-              <th class="p-3">Dimension</th>
-              <th class="p-3">Legacy Fraud Engines (FICO / SAS)</th>
-              <th class="p-3">Single Telco Portals (stc alone)</th>
-              <th class="p-3 text-cyan-400">SafePay MENA</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800/60 text-slate-200">
-            <tr>
-              <td class="p-3 font-bold">Network Visibility</td>
-              <td class="p-3 text-slate-400">Zero (Blind to SIM & active calls)</td>
-              <td class="p-3 text-slate-400">Single carrier only (no roaming)</td>
-              <td class="p-3 font-bold text-cyan-300">Cross-carrier MENA aggregator (+20, +966, +971)</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold">Vishing Defense</td>
-              <td class="p-3 text-slate-400">None (PIN entered by victim)</td>
-              <td class="p-3 text-slate-400">Raw Scam Signal boolean</td>
-              <td class="p-3 font-bold text-amber-300">Scam Signal + Biometric Anti-Coercion modal</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold">Latency Performance</td>
-              <td class="p-3 text-slate-400">Post-clearing batch analysis</td>
-              <td class="p-3 text-slate-400">Raw API round-trip latency</td>
-              <td class="p-3 font-bold text-emerald-300">Sub-10ms deterministic matrix (0.0024ms actual)</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold">Regulatory Defense</td>
-              <td class="p-3 text-slate-400">Generic alerts</td>
-              <td class="p-3 text-slate-400">None (Data provider only)</td>
-              <td class="p-3 font-bold text-indigo-300">CBUAE Notice 2025/3057 & SAMA compliance traces</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="text-xs text-slate-400 text-center italic">"The telecom APIs exist individually. SafePay MENA is the surgeon that orchestrates them."</p>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>A complete regional pre-auth middleware, not just an API wrapper.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 12: TRACTION & VALIDATION ==================== -->
-  <div class="slide" id="slide-12">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">12 / VALIDATION & MENTORSHIP</span>
-      <span class="text-xs text-slate-400 mono">Slide 12 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Validation: stc Mentorship & Empirical Evidence</h2>
-
-      <div class="grid grid-cols-3 gap-6">
-        <div class="glass-box p-5 rounded-xl space-y-3 border-l-4 border-l-cyan-400">
-          <div class="text-cyan-400 text-xs font-bold mono">STC ALIGNMENT</div>
-          <h3 class="text-base font-bold text-white">Mentorship Call</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Completed technical debrief with Eng. Abdullah Alkaoud (stc). Validated carrier SLA requirements (250ms circuit breaker) and prioritized active vishing call detection.
-          </p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-3 border-l-4 border-l-indigo-400">
-          <div class="text-indigo-400 text-xs font-bold mono">RESEARCH SYNTHESIS</div>
-          <h3 class="text-base font-bold text-white">299 NotebookLM Sources</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Synthesized empirical data: UAE AED 4.99 fraud multiplier, CBUAE Notice 2025/3057 mandate, and measured 44% scam reduction from global CAMARA pilots.
-          </p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-3 border-l-4 border-l-emerald-400">
-          <div class="text-emerald-400 text-xs font-bold mono">FUNCTIONAL PROTOTYPE</div>
-          <h3 class="text-base font-bold text-white">Verified Software</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Complete FastAPI backend, live WebSocket feed, responsive mobile wallet simulator, Nokia NaC integration, and 100% automated test pass rate.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Architected around empirical evidence and verified carrier constraints.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 13: REGULATORY COMPLIANCE ==================== -->
-  <div class="slide" id="slide-13">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">13 / GOVERNANCE & PRIVACY</span>
-      <span class="text-xs text-slate-400 mono">Slide 13 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Regulatory Compliance & Data Sovereignty</h2>
-
-      <div class="grid grid-cols-3 gap-6">
-        <div class="glass-box p-5 rounded-xl space-y-2">
-          <div class="text-xs font-bold text-cyan-400 mono">SAMA CYBERSECURITY</div>
-          <h3 class="text-sm font-bold text-white">Saudi Central Bank</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">Fully aligned with SAMA Counter-Fraud Framework (96 controls across 4 domains) and Sarie 20k SAR transfer ceilings.</p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-2">
-          <div class="text-xs font-bold text-indigo-400 mono">CST BIOMETRIC CAPS</div>
-          <h3 class="text-sm font-bold text-white">Telecom Authority</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">Cross-checks against CST SIM ownership caps (10 citizens, 2 expats) to detect multi-SIM fraud syndicates.</p>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-2">
-          <div class="text-xs font-bold text-emerald-400 mono">LOCAL SOVEREIGNTY</div>
-          <h3 class="text-sm font-bold text-white">Sovereign Cloud</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">Containerized Docker architecture ready for deployment inside stc Cloud or Oracle Cloud Riyadh to satisfy strict data residency laws.</p>
-        </div>
-      </div>
-
-      <div class="glass-box p-4 rounded-xl border border-slate-800 text-xs text-slate-400">
-        <b>Data Minimization:</b> Ephemeral 15-minute in-memory cache for carrier responses. Tamper-proof cryptographic hashes logged to PostgreSQL. Zero customer financial data exposed.
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Enterprise security architecture built for central bank compliance inspections.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 14: GO-TO-MARKET ==================== -->
-  <div class="slide" id="slide-14">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">14 / GO-TO-MARKET ROADMAP</span>
-      <span class="text-xs text-slate-400 mono">Slide 14 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl">
-      <h2 class="text-4xl font-extrabold text-white">Commercial Go-To-Market Strategy</h2>
-
-      <div class="grid grid-cols-3 gap-6">
-        <div class="glass-box p-5 rounded-xl space-y-3 border-t-2 border-t-cyan-400">
-          <div class="text-cyan-400 font-bold text-xs mono">PHASE 1 (MONTHS 1 - 4)</div>
-          <h3 class="text-base font-bold text-white">Sandbox Carrier Pilot</h3>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• Pilot with stc Open Gateway & STC Bank</li>
-            <li>• Pre-auth check on transfers &gt;10,000 SAR</li>
-            <li>• Optimize active vishing call detection</li>
-          </ul>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-3 border-t-2 border-t-indigo-400">
-          <div class="text-indigo-400 font-bold text-xs mono">PHASE 2 (MONTHS 5 - 12)</div>
-          <h3 class="text-base font-bold text-white">GCC Commercial Launch</h3>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• Expand across Sarie KSA & Aani UAE</li>
-            <li>• Onboard top 5 GCC retail banks</li>
-            <li>• Secure 3DS checkouts ahead of March 2026 CBUAE OTP deadline</li>
-          </ul>
-        </div>
-
-        <div class="glass-box p-5 rounded-xl space-y-3 border-t-2 border-t-emerald-400">
-          <div class="text-emerald-400 font-bold text-xs mono">PHASE 3 (YEAR 2+)</div>
-          <h3 class="text-base font-bold text-white">Scale Across Egypt & MENA</h3>
-          <ul class="text-xs text-slate-300 space-y-1">
-            <li>• Integrate with Egypt EBC / InstaPay (1.5B annual transactions)</li>
-            <li>• Expand to Jordan, Qatar & Oman</li>
-            <li>• Enterprise telco revenue share model</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>Phased execution capturing urgent regulatory demand in UAE/KSA before scaling across the Arab world.</div>
-      <div class="mono">SafePay MENA</div>
-    </div>
-  </div>
-
-  <!-- ==================== SLIDE 15: CONCLUSION & CTA ==================== -->
-  <div class="slide" id="slide-15">
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-cyan-400 mono font-semibold tracking-wider uppercase">15 / CONCLUSION & CALL TO ACTION</span>
-      <span class="text-xs text-slate-400 mono">Slide 15 / 15</span>
-    </div>
-
-    <div class="space-y-6 my-auto max-w-5xl text-center">
-      <div class="inline-block px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs mono">
-        GSMA MENA IGNITE HACKATHON 2026
-      </div>
-      <h2 class="text-5xl font-extrabold text-white leading-tight">
-        SafePay <span class="gradient-text">MENA</span>
-      </h2>
-      <p class="text-xl text-slate-300 max-w-3xl mx-auto italic leading-relaxed">
-        "The telecom networks possess the real-time truth.<br/>
-        Instant payment rails possess the settlement urgency.<br/>
-        Central bank regulations have set the deadline: March 31, 2026.<br/>
-        SafePay MENA is the operational bridge that unites them."
-      </p>
-
-      <div class="grid grid-cols-3 gap-4 max-w-4xl mx-auto pt-4 text-left">
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-cyan-400 font-bold mono">LEAD DEVELOPER</div>
-          <div class="text-sm font-bold text-white">Karim Mohamed Abdelnabi</div>
-          <div class="text-xs text-slate-400">karim.abdelnabi2005@gmail.com</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-indigo-400 font-bold mono">LIVE DASHBOARD</div>
-          <div class="text-sm font-bold text-white">http://127.0.0.1:8000</div>
-          <div class="text-xs text-slate-400">Fully Functional & Tested</div>
-        </div>
-        <div class="glass-box p-4 rounded-xl space-y-1">
-          <div class="text-xs text-emerald-400 font-bold mono">TECH STACK</div>
-          <div class="text-sm font-bold text-white">Python 3.11+, Nokia NaC</div>
-          <div class="text-xs text-slate-400">Gemini 2.0 Flash, FastAPI</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-4">
-      <div>SafePay MENA • Real-Time AI Telecom Fraud Shield for Instant Payments</div>
-      <div class="mono">Thank You • Q&A</div>
-    </div>
-  </div>
-
-  <!-- Navigation Script -->
-  <script>
-    let currentSlide = 1;
-    const totalSlides = 15;
-
-    function showSlide(n) {
-      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
-      const target = document.getElementById(`slide-${n}`);
-      if (target) {
-        target.classList.add('active');
-        currentSlide = n;
-      }
-    }
-
-    function nextSlide() {
-      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
-    }
-
-    function prevSlide() {
-      if (currentSlide > 1) showSlide(currentSlide - 1);
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-        e.preventDefault();
-        nextSlide();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        e.preventDefault();
-        prevSlide();
-      } else if (e.key === 'f' || e.key === 'F') {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-      }
-    });
-  </script>
+    <div class="band"><p>SafePay MENA: network evidence when it matters, deterministic control before money moves.</p></div>
+    <div class="footer"><span>Live prototype and source repository available for evaluation</span><span>10 / 10</span></div>
+  </section>
 </body>
 </html>

@@ -78,7 +78,7 @@ def test_number_verification_requires_bound_oauth_callback(valid_state):
     asyncio.run(run())
 
 
-@pytest.mark.parametrize("failure", ["timeout", "invalid_json", "invalid_boolean", "unauthorized"])
+@pytest.mark.parametrize("failure", ["timeout", "invalid_json", "invalid_boolean", "unauthorized", "rate_limited"])
 def test_provider_failure_is_unknown_never_a_clean_result(failure):
     def respond(request):
         if failure == "timeout":
@@ -87,6 +87,8 @@ def test_provider_failure_is_unknown_never_a_clean_result(failure):
             return httpx.Response(200, text="not JSON")
         if failure == "invalid_boolean":
             return httpx.Response(200, json={"swapped": "false"})
+        if failure == "rate_limited":
+            return httpx.Response(429, json={"message": "Too many requests"})
         return httpx.Response(401, json={"message": "Authorization header is missing"})
 
     async def run():
@@ -94,4 +96,34 @@ def test_provider_failure_is_unknown_never_a_clean_result(failure):
             evidence = await NokiaGateway("test-key", client).check("sim_swap", "+99999991000")
             assert evidence["status"] == "UNKNOWN"
             assert evidence["data"] == {}
+    asyncio.run(run())
+
+
+def test_number_verification_cancellation_stops_later_oauth_requests():
+    credentials_started = asyncio.Event()
+    release_credentials = asyncio.Event()
+    cancelled = False
+    paths = []
+
+    async def respond(request):
+        paths.append(request.url.path)
+        credentials_started.set()
+        await release_credentials.wait()
+        return httpx.Response(200, json={"client_id": "client"})
+
+    async def run():
+        nonlocal cancelled
+        async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
+            check = asyncio.create_task(NokiaGateway("test-key", client).check(
+                "number_verification", "+99999991000", should_stop=lambda: cancelled,
+            ))
+            await credentials_started.wait()
+            cancelled = True
+            release_credentials.set()
+            result = await check
+
+            assert result["status"] == "UNKNOWN"
+            assert result["error"] == "ProviderCheckCancelled"
+            assert paths == ["/oauth2/v1/auth/clientcredentials"]
+
     asyncio.run(run())

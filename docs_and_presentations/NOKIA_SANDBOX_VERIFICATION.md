@@ -36,7 +36,7 @@ All successful results below are provider simulator responses, not production ca
 | OpenID discovery | no subscriber input | 200 | same endpoint fields returned |
 | OAuth client credentials | authenticated application | 200 | client ID and client secret present, kept in memory only |
 
-Representative individual request times: SIM date 599 ms; Device Swap 305/183 ms; Roaming 164 ms; Reachability 145 ms; Call Forwarding 196 ms. Previous SIM check requests took 1176/204 ms. These are individual observations, not p50/p99 benchmarks or production latency guarantees. They show why the current app's universal 250 ms carrier timeout is unsuitable for reliable sandbox demonstration.
+Representative individual request times: SIM date 599 ms; Device Swap 305/183 ms; Roaming 164 ms; Reachability 145 ms; Call Forwarding 196 ms. Previous SIM check requests took 1176/204 ms. These are individual observations, not p50/p99 benchmarks or production latency guarantees. The current adapter therefore uses multi-second request limits for sandbox reliability.
 
 ## Exact verified endpoint paths
 
@@ -89,6 +89,14 @@ The successful payment workflow used five Gemini turns and four logical Nokia to
 - Production access and coverage for Egypt, Saudi Arabia, and the UAE remain unverified.
 - The current prototype now includes bounded Gemini tool orchestration, explicit source/subject labeling, pre-call screening, enrollment, unknown/failure handling, stored decisions, and HTTP/browser acceptance tests. Production readiness, calibrated fraud accuracy, authenticated public live access, and operator-specific consent remain future work.
 - No additional user portal action was required to complete the tested simulator flows. Old exposed-key revocation remains a separate security housekeeping task; it has not been confirmed.
+
+## Rate-limit QA follow-up - 9 September 2026
+
+A later controlled run completed live first-time enrollment with successful Number Verification and SIM Swap observations, then completed a suspicious-transfer investigation with two successful observations. The RapidAPI free plan subsequently returned HTTP 429 for SIM Swap, Device Swap, Roaming, Reachability, and the first Number Verification credential request.
+
+The adapter preserved those responses as `UNKNOWN` evidence without exposing provider bodies or credentials. The run also revealed that an earlier policy branch allowed a Gemini protective `BLOCK` proposal to strengthen a deterministic non-block when provider evidence was unavailable. That branch was removed: Gemini can now request review, but only deterministic evidence policy can produce `BLOCK`. A regression test reproduces HTTP 429 and requires `RETRY`.
+
+No further live calls were made after the limit was isolated. This result demonstrates failure handling, not successful availability of every tool on every run.
 
 ## Sources
 

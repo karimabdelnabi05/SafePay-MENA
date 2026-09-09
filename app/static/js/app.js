@@ -5,6 +5,7 @@ const state = {
   sessionSignature: null,
   enrolled: false,
   pending: false,
+  operationGeneration: 0,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -52,10 +53,15 @@ function renderReady() {
 
 function invalidateSession() {
   if (state.pending) return;
+  state.operationGeneration += 1;
+  clearSessionState();
+  renderReady();
+}
+
+function clearSessionState() {
   state.sessionSignature = null;
   state.enrolled = false;
   state.currentRun = null;
-  renderReady();
 }
 
 function setFormLocked(locked) {
@@ -91,22 +97,23 @@ function updateScenarioContext() {
     : "Review payment";
   byId("reviewButton").dataset.label = byId("reviewButton").textContent;
   const defaults = {
-    routine: [200, "family"],
-    identity_mismatch: [300, "new_payee"],
-    first_setup: [100, "family"],
-    new_device: [100, "family"],
-    scam_transfer: [15000, "new_payee"],
-    sim_swap: [35000, "new_payee"],
-    card_misuse: [1200, "merchant"],
-    combined_attack: [8000, "wallet"],
-    legitimate_travel: [600, "new_payee"],
-    velocity: [100, "new_payee"],
-    provider_outage: [500, "new_payee"],
-    enrollment_outage: [100, "family"],
+    routine: [200, "family", "INSTANT_PAYMENT"],
+    identity_mismatch: [300, "new_payee", "INSTANT_PAYMENT"],
+    first_setup: [100, "family", "INSTANT_PAYMENT"],
+    new_device: [100, "family", "INSTANT_PAYMENT"],
+    scam_transfer: [15000, "new_payee", "INSTANT_PAYMENT"],
+    sim_swap: [35000, "new_payee", "INSTANT_PAYMENT"],
+    card_misuse: [1200, "merchant", "CARD_CHECKOUT"],
+    combined_attack: [8000, "wallet", "WALLET_TRANSFER"],
+    legitimate_travel: [600, "new_payee", "INSTANT_PAYMENT"],
+    velocity: [100, "new_payee", "INSTANT_PAYMENT"],
+    provider_outage: [500, "new_payee", "INSTANT_PAYMENT"],
+    enrollment_outage: [100, "family", "INSTANT_PAYMENT"],
   };
-  const values = defaults[scenario?.id] || [200, "family"];
+  const values = defaults[scenario?.id] || [200, "family", "INSTANT_PAYMENT"];
   byId("amountInput").value = values[0];
   byId("recipientSelect").value = values[1];
+  byId("channelSelect").value = values[2];
 }
 
 function chooseCountry(code) {
@@ -121,9 +128,17 @@ function chooseCountry(code) {
   if (changed) invalidateSession();
 }
 
-function renderEvidence(items = []) {
+function renderEvidence(items = [], result = {}) {
   if (!items.length) {
-    byId("evidenceBody").innerHTML = '<p class="empty">No network evidence requested. The local screen kept this routine payment on the zero-call path.</p>';
+    let copy = "No network evidence was returned for this result.";
+    if (result.decision_source === "LOCAL_SCREENING" && result.decision === "APPROVE") {
+      copy = "No network evidence requested. The local screen kept this routine payment on the zero-call path.";
+    } else if (result.decision === "VERIFY_DEVICE") {
+      copy = "No network evidence was returned because fresh device verification is required first.";
+    } else if ((result.model_calls || 0) > 0) {
+      copy = "No network evidence was returned before the agent investigation stopped.";
+    }
+    byId("evidenceBody").innerHTML = `<p class="empty">${copy}</p>`;
     return;
   }
   const rows = items.map((item) => {
@@ -164,7 +179,7 @@ function renderResult(result) {
       ? "Routine context stayed below the investigation threshold; no external evidence was requested."
       : "No additional risk reason was recorded."];
   byId("reasonList").innerHTML = reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
-  renderEvidence(result.evidence);
+  renderEvidence(result.evidence, result);
   renderTrace(result.agent_trace, result.decision_source);
   byId("resultActions").hidden = !["HOLD", "RETRY", "VERIFY_DEVICE"].includes(result.decision);
   document.querySelectorAll(".step").forEach((step) => step.classList.add("active"));
@@ -180,7 +195,11 @@ async function ensureSession(scenario) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(context),
   });
-  if (!session.ok) throw new Error((await session.json()).detail || "Could not start the review session.");
+  if (!session.ok) {
+    const error = new Error((await session.json()).detail || "Could not start the review session.");
+    error.status = session.status;
+    throw error;
+  }
   state.sessionSignature = signature;
   state.enrolled = false;
 }
@@ -197,6 +216,7 @@ async function startAndRun(event) {
     byId("amountInput").focus();
     return;
   }
+  const operation = ++state.operationGeneration;
   setFormLocked(true);
   button.dataset.label = enrollment ? "Verify device" : (state.enrolled ? "Continue to payment" : "Review payment");
   button.textContent = enrollment ? "Verifying device..." : "Reviewing payment...";
@@ -207,40 +227,58 @@ async function startAndRun(event) {
     const path = enrollment ? "/api/v1/enrollments" : "/api/v1/payments";
     const payload = enrollment
       ? { request_id: requestId }
-      : { request_id: requestId, amount, recipient: byId("recipientSelect").value };
+      : {
+          request_id: requestId,
+          amount,
+          recipient: byId("recipientSelect").value,
+          channel: byId("channelSelect").value,
+        };
     const response = await fetch(path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error((await response.json()).detail || "The review could not complete.");
+    if (!response.ok) {
+      const error = new Error((await response.json()).detail || "The review could not complete.");
+      error.status = response.status;
+      throw error;
+    }
     const result = await response.json();
+    if (operation !== state.operationGeneration) return;
     if (result.decision === "TRUST_ESTABLISHED") {
       state.enrolled = true;
       button.dataset.label = "Continue to payment";
+    } else if (enrollment) {
+      button.dataset.label = "Retry device verification";
     } else {
       button.dataset.label = "Review payment";
     }
     renderResult(result);
   } catch (error) {
+    if (operation !== state.operationGeneration) return;
+    if (error.status === 401) clearSessionState();
     showError(`${error.message} Check the selected mode and retry.`);
     renderReady();
   } finally {
-    setFormLocked(false);
-    button.textContent = button.dataset.label;
+    if (operation === state.operationGeneration) {
+      setFormLocked(false);
+      button.textContent = button.dataset.label;
+    }
   }
 }
 
 async function cancelCurrent() {
   if (!state.currentRun) return;
   const button = byId("cancelButton");
+  const operation = ++state.operationGeneration;
   setBusy(button, true, "Cancelling...");
   try {
     const response = await fetch(`/api/v1/runs/${encodeURIComponent(state.currentRun.id)}/cancel`, { method: "POST" });
     if (!response.ok) throw new Error((await response.json()).detail || "Could not cancel this review.");
-    renderResult(await response.json());
+    const result = await response.json();
+    if (operation === state.operationGeneration) renderResult(result);
   } catch (error) {
-    showError(error.message);
+    if (operation === state.operationGeneration) showError(error.message);
   } finally {
     setBusy(button, false, "");
   }

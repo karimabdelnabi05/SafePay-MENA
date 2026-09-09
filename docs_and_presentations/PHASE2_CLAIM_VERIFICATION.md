@@ -40,7 +40,7 @@ LexisNexis' 2024 EMEA infographic reports a UAE financial-services fraud-cost mu
 
 ### 6. Scam Signal exists, but generic call state is not the complete product
 
-Telefónica describes Scam Signal as correlating network signals with high-risk actions to identify potential scams. Its technical overview says the specification follows CAMARA standards but resides in a private GSMA repository with controlled access. Public documentation does not validate an invented endpoint, response schema, or the assumption that it merely returns an active-call boolean. [Telefónica developer documentation](https://developers.opengateway.telefonica.com/docs/scamsignal), [Telefónica technical overview](https://bxbucket.blob.core.windows.net/bxbucket/opengateway-web/uploads/2025/5/api-overview-scam-signal-20250520.pdf)
+Telefonica describes Scam Signal as correlating network signals with high-risk actions to identify potential scams. Its technical overview says the specification follows CAMARA standards but resides in a private GSMA repository with controlled access. Public documentation does not validate an invented endpoint, response schema, or the assumption that it merely returns an active-call boolean. [Telefonica developer documentation](https://developers.opengateway.telefonica.com/docs/scamsignal), [Telefonica technical overview](https://bxbucket.blob.core.windows.net/bxbucket/opengateway-web/uploads/2025/5/api-overview-scam-signal-20250520.pdf)
 
 Do not imply that an ordinary call is verified malicious, that no call means no scam, or that this checks every messaging-app voice call. Those are implementation/provider questions requiring documented capability and test evidence.
 

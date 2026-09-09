@@ -1,17 +1,22 @@
 """Restricted Nokia simulator adapter. Credentials never enter evidence records."""
 
-import time
-import secrets
 import asyncio
+import secrets
+import time
 from datetime import datetime, timezone
-from urllib.parse import urlparse, urljoin, parse_qs
+from typing import ClassVar
+from urllib.parse import parse_qs, urljoin, urlparse
 
 import httpx
 
 
+class ProviderCheckCancelled(Exception):
+    """Stop a multi-request provider flow after the current HTTP call returns."""
+
+
 class NokiaGateway:
     HOST = "network-as-code.p.rapidapi.com"
-    ROUTES = {
+    ROUTES: ClassVar[dict[str, tuple[str, str]]] = {
         "sim_swap": ("/passthrough/camara/v1/sim-swap/sim-swap/v0/check", "swapped"),
         "device_swap": ("/passthrough/camara/v1/device-swap/device-swap/v1/check", "swapped"),
         "roaming": ("/device-status/device-roaming-status/v1/retrieve", "roaming"),
@@ -22,7 +27,7 @@ class NokiaGateway:
         self.api_key = api_key
         self.client = client
 
-    async def check(self, tool, phone):
+    async def check(self, tool, phone, should_stop=None):
         start = time.perf_counter()
         if tool not in self.ROUTES or phone not in {"+99999991000", "+99999991001"}:
             return {"tool": tool, "source": "NOKIA_SANDBOX", "status": "UNSUPPORTED",
@@ -32,8 +37,9 @@ class NokiaGateway:
                    else {"device": {"phoneNumber": phone}})
         data, status, error, http_status = {}, "UNKNOWN", None, None
         try:
+            self._raise_if_cancelled(should_stop)
             if tool == "number_verification":
-                response = await asyncio.wait_for(self._verify_number(phone, path), timeout=20)
+                response = await asyncio.wait_for(self._verify_number(phone, path, should_stop), timeout=20)
             else:
                 response = await self.client.post(
                     "https://" + self.HOST + path,
@@ -45,7 +51,8 @@ class NokiaGateway:
             if type(body.get(field)) is not bool:
                 raise ValueError("Invalid provider response")
             data, status = {field: body[field]}, "SUCCESS"
-        except (httpx.HTTPError, ValueError, AttributeError, KeyError, TypeError, TimeoutError) as exc:
+        except (httpx.HTTPError, ValueError, AttributeError, KeyError, TypeError,
+                TimeoutError, ProviderCheckCancelled) as exc:
             error = type(exc).__name__
         return {"tool": tool, "source": "NOKIA_SANDBOX", "status": status,
                 "subject": phone, "data": data, "error": error, "http_status": http_status,
@@ -55,14 +62,21 @@ class NokiaGateway:
     def _headers(self):
         return {"x-rapidapi-key": self.api_key, "x-rapidapi-host": self.HOST}
 
-    async def _verify_number(self, phone, path):
+    @staticmethod
+    def _raise_if_cancelled(should_stop):
+        if should_stop and should_stop():
+            raise ProviderCheckCancelled
+
+    async def _verify_number(self, phone, path, should_stop=None):
         base = "https://" + self.HOST
         credentials = await self.client.get(base + "/oauth2/v1/auth/clientcredentials",
                                              headers=self._headers(), timeout=8, follow_redirects=False)
+        self._raise_if_cancelled(should_stop)
         credentials.raise_for_status()
         client_id = credentials.json()["client_id"]
         metadata = await self.client.get(base + "/.well-known/oauth-authorization-server",
                                          headers=self._headers(), timeout=8, follow_redirects=False)
+        self._raise_if_cancelled(should_stop)
         metadata.raise_for_status()
         endpoint = metadata.json()["fast_flow_csp_auth_endpoint"]
         allowed = {"nb-auth.nac-runtime-stg-eu.g002.saas.nokia.com",
@@ -82,6 +96,7 @@ class NokiaGateway:
             "prompt": "none", "state": state, "nonce": nonce,
         }, timeout=8, follow_redirects=False)
         for _ in range(6):
+            self._raise_if_cancelled(should_stop)
             location = response.headers.get("location")
             if not location or response.status_code not in (302, 303, 307):
                 raise ValueError("Incomplete simulator authorization")
@@ -91,10 +106,12 @@ class NokiaGateway:
             if location.split("?")[0] == callback:
                 if query.get("state") != [state] or len(query.get("code", [])) != 1:
                     raise ValueError("Invalid OAuth callback")
+                self._raise_if_cancelled(should_stop)
                 return await self.client.post(base + path, headers=self._headers(),
                     params={"code": query["code"][0], "state": state},
                     json={"phoneNumber": phone}, timeout=8, follow_redirects=False)
             if not permitted(location):
                 raise ValueError("Untrusted OAuth redirect")
+            self._raise_if_cancelled(should_stop)
             response = await self.client.get(location, timeout=8, follow_redirects=False)
         raise ValueError("OAuth redirect limit")

@@ -2,7 +2,7 @@
 
 SafePay MENA is a GSMA MENA Ignite Phase 2 working prototype for adding telecom evidence to payment-release decisions.
 
-Routine payments stay on a local zero-call path. Elevated-risk payments trigger a bounded Gemini function-calling agent that selects relevant CAMARA APIs through Nokia Network as Code. A deterministic policy owns the final disposition.
+Routine payments stay on a local zero-call path. In live sandbox mode, elevated-risk payments trigger a bounded Gemini function-calling agent that selects relevant CAMARA APIs through Nokia Network as Code. Fixture mode provides the same repeatable policy paths without calling external services. Deterministic policy owns the final disposition in both modes.
 
 > This is a hackathon prototype. Bank context is synthetic, Nokia calls use sandbox simulator subjects, and no production payment or mobile network is connected.
 
@@ -38,12 +38,15 @@ This does not claim production operator coverage or regulatory certification in 
           |
           | elevated risk
           v
-    Bounded Gemini agent --> Nokia/CAMARA sandbox observations
+    Fixture tool plan or bounded Gemini agent
+                   |
+                   v
+          Nokia/CAMARA observations
           |
           v
     Deterministic release policy --> APPROVE | HOLD | BLOCK | RETRY
 
-The model receives amount, recipient relationship, country, channel, anomaly facts, and pre-screen reasons. It never receives the canned scenario label. Tool names, endpoints, simulator subjects, redirect hosts, repeat calls, and call budgets are enforced outside the model.
+The model receives amount, recipient relationship, country, payment channel, anomaly facts, and pre-screen reasons. It never receives the canned scenario label. Tool names, endpoints, simulator subjects, redirect hosts, repeat calls, and call budgets are enforced outside the model.
 
 Implemented Nokia sandbox tools:
 
@@ -59,7 +62,7 @@ SafePay does not claim an active-call API. Provider errors and malformed respons
 
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
-    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
     python -m uvicorn app.main:app --reload
 
 Open http://127.0.0.1:8000.
@@ -78,7 +81,7 @@ Live mode is restricted to Nokia's documented +99999991000 and +99999991001 simu
 
 ## Test
 
-    python -m pytest -q
+    python -m pytest -q --ignore=tests/test_browser.py
 
 The in-product acceptance evaluation is also available from the web interface or:
 
@@ -88,6 +91,7 @@ It runs 36 synthetic cases across Egypt, Saudi Arabia, and the UAE. These result
 
 Browser acceptance can be run against a local server:
 
+    playwright install chromium
     $env:SAFEPAY_BROWSER_URL="http://127.0.0.1:8000"
     python -m pytest tests/test_browser.py -q
 
@@ -97,7 +101,7 @@ Browser acceptance can be run against a local server:
 |---|---|
 | POST /api/v1/sessions | Start an isolated one-hour demo session |
 | POST /api/v1/enrollments | Establish fresh device trust |
-| POST /api/v1/payments | Screen and, when needed, investigate a payment |
+| POST /api/v1/payments | Screen a payment with independent recipient relationship and channel fields |
 | GET /api/v1/runs/{id} | Retrieve the stored result |
 | POST /api/v1/runs/{id}/cancel | Cancel a pending or held run |
 | POST /api/v1/evaluations | Run the synthetic acceptance suite |
@@ -115,6 +119,8 @@ Render's official FastAPI instructions use pip install -r requirements.txt and U
 
 - [Pitch deck](docs_and_presentations/SafePay_MENA_Phase2_Pitch_Deck.pdf)
 - [Nokia sandbox verification](docs_and_presentations/NOKIA_SANDBOX_VERIFICATION.md)
+- [Phase 2 QA report](docs_and_presentations/PHASE2_QA_REPORT.md)
+- [Phase 2 rubric scorecard](docs_and_presentations/PHASE2_RUBRIC_SCORECARD.md)
 - [Claim verification](docs_and_presentations/PHASE2_CLAIM_VERIFICATION.md)
 - [Security threat model](SAFEPAY_SECURITY_THREAT_MODEL_AND_TRACES.md)
 - [TDD build log](docs_and_presentations/TDD_BUILD_LOG.md)
