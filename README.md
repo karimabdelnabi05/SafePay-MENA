@@ -114,7 +114,7 @@ Render's official FastAPI instructions use pip install -r requirements.txt and U
 ## Phase 2 Material
 
 - [Pitch deck](docs_and_presentations/SafePay_MENA_Phase2_Pitch_Deck.pdf)
-- [Pitch source](SafePay_MENA_Pitch_Deck_Content.md)
 - [Nokia sandbox verification](docs_and_presentations/NOKIA_SANDBOX_VERIFICATION.md)
 - [Claim verification](docs_and_presentations/PHASE2_CLAIM_VERIFICATION.md)
+- [Security threat model](SAFEPAY_SECURITY_THREAT_MODEL_AND_TRACES.md)
 - [TDD build log](docs_and_presentations/TDD_BUILD_LOG.md)
