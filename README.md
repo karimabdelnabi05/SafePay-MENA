@@ -125,6 +125,9 @@ Render's official FastAPI instructions use pip install -r requirements.txt and U
 
 ## Phase 2 Material
 
+- [Latest investigation/UX verification](docs_and_presentations/INVESTIGATION_UX_RELEASE.md): 114 tests, quota handling, decision inspector and evaluation fixes.
+- [Nokia quota options](docs_and_presentations/NOKIA_QUOTA_OPTIONS.md): current gateway, portal access and the organizer request.
+
 Build the required source upload from the committed release with `python build_submission.py` after installing development dependencies. It exports tracked files only, checks for accidental secrets, and runs the backend suite from the extracted ZIP. The output is `dist/SafePay_MENA_Source.zip` with a commit and SHA-256 manifest.
 
 - [Prototype submission checklist](docs_and_presentations/PROTOTYPE_SUBMISSION_CHECKLIST.md): all form fields, required uploads, draft text and remaining release work.

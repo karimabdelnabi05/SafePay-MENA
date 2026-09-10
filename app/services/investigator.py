@@ -28,6 +28,7 @@ async def investigate(
     on_progress=None,
 ):
     evidence, trace, calls, proposal = [], [], 0, None
+    turns = 0
 
     async def emit(stage, actor, message, **details):
         if on_progress:
@@ -74,14 +75,22 @@ async def investigate(
                     trace.append({"actor": "POLICY", "tool": "stop",
                                   "reason": "The review was cancelled; no further external calls were made"})
                     break
-                calls += 1
-                await emit("AGENT_DECISION", "GEMINI",
-                           "Gemini is selecting the next permitted evidence action",
-                           model_call=calls)
-                # Robust call to Gemini with retry on transient 429 / 503 / timeouts
+                if gateway.availability.snapshot()["status"] == "RATE_LIMITED":
+                    failure = "NokiaRateLimited"
+                    trace.append({"actor": "POLICY", "tool": "stop",
+                                  "reason": "Nokia cooldown is active; no model or network request was sent"})
+                    break
+                turns += 1
                 response = None
-                is_mock = isinstance(getattr(client, "_transport", None), httpx.MockTransport)
-                for attempt in range(3):
+                for attempt in range(2):
+                    if should_stop and should_stop():
+                        failure = "Cancelled"
+                        break
+                    if calls >= 7:
+                        raise ValueError("Model request budget exhausted")
+                    calls += 1
+                    await emit("AGENT_DECISION", "GEMINI", "Gemini is selecting the next permitted evidence action",
+                               model_call=calls, model_turn=turns, attempt=attempt + 1)
                     try:
                         resp = await client.post(
                             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
@@ -95,17 +104,26 @@ async def investigate(
                                 "toolConfig": {"functionCallingConfig": {"mode": "ANY"}},
                                 "generationConfig": {"temperature": 0, "maxOutputTokens": 512},
                             }, timeout=25, follow_redirects=False)
-                        if resp.status_code in (429, 503) and attempt < 2 and not is_mock:
-                            await asyncio.sleep(1.5 * (attempt + 1))
+                        if resp.status_code in (502, 503, 504) and attempt == 0:
+                            reason = f"Gemini HTTP {resp.status_code}; one bounded retry"
+                            trace.append({"actor": "GEMINI", "tool": "retry", "reason": reason, "status": "RETRY"})
+                            await emit("AGENT_RETRY", "GEMINI", reason, http_status=resp.status_code,
+                                       model_call=calls, attempt=attempt + 1)
+                            await asyncio.sleep(.5)
                             continue
                         resp.raise_for_status()
                         response = resp
                         break
                     except (httpx.TimeoutException, httpx.NetworkError):
-                        if attempt < 2 and not is_mock:
-                            await asyncio.sleep(1.0)
+                        if attempt == 0:
+                            reason = "Gemini connection interrupted; one bounded retry"
+                            trace.append({"actor": "GEMINI", "tool": "retry", "reason": reason, "status": "RETRY"})
+                            await emit("AGENT_RETRY", "GEMINI", reason, model_call=calls, attempt=attempt + 1)
+                            await asyncio.sleep(.5)
                             continue
                         raise
+                if failure:
+                    break
                 if response is None:
                     raise httpx.RequestError("No response received from model")
                 content = response.json()["candidates"][0]["content"]
@@ -161,6 +179,11 @@ async def investigate(
                     if call.get("id"):
                         result["id"] = call["id"]
                     responses.append({"functionResponse": result})
+                    if observation.get("error") in {"NOKIA_RATE_LIMITED", "NOKIA_COOLDOWN"}:
+                        failure = "NokiaRateLimited"
+                        trace.append({"actor": "POLICY", "tool": "stop",
+                                      "reason": "Nokia rate limit: remaining requests stopped; no automatic release"})
+                        break
                 if failure:
                     break
                 contents.append(content)
@@ -171,7 +194,7 @@ async def investigate(
         if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429:
             reason = "Gemini API rate limit reached (HTTP 429: Quota exhausted); policy fail-closed protected funds"
         elif isinstance(exc, (httpx.TimeoutException, TimeoutError)):
-            reason = "Gemini API request timed out (>25s); policy fail-closed protected funds"
+            reason = "Model request or investigation deadline exceeded; no automatic release"
         elif isinstance(exc, ValueError):
             reason = f"Invalid agent tool request ({str(exc)[:80]}); policy fail-closed protected funds"
         else:
@@ -179,12 +202,16 @@ async def investigate(
         trace.append({"actor": "POLICY", "tool": "stop", "reason": reason})
 
     decision, score, reasons = assess(context, evidence)
-    observed_tools = {e["tool"] for e in evidence}
+    observed_tools = {e["tool"] for e in evidence if e["status"] == "SUCCESS"}
     missing_evidence = [t for t in ("sim_swap", "number_verification") if t not in observed_tools]
 
     diagnostic = None
     if failure:
-        if isinstance(caught_exc, httpx.HTTPStatusError):
+        if failure == "NokiaRateLimited":
+            diagnostic = {"code": "NOKIA_RATE_LIMITED", "provider": "NOKIA",
+                          "http_status": 429 if any(e.get("http_status") == 429 for e in evidence) else None,
+                          "model_call": calls}
+        elif isinstance(caught_exc, httpx.HTTPStatusError):
             code_map = {
                 429: "GEMINI_RATE_LIMITED",
                 401: "GEMINI_AUTH_FAILED",
@@ -213,7 +240,8 @@ async def investigate(
         reasons.append("Agent investigation did not complete")
         for tool in missing_evidence:
             label = "SIM Swap" if tool == "sim_swap" else tool.replace("_", " ").title()
-            reasons.append(f"{label} was not called")
+            reasons.append(f"{label} was not called" if not any(e["tool"] == tool for e in evidence)
+                           else f"{label} evidence was unavailable")
         score = None
         risk_score_status = "INCOMPLETE"
     else:
@@ -227,12 +255,21 @@ async def investigate(
     elif proposal in {"HOLD", "RETRY"} and decision == "APPROVE":
         decision = proposal
         reasons.append("Agent requested additional review")
+    if decision == "RETRY":
+        score, risk_score_status = None, "INCOMPLETE"
+    policy_override = proposal is not None and proposal != decision
+    policy_message = (f"Agent proposed {proposal}; enforced policy returned {decision}"
+                      if policy_override else f"Enforced policy returned {decision} from the available evidence")
+    if diagnostic:
+        await emit("PROVIDER_ERROR", diagnostic.get("provider", "GEMINI"),
+                   trace[-1]["reason"], **diagnostic)
     await emit("POLICY_DECISION", "POLICY",
-               "Deterministic policy validated the agent proposal and observed evidence",
+               policy_message,
                decision=decision)
     return {"decision": decision, "final_risk_score": score, "risk_score_status": risk_score_status,
-            "reasons": reasons, "evidence": evidence, "agent_trace": trace, "model_calls": calls,
-            "telecom_calls": len(evidence), "agent_proposal": proposal, "agent_error": failure,
+            "reasons": reasons, "evidence": evidence, "agent_trace": trace, "model_calls": calls, "model_turns": turns,
+            "telecom_calls": sum(e.get("request_made", True) for e in evidence),
+            "agent_proposal": proposal, "policy_override": policy_override, "agent_error": failure,
             "agent_diagnostic": diagnostic, "missing_evidence": missing_evidence,
             "decision_source": "GEMINI_WITH_POLICY" if not failure else "POLICY_FAIL_CLOSED",
             "investigation_ms": round((time.monotonic() - start) * 1000, 2)}

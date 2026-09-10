@@ -57,7 +57,7 @@ function renderReady() {
   byId("outcomeMain").dataset.state = "READY";
   byId("outcomeEyebrow").textContent = "Decision workspace";
   byId("outcomeTitle").textContent = "Ready for review";
-  byId("outcomeCopy").textContent = "Choose a scenario and review the payment. Technical evidence stays available below without obscuring the decision.";
+  byId("outcomeCopy").textContent = "No payment submitted for review.";
   byId("preScore").textContent = "-";
   byId("finalScore").textContent = "-";
   byId("externalCalls").textContent = "0";
@@ -67,6 +67,10 @@ function renderReady() {
   byId("liveProgress").hidden = true;
   byId("resultActions").hidden = true;
   byId("resumeButton").hidden = true;
+  byId("paymentReceipt").hidden = true;
+  byId("policyComparison").hidden = true;
+  byId("diagnosticBody").innerHTML = "<dt>Run</dt><dd>Not started</dd>";
+  byId("exportTraceButton").disabled = true;
   document.querySelectorAll(".step").forEach((step, index) => step.classList.toggle("active", index === 0));
 }
 
@@ -117,12 +121,21 @@ function updateLiveAccessUi() {
   if (!authorized) {
     byId("liveAccessStatus").textContent = "Enter the judge code to use protected connected mode.";
   } else if (state.liveAccess.remaining <= 0 || state.liveAccess.global_remaining <= 0) {
-    byId("liveAccessStatus").textContent = "Connected quota is temporarily exhausted. Fixture mode remains available.";
+    byId("liveAccessStatus").textContent = "SafePay's run allowance is exhausted. Fixture mode remains available.";
   } else {
     const count = state.liveAccess.remaining;
     byId("liveAccessStatus").textContent = `${count} connected run${count === 1 ? "" : "s"} remaining this hour.`;
   }
   updateReviewAvailability();
+  const nokia = state.liveAccess.nokia || {};
+  const messages = {
+    RATE_LIMITED: `Nokia rate limited. Local cooldown: ${nokia.retry_after_seconds}s. Provider reset is not confirmed.`,
+    RETRY_AVAILABLE: "Local cooldown ended. Nokia quota has not been rechecked.",
+    LAST_CHECK_SUCCEEDED: "Last Nokia check succeeded. Remaining provider quota is not known.",
+    LAST_CHECK_FAILED: "Last Nokia check failed. Inspect the run for the provider error.",
+  };
+  byId("providerStatus").textContent = messages[nokia.status] || "Nokia quota has not been checked.";
+  byId("providerStatus").dataset.state = nokia.status || "NOT_CHECKED";
 }
 
 function renderLiveProgress(result) {
@@ -150,21 +163,32 @@ function renderLiveProgress(result) {
     API_SELECTED: "API selected",
     EVIDENCE_RECEIVED: "Evidence received",
     POLICY_DECISION: "Policy decision",
+    PROVIDER_ERROR: "Provider issue",
+    AGENT_RETRY: "Retrying model",
+    INCOMPLETE: "Incomplete",
     COMPLETE: "Complete",
     CANCELLED: "Cancelled",
   };
-  byId("progressStage").textContent = stageNames[result.stage || progress.at(-1)?.stage] || "Running";
+  const incomplete = result.decision === "RETRY" || result.stage === "INCOMPLETE" || result.risk_score_status === "INCOMPLETE";
+  byId("progressStage").textContent = incomplete ? "Incomplete" : stageNames[result.stage || progress.at(-1)?.stage] || "Running";
+  panel.dataset.state = incomplete ? "INCOMPLETE" : "ACTIVE";
   byId("progressList").innerHTML = visibleProgress.map((item, index) => {
-    const metadata = [item.tool ? toolLabel(item.tool) : null, item.status,
+    const metadata = [item.observed_at ? new Date(item.observed_at * 1000).toLocaleTimeString() : null,
+      item.tool ? toolLabel(item.tool) : null, item.status,
       item.http_status ? `HTTP ${item.http_status}` : null,
       item.latency_ms != null ? `${item.latency_ms} ms` : null]
       .filter(Boolean).join(" | ");
-    return `<li data-stage="${escapeHtml(item.stage || "")}"><span class="progress-index">${index + 1}</span><div><strong>${escapeHtml(item.actor || "SAFEPAY")} | ${escapeHtml(stageNames[item.stage] || item.stage || "Update")}</strong><span>${escapeHtml(item.message || "Progress recorded")}</span>${metadata ? `<small>${escapeHtml(metadata)}</small>` : ""}</div></li>`;
+    const label = incomplete && item.stage === "COMPLETE" ? "Incomplete" : stageNames[item.stage] || item.stage || "Update";
+    return `<li data-stage="${escapeHtml(item.stage || "")}"><span class="progress-index">${index + 1}</span><div><strong>${escapeHtml(item.actor || "SAFEPAY")} | ${escapeHtml(label)}</strong><span>${escapeHtml(item.message || "Progress recorded")}</span>${item.reason ? `<span>${escapeHtml(item.reason)}</span>` : ""}${metadata ? `<small>${escapeHtml(metadata)}</small>` : ""}</div></li>`;
   }).join("");
   if (result.decision === "PENDING") byId("progressList").scrollTop = byId("progressList").scrollHeight;
 }
 
 function renderPending(enrollment, connected = false) {
+  byId("paymentReceipt").hidden = true;
+  byId("policyComparison").hidden = true;
+  byId("diagnosticBody").innerHTML = "<dt>Run</dt><dd>Investigation in progress</dd>";
+  byId("exportTraceButton").disabled = true;
   byId("outcomeMain").dataset.state = "READY";
   byId("outcomeEyebrow").textContent = "Investigation running";
   byId("outcomeTitle").textContent = enrollment ? "Verifying device" : "Reviewing payment";
@@ -265,6 +289,50 @@ function renderTrace(items = [], source = "") {
   byId("traceBody").innerHTML = `<ol class="trace">${rows}</ol>`;
 }
 
+function renderInspector(result) {
+  const comparison = byId("policyComparison");
+  comparison.hidden = !result.agent_proposal;
+  byId("agentProposal").textContent = result.agent_proposal || "No proposal";
+  byId("policyDecision").textContent = result.decision;
+  byId("policyExplanation").textContent = result.agent_proposal !== result.decision
+    ? "Policy overrode the agent proposal. The payment follows the enforced decision."
+    : "The proposal and enforced decision agree.";
+  const fields = [
+    ["Run ID", result.id], ["Execution", result.decision_source],
+    ["Model requests", result.model_calls || 0], ["Agent turns", result.model_turns ?? result.model_calls ?? 0],
+    ["Network checks", result.telecom_calls || 0],
+    ["Evidence still needed", (result.missing_evidence || (result.evidence || []).filter(e => e.status !== "SUCCESS").map(e => e.tool)).map(toolLabel).join(", ") || "None recorded"],
+    ["Diagnostic", result.agent_diagnostic?.code || result.agent_error || "No agent error recorded"],
+  ];
+  for (const e of result.evidence || []) {
+    if (e.status !== "SUCCESS") fields.push([toolLabel(e.tool), [e.error, e.failure_step,
+      e.http_status ? `HTTP ${e.http_status}` : null,
+      e.request_made === false ? "No request sent" : null,
+      e.retry_after_seconds ? `Cooldown ${e.retry_after_seconds}s; reset not confirmed` : null].filter(Boolean).join(" / ")]);
+  }
+  byId("diagnosticBody").innerHTML = fields.map(([label, value]) =>
+    `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value ?? "Not recorded")}</dd>`).join("");
+  byId("exportTraceButton").disabled = !result.id;
+  const market = state.catalog?.countries[state.country];
+  byId("paymentReceipt").textContent = `${market?.currency || ""} ${Number(byId("amountInput").value).toLocaleString()} / ${byId("recipientSelect").selectedOptions[0]?.textContent || ""} / sandbox`;
+  byId("paymentReceipt").hidden = false;
+}
+
+function exportTrace() {
+  const run = state.currentRun;
+  if (!run?.id) return;
+  const keys = ["id", "decision", "decision_source", "pre_call_score", "final_risk_score", "risk_score_status",
+    "model_calls", "model_turns", "telecom_calls", "agent_proposal", "policy_override", "agent_diagnostic",
+    "missing_evidence", "agent_trace", "evidence", "progress", "reasons"];
+  const exported = Object.fromEntries(keys.filter(key => key in run).map(key => [key, run[key]]));
+  const url = URL.createObjectURL(new Blob([JSON.stringify(exported, null, 2)], {type: "application/json"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `safepay-trace-${String(run.id).replace(/[^a-zA-Z0-9_-]/g, "_")}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function renderResult(result) {
   state.currentRun = result;
   byId("resumeButton").hidden = true;
@@ -274,7 +342,7 @@ function renderResult(result) {
   byId("outcomeTitle").textContent = content[0];
   byId("outcomeCopy").textContent = content[1];
   byId("preScore").textContent = result.pre_call_score ?? "Not scored";
-  byId("finalScore").textContent = result.final_risk_score ?? "Not scored";
+  byId("finalScore").textContent = result.decision === "RETRY" ? "Not assessed" : result.final_risk_score ?? "Not scored";
   byId("externalCalls").textContent = String((result.telecom_calls || 0) + (result.model_calls || 0));
   const reasons = result.reasons?.length
     ? result.reasons
@@ -285,6 +353,7 @@ function renderResult(result) {
   renderEvidence(result.evidence, result);
   renderTrace(result.agent_trace, result.decision_source);
   renderLiveProgress(result);
+  renderInspector(result);
   byId("resultActions").hidden = !["HOLD", "RETRY", "VERIFY_DEVICE"].includes(result.decision);
   document.querySelectorAll(".step").forEach((step) => step.classList.add("active"));
   byId("outcomeMain").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -468,6 +537,7 @@ async function startAndRun(event) {
       button.dataset.label = "Review payment";
     }
     renderResult(result);
+    if (connected) await refreshLiveAccess().catch(() => {});
   } catch (error) {
     if (operation !== state.operationGeneration) return;
     if (error.status === 401) clearSessionState();
@@ -523,7 +593,7 @@ async function runEvaluation() {
     const response = await fetch("/api/v1/evaluations", { method: "POST" });
     if (!response.ok) throw new Error("Evaluation could not run.");
     const result = await response.json();
-    byId("evaluationResult").textContent = `${result.passed} passed · ${result.failed} failed · ${result.mode} · ${result.elapsed_ms} ms (36/36 Policy Invariants Verified)`;
+    byId("evaluationResult").textContent = `${result.passed} passed / ${result.failed} failed / ${result.mode} / ${result.elapsed_ms} ms`;
     if (matrix && tbody && Array.isArray(result.cases)) {
       matrix.removeAttribute("hidden");
       matrix.hidden = false;
@@ -575,10 +645,14 @@ async function runEvaluation() {
         toolsTd.textContent = toolsText;
 
         const invTd = document.createElement("td");
-        invTd.textContent = "4/4 Invariants";
+        const checks = Object.entries(item.checks || {});
+        invTd.textContent = `${checks.filter(([, passed]) => passed === true).length}/${checks.length} checks`;
+        const failedChecks = checks.filter(([, passed]) => passed !== true).map(([name]) => name);
+        if (failedChecks.length) invTd.textContent += `: ${failedChecks.join(", ")}`;
 
         const statTd = document.createElement("td");
-        statTd.innerHTML = `<span class="eval-pass">✓ PASS</span>`;
+        const passed = item.passed === true && checks.length > 0 && failedChecks.length === 0;
+        statTd.innerHTML = `<span class="${passed ? "eval-pass" : "eval-fail"}">${passed ? "PASS" : "FAIL"}</span>`;
 
         tr.appendChild(mktTd);
         tr.appendChild(scenTd);
@@ -668,4 +742,31 @@ byId("accessCodeInput").addEventListener("keydown", (event) => {
 byId("cancelButton").addEventListener("click", cancelCurrent);
 byId("resumeButton").addEventListener("click", reconnectReview);
 byId("evaluationButton").addEventListener("click", runEvaluation);
+byId("exportTraceButton").addEventListener("click", exportTrace);
+byId("refreshProviderButton").addEventListener("click", async () => {
+  const button = byId("refreshProviderButton");
+  button.disabled = true;
+  try { await refreshLiveAccess(); }
+  catch { byId("providerStatus").textContent = "Availability could not be refreshed."; }
+  finally { button.disabled = false; }
+});
+const viewTabs = [byId("paymentTab"), byId("qualityTab")];
+function selectView(tab) {
+  for (const item of viewTabs) {
+    const selected = item === tab;
+    item.setAttribute("aria-selected", String(selected));
+    item.tabIndex = selected ? 0 : -1;
+    byId(item.getAttribute("aria-controls")).hidden = !selected;
+  }
+}
+for (const [index, tab] of viewTabs.entries()) {
+  tab.addEventListener("click", () => selectView(tab));
+  tab.addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const target = viewTabs[event.key === "Home" ? 0 : event.key === "End" ? 1 : 1 - index];
+    selectView(target);
+    target.focus();
+  });
+}
 init();

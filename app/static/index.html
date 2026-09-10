@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SafePay MENA telecom evidence orchestration demo">
   <title>SafePay MENA</title>
-  <link rel="stylesheet" href="/static/css/app.css?v=1.3">
+  <link rel="stylesheet" href="/static/css/app.css?v=2.0">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to payment review</a>
@@ -21,22 +21,34 @@
 
   <main id="main" class="page">
     <section class="intro" aria-labelledby="pageTitle">
-      <div><h1 id="pageTitle">Payment review</h1><p>Routine payments stay instant. Elevated risk triggers a bounded evidence investigation before money moves.</p></div>
+      <div><h1 id="pageTitle">Payment review</h1><p>Sandbox payment protection</p></div>
       <span class="environment" id="environmentBadge">SIMULATED BANK CONTEXT</span>
     </section>
 
+    <div class="view-tabs" role="tablist" aria-label="Workspace">
+      <button role="tab" id="paymentTab" aria-selected="true" aria-controls="paymentView" type="button">Payment</button>
+      <button role="tab" id="qualityTab" aria-selected="false" aria-controls="qualityView" tabindex="-1" type="button">Quality checks</button>
+    </div>
+    <div id="paymentView" role="tabpanel" aria-labelledby="paymentTab">
     <nav class="steps" aria-label="Review steps">
-      <div class="step active"><strong>1</strong><span>Choose context</span></div>
-      <div class="step"><strong>2</strong><span>Run review</span></div>
-      <div class="step"><strong>3</strong><span>Inspect outcome</span></div>
+      <div class="step active"><strong>1</strong><span>Payment details</span></div>
+      <div class="step"><strong>2</strong><span>Security review</span></div>
+      <div class="step"><strong>3</strong><span>Payment decision</span></div>
     </nav>
 
     <div class="workspace">
       <section class="panel" aria-labelledby="setupTitle">
-        <div class="panel-head"><h2 id="setupTitle">Transaction context</h2><p>Select a repeatable judge scenario or Nokia sandbox mode.</p></div>
+        <div class="panel-head"><h2 id="setupTitle">Payment details</h2><p>Test account / no money moves</p></div>
         <form class="panel-body" id="reviewForm" novalidate>
           <div class="error" id="formError" role="alert" tabindex="-1"></div>
           <fieldset><legend>Market</legend><div class="segments" id="countrySegments"></div></fieldset>
+          <div class="field-row">
+            <div class="field"><label for="amountInput">Amount</label><input id="amountInput" type="number" min="1" max="1000000" step="1" value="200" required><span class="helper" id="currencyHelp">EGP</span></div>
+            <div class="field"><label for="recipientSelect">Recipient relationship</label><select id="recipientSelect"><option value="family">Family / known</option><option value="new_payee">New payee</option><option value="merchant">Merchant</option><option value="wallet">Wallet</option></select></div>
+          </div>
+          <div class="field"><label for="channelSelect">Payment channel</label><select id="channelSelect"><option value="INSTANT_PAYMENT">Instant account transfer</option><option value="CARD_CHECKOUT">Card checkout</option><option value="WALLET_TRANSFER">Wallet transfer</option></select></div>
+          <div class="context-strip" id="railContext">Egypt / InstaPay / IPN</div>
+          <div class="field"><label for="scenarioSelect">Sample situation</label><select id="scenarioSelect" required></select><span class="helper" id="scenarioHelp">Loading scenarios...</span></div>
           <div class="mode-row"><label for="modeSelect">Evidence mode</label><select class="mode-select" id="modeSelect"><option value="FIXTURE">Repeatable fixture</option></select></div>
           <section class="live-access" id="liveAccessPanel" aria-labelledby="liveAccessTitle" hidden>
             <div class="live-access-head">
@@ -52,14 +64,9 @@
               <p class="access-error" id="accessError" role="alert"></p>
             </div>
             <p class="live-access-status" id="liveAccessStatus">Connected mode is locked.</p>
+            <p class="provider-status" id="providerStatus" role="status">Nokia quota has not been checked.</p>
+            <button class="text-button" id="refreshProviderButton" type="button">Refresh availability</button>
           </section>
-          <div class="field"><label for="scenarioSelect">Scenario</label><select id="scenarioSelect" required></select><span class="helper" id="scenarioHelp">Loading scenarios...</span></div>
-          <div class="field"><label for="channelSelect">Payment channel</label><select id="channelSelect"><option value="INSTANT_PAYMENT">Instant account transfer</option><option value="CARD_CHECKOUT">Card checkout</option><option value="WALLET_TRANSFER">Wallet transfer</option></select></div>
-          <div class="field-row">
-            <div class="field"><label for="amountInput">Amount</label><input id="amountInput" type="number" min="1" max="1000000" step="1" value="200" required><span class="helper" id="currencyHelp">EGP</span></div>
-            <div class="field"><label for="recipientSelect">Recipient relationship</label><select id="recipientSelect"><option value="family">Family / known</option><option value="new_payee">New payee</option><option value="merchant">Merchant</option><option value="wallet">Wallet</option></select></div>
-          </div>
-          <div class="context-strip" id="railContext">Egypt · InstaPay / IPN</div>
           <button class="primary" id="reviewButton" type="submit" disabled>Review payment</button>
           <span class="helper">No payment is executed. Live mode is restricted to Nokia's documented simulator subjects.</span>
         </form>
@@ -69,7 +76,8 @@
         <div class="outcome-main" id="outcomeMain" data-state="READY" aria-live="polite" aria-atomic="true" tabindex="-1">
           <div class="eyebrow" id="outcomeEyebrow">Decision workspace</div>
           <h2 id="outcomeTitle">Ready for review</h2>
-          <p class="outcome-copy" id="outcomeCopy">Choose a scenario and review the payment. Technical evidence stays available below without obscuring the decision.</p>
+          <p class="outcome-copy" id="outcomeCopy">No payment submitted for review.</p>
+          <p class="payment-receipt" id="paymentReceipt" hidden></p>
         </div>
         <section class="live-progress" id="liveProgress" aria-labelledby="liveProgressTitle" hidden>
           <div class="live-progress-head">
@@ -82,27 +90,38 @@
         <div class="metrics" aria-label="Decision metrics">
           <div class="metric"><span>Pre-call score</span><strong id="preScore">-</strong></div>
           <div class="metric"><span>Final risk score</span><strong id="finalScore">-</strong></div>
-          <div class="metric"><span>Agent turns + CAMARA tools</span><strong id="externalCalls">0</strong></div>
+          <div class="metric"><span>Model requests + network checks</span><strong id="externalCalls">0</strong></div>
         </div>
+        <section class="policy-comparison" id="policyComparison" hidden aria-label="Decision comparison">
+          <div><span>Agent proposal</span><strong id="agentProposal">-</strong></div>
+          <div><span>Enforced policy</span><strong id="policyDecision">-</strong></div>
+          <p id="policyExplanation"></p>
+        </section>
         <div class="reason-block"><h3>Why this happened</h3><ul class="reason-list" id="reasonList"><li>The review has not started.</li></ul></div>
         <div class="actions" id="resultActions" hidden><button class="secondary" id="resumeButton" type="button" hidden>Reconnect to review</button><button class="danger-button" id="cancelButton" type="button">Cancel review</button></div>
         <details><summary>Network evidence</summary><div class="details-body" id="evidenceBody"><p class="empty">No network evidence requested.</p></div></details>
         <details><summary>Agent and policy trace</summary><div class="details-body" id="traceBody"><p class="empty">No agent investigation was needed.</p></div></details>
+        <details id="investigationInspector"><summary>Investigation details</summary><div class="details-body">
+          <dl class="diagnostics" id="diagnosticBody"><dt>Run</dt><dd>Not started</dd></dl>
+          <button class="secondary" id="exportTraceButton" type="button" disabled>Export trace</button>
+        </div></details>
       </section>
     </div>
+    </div>
 
+    <section id="qualityView" role="tabpanel" aria-labelledby="qualityTab" hidden>
     <section class="evaluation" aria-labelledby="evaluationTitle">
       <div class="evaluation-intro">
-        <h2 id="evaluationTitle">Automated Policy & Rail Invariant Suite (36 Cases)</h2>
-        <p>Runs 36 internal HTTP integration tests across Egypt (InstaPay), Saudi Arabia (sarie), and UAE (Aani). Verifies deterministic policy decisions, CAMARA tool plans, and zero-leakage security boundaries without external carrier latency.</p>
+        <h2 id="evaluationTitle">Synthetic regression checks</h2>
+        <p>36 fixture cases / 3 market contexts / no live provider calls</p>
         <p class="eval-result" id="evaluationResult" aria-live="polite"></p>
       </div>
       <button class="secondary" id="evaluationButton" type="button">Run 36-case evaluation</button>
       <div id="evaluationMatrix" class="eval-matrix" hidden>
         <div class="eval-matrix-header">
           <div>
-            <strong class="eval-matrix-title">Regression Invariant Matrix (36 Cases)</strong>
-            <span class="eval-matrix-subtitle">3 rails × 12 scenario vectors verified across all policy contracts</span>
+            <strong class="eval-matrix-title">Scenario results</strong>
+            <span class="eval-matrix-subtitle">Decision / tool plan / evidence status / external-call count</span>
           </div>
           <div class="eval-matrix-badges">
             <span class="eval-badge">🇪🇬 InstaPay (12)</span>
@@ -116,7 +135,7 @@
               <tr>
                 <th>Market</th>
                 <th>Scenario Vector</th>
-                <th>Verified Decision</th>
+                <th>Actual Decision</th>
                 <th>CAMARA Tool Plan</th>
                 <th>Invariants Checked</th>
                 <th>Status</th>
@@ -127,8 +146,9 @@
         </div>
       </div>
     </section>
+    </section>
     <p class="footer">Prototype uses simulated bank context. Nokia mode uses sandbox APIs and independent simulator subjects; production mobile networks and payment rails are not connected.</p>
   </main>
-  <script src="/static/js/app.js?v=1.3" defer></script>
+  <script src="/static/js/app.js?v=2.0" defer></script>
 </body>
 </html>

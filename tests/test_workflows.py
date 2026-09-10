@@ -254,7 +254,7 @@ def test_model_block_proposal_cannot_override_deterministic_hold():
         assert result["decision_source"] == "GEMINI_WITH_POLICY"
 
 
-def test_model_cannot_turn_rate_limited_nokia_evidence_into_a_network_block():
+def test_nokia_rate_limit_stops_agent_requests_without_manufacturing_a_block():
     model_calls = 0
 
     def external(request):
@@ -280,9 +280,10 @@ def test_model_cannot_turn_rate_limited_nokia_evidence_into_a_network_block():
             "recipient": "family",
         }).json()
 
-        assert result["agent_proposal"] == "BLOCK"
+        assert result["agent_proposal"] is None
+        assert model_calls == 1
         assert result["decision"] == "RETRY"
-        assert result["final_risk_score"] == 35
+        assert result["final_risk_score"] is None
         assert result["evidence"][0]["status"] == "UNKNOWN"
         assert result["evidence"][0]["http_status"] == 429
 
@@ -632,6 +633,8 @@ def test_connected_judge_run_requires_access_reports_progress_and_uses_nokia():
             "remaining": 0,
             "global_remaining": 2,
             "expires_at": None,
+            "nokia": {"status": "NOT_CHECKED", "retry_after_seconds": 0,
+                      "last_http_status": None, "reset_confirmed": False},
         }
         assert client.post("/api/v1/live-access", json={"code": "wrong"}).status_code == 401
         assert client.post("/api/v1/live-access", json={"code": "\u062e\u0637\u0623"}).status_code == 401

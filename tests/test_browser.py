@@ -343,9 +343,74 @@ def test_tester_can_run_the_visible_quality_gate():
         browser = p.chromium.launch()
         page = browser.new_page(viewport={"width": 1100, "height": 900}, reduced_motion="reduce")
         page.goto(BASE)
+        page.get_by_role("tab", name="Quality checks").click()
         page.get_by_role("button", name="Run 36-case evaluation", exact=True).click()
         expect(page.locator("#evaluationResult")).to_contain_text("36 passed")
         expect(page.locator("#evaluationResult")).to_contain_text("0 failed")
+        browser.close()
+
+
+def test_quality_matrix_reports_failed_checks_and_fits_mobile():
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 375, "height": 812})
+        page.route("**/api/v1/evaluations", lambda route: route.fulfill(json={
+            "passed": 0, "failed": 1, "mode": "FIXTURE", "elapsed_ms": 1,
+            "cases": [{"country": "EG", "scenario": "sim_swap", "actual": "APPROVE", "expected": "BLOCK",
+                       "actual_tools": [], "passed": False, "checks": {"decision": False, "tool_plan": False,
+                       "evidence_status": True, "no_external_calls": True}}]}))
+        page.goto(BASE)
+        page.get_by_role("tab", name="Quality checks").click()
+        page.get_by_role("button", name="Run 36-case evaluation", exact=True).click()
+        row = page.locator("#evaluationTableBody tr")
+        expect(row).to_contain_text("FAIL")
+        expect(row).to_contain_text("2/4")
+        expect(page.locator("#evaluationResult")).not_to_contain_text("36/36")
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        browser.close()
+
+
+def test_incomplete_run_explains_override_and_exports_a_redacted_trace(tmp_path):
+    result = {
+        "id": "review-example", "decision": "RETRY", "decision_source": "GEMINI_WITH_POLICY",
+        "connected": True, "stage": "INCOMPLETE", "pre_call_score": 80, "final_risk_score": None,
+        "risk_score_status": "INCOMPLETE", "agent_proposal": "APPROVE", "policy_override": True,
+        "model_calls": 2, "model_turns": 2, "telecom_calls": 1,
+        "missing_evidence": ["sim_swap", "number_verification"],
+        "reasons": ["Required evidence is unavailable"],
+        "evidence": [{"tool": "number_verification", "status": "UNKNOWN", "source": "NOKIA_SANDBOX",
+                      "http_status": 429, "error": "NOKIA_RATE_LIMITED", "data": {},
+                      "failure_step": "/oauth2/v1/auth/clientcredentials"}],
+        "progress": [{"stage": "POLICY_DECISION", "actor": "POLICY",
+                      "message": "Agent proposed APPROVE; enforced policy returned RETRY"}],
+        "private_credential": "must-not-export",
+    }
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 375, "height": 812})
+        page.route("**/api/v1/payments", lambda route: route.fulfill(json=result))
+        page.goto(BASE)
+        page.locator("#reviewButton").click()
+        expect(page.locator("#progressStage")).to_have_text("Incomplete")
+        expect(page.locator("#finalScore")).to_have_text("Not assessed")
+        expect(page.locator("#policyExplanation")).to_contain_text("overrode")
+        page.get_by_text("Investigation details", exact=True).click()
+        expect(page.locator("#diagnosticBody")).to_contain_text("HTTP 429")
+        expect(page.locator("#diagnosticBody")).to_contain_text("clientcredentials")
+        with page.expect_download() as download:
+            page.get_by_role("button", name="Export trace").click()
+        path = tmp_path / "trace.json"
+        download.value.save_as(path)
+        exported = json.loads(path.read_text())
+        assert exported["id"] == "review-example"
+        assert exported["policy_override"] is True
+        assert "must-not-export" not in path.read_text()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        page.get_by_role("tab", name="Quality checks").click()
+        expect(page.locator("#paymentView")).to_be_hidden()
+        page.get_by_role("tab", name="Quality checks").press("ArrowLeft")
+        expect(page.locator("#paymentView")).to_be_visible()
+        expect(page.locator("#outcomeTitle")).to_have_text("Verification incomplete")
         browser.close()
 
 

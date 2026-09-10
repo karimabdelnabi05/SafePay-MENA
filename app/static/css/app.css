@@ -374,6 +374,7 @@ th { color: var(--muted); font-size: .72rem; }
 .trace strong { display: block; font-size: .82rem; }
 .trace span { color: var(--muted); font-size: .78rem; }
 .evaluation {
+  min-width: 0;
   margin-top: 16px;
   display: grid;
   grid-template-columns: 1fr auto;
@@ -387,7 +388,25 @@ th { color: var(--muted); font-size: .72rem; }
 .evaluation h2 { margin-bottom: 4px; font-size: 1rem; }
 .evaluation p { margin-bottom: 0; color: var(--muted); font-size: .84rem; }
 .eval-result { margin-top: 8px !important; color: var(--ink) !important; font-weight: 700; }
+.eval-fail { color: var(--danger); font-weight: 800; }
+.view-tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 20px; gap: 20px; }
+.view-tabs button { background: none; border: 0; border-bottom: 3px solid transparent; min-height: 48px; padding: 10px 4px; color: var(--muted); font-weight: 700; }
+.view-tabs [aria-selected="true"] { border-bottom-color: var(--brand); color: var(--brand); }
+.provider-status { font-size: .78rem; margin: 8px 0; color: var(--muted); }
+.provider-status[data-state="RATE_LIMITED"] { color: var(--danger); font-weight: 700; }
+.text-button { border: 0; background: none; color: var(--brand); padding: 8px 0; min-height: 44px; font-size: .8rem; text-decoration: underline; }
+.payment-receipt { margin: 14px 0 0; font-size: .82rem; font-weight: 700; }
+.policy-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 22px; background: #edf3fb; border-bottom: 1px solid var(--line); }
+.policy-comparison span { display: block; color: var(--muted); font-size: .76rem; }
+.policy-comparison strong { font-size: .88rem; }
+.policy-comparison p { grid-column: 1 / -1; font-size: .8rem; margin: 0; }
+.diagnostics { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr); gap: 8px 12px; font-size: .78rem; }
+.diagnostics dt { color: var(--muted); }
+.diagnostics dd { margin: 0; overflow-wrap: anywhere; }
+.live-progress[data-state="INCOMPLETE"] #progressStage { color: var(--warning); }
+.live-progress[data-state="INCOMPLETE"] .live-indicator { background: var(--accent); box-shadow: none; }
 .eval-matrix {
+  min-width: 0;
   display: block;
   grid-column: 1 / -1;
   width: 100%;
@@ -428,6 +447,8 @@ th { color: var(--muted); font-size: .72rem; }
   color: var(--ink);
 }
 .eval-matrix-scroll {
+  max-width: 100%;
+  overflow-x: auto;
   max-height: 380px;
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -435,11 +456,13 @@ th { color: var(--muted); font-size: .72rem; }
   background: var(--surface);
 }
 .eval-table {
+  min-width: 690px;
   width: 100%;
   border-collapse: collapse;
   font-size: 0.78rem;
   text-align: left;
 }
+.eval-tag { white-space: nowrap; }
 .eval-table th {
   position: sticky;
   top: 0;

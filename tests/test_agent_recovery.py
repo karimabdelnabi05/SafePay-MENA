@@ -1,4 +1,5 @@
 """Agent/provider contract regressions exercised through the payment API."""
+import asyncio
 import json
 
 import httpx
@@ -95,3 +96,92 @@ def test_model_http_failure_after_number_verification_explains_missing_sim(statu
     assert result["model_calls"] == 2
     assert "sensitive-provider-message" not in json.dumps(result)
     assert "SIM Swap was not called" in " ".join(result["reasons"])
+
+
+def test_unknown_evidence_does_not_get_a_final_score_or_validate_agent_approval():
+    calls = 0
+
+    def external(request):
+        nonlocal calls
+        if request.url.host != "generativelanguage.googleapis.com":
+            return httpx.Response(503)
+        calls += 1
+        part = (function("number_verification", reason="Verify number") if calls == 1 else
+                function("finish", decision="APPROVE", reason="Identity is clear"))
+        return httpx.Response(200, json={"candidates": [{"content": {"role": "model", "parts": [part]}}]})
+
+    result = payment(external)
+    assert result["decision"] == "RETRY"
+    assert result["agent_proposal"] == "APPROVE"
+    assert result["policy_override"] is True
+    assert result["risk_score_status"] == "INCOMPLETE"
+    assert result["final_risk_score"] is None
+    assert result["missing_evidence"] == ["sim_swap", "number_verification"]
+    assert result["evidence"][0]["http_status"] == 503
+    assert result["evidence"][0]["failure_step"] == "/oauth2/v1/auth/clientcredentials"
+
+
+def test_nokia_429_starts_shared_cooldown_and_prevents_more_provider_calls():
+    requests = []
+
+    def external(request):
+        requests.append(request)
+        return httpx.Response(429, headers={"Retry-After": "120"}, json={"error": "private"})
+
+    with TestClient(create_app(allow_live=True, nokia_key="test",
+                               external_transport=httpx.MockTransport(external))) as client:
+        client.post("/api/v1/sessions", json={"scenario": "first_setup", "mode": "NOKIA_SANDBOX"})
+        result = client.post("/api/v1/enrollments", json={"request_id": "quota"}).json()
+        assert result["decision"] == "RETRY"
+        assert len(requests) == 1
+        assert result["telecom_calls"] == 1
+        assert result["evidence"][0]["http_status"] == 429
+        assert result["evidence"][0]["retry_after_seconds"] == 120
+        assert result["evidence"][1]["request_made"] is False
+        availability = client.get("/api/v1/live-access").json()["nokia"]
+        assert availability["status"] == "RATE_LIMITED"
+        assert 0 < availability["retry_after_seconds"] <= 120
+        assert availability["reset_confirmed"] is False
+        client.post("/api/v1/enrollments", json={"request_id": "quota-again"})
+        assert len(requests) == 1
+
+
+def test_transient_model_retry_is_counted_and_traced_with_mock_transport():
+    requests = []
+
+    def external(request):
+        requests.append(request)
+        if len(requests) == 1:
+            return httpx.Response(503)
+        return httpx.Response(200, json={"candidates": [{"content": {"role": "model", "parts": [
+            function("finish", decision="RETRY", reason="Evidence is unavailable")]}}]})
+
+    result = payment(external)
+    assert len(requests) == 2
+    assert result["model_calls"] == 2
+    assert result["model_turns"] == 1
+    assert result["agent_error"] is None
+    assert any(t.get("status") == "RETRY" for t in result["agent_trace"])
+
+
+def test_cancellation_during_model_backoff_prevents_the_retry_request():
+    started = asyncio.Event()
+    requests = []
+
+    async def external(request):
+        requests.append(request)
+        started.set()
+        return httpx.Response(503)
+
+    async def run():
+        app = create_app(allow_live=True, nokia_key="test", gemini_key="test",
+                         external_transport=httpx.MockTransport(external))
+        async with app.router.lifespan_context(app), httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+            await client.post("/api/v1/sessions", json={"scenario": "sim_swap", "mode": "NOKIA_SANDBOX"})
+            task = asyncio.create_task(client.post("/api/v1/payments", json={"request_id": "cancel-retry", "amount": 35000}))
+            await started.wait()
+            await client.post("/api/v1/runs/cancel-retry/cancel")
+            assert (await task).json()["decision"] == "CANCELLED"
+            assert len(requests) == 1
+    asyncio.run(run())

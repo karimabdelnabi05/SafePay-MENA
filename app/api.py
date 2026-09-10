@@ -16,7 +16,7 @@ from app.core.demo import COUNTRIES, SCENARIOS, context_for, signals_for
 from app.core.policy import assess, screen
 from app.services.fixtures import FixtureGateway
 from app.services.investigator import investigate
-from app.services.nokia import NokiaGateway
+from app.services.nokia import NokiaAvailability, NokiaGateway
 
 
 class SessionInput(BaseModel):
@@ -85,6 +85,7 @@ def create_app(
     failed_access = {}
     global_failures = []
     global_runs = []
+    nokia_availability = NokiaAvailability()
     background_tasks = set()
     access_required = bool(judge_access_code)
     access_ttl = 2 * 3600
@@ -149,6 +150,7 @@ def create_app(
             "remaining": max(0, live_run_limit - len(grant["runs"])) if grant else 0,
             "global_remaining": max(0, live_global_limit - len(global_runs)),
             "expires_at": grant["expires_at"] if grant and access_required else None,
+            "nokia": nokia_availability.snapshot(),
         }
 
     def require_live_access(request):
@@ -165,7 +167,7 @@ def create_app(
         if len(grant["runs"]) >= live_run_limit:
             raise HTTPException(429, "This judge session has reached its hourly connected-run limit")
         if len(global_runs) >= live_global_limit:
-            raise HTTPException(429, "The shared Nokia sandbox quota is temporarily exhausted")
+            raise HTTPException(429, "SafePay's shared connected-run allowance is exhausted; this is separate from provider quota")
         grant["runs"].append(now)
         global_runs.append(now)
 
@@ -254,6 +256,7 @@ def create_app(
         if row and json.loads(row[0]).get("connected"):
             result["connected"] = True
             result["stage"] = ("CANCELLED" if result["decision"] == "CANCELLED" else
+                               "INCOMPLETE" if result["decision"] == "RETRY" or result.get("agent_error") else
                                "COMPLETE" if result["decision"] != "PENDING" else result.get("stage", "QUEUED"))
         db.execute("UPDATE runs SET result=? WHERE session=? AND id=?",
                    (json.dumps(result), sid, result["id"]))
@@ -274,6 +277,8 @@ def create_app(
         return run_cancelled_for_session(request.cookies["safepay_session"], run_id)
 
     def add_progress(sid, run_id, stage, actor, message, **details):
+        if stage == "COMPLETE" and details.get("decision") == "RETRY":
+            stage, message = "INCOMPLETE", "Verification stopped without sufficient evidence; no automatic release"
         row = db.execute("SELECT result FROM runs WHERE session=? AND id=?", (sid, run_id)).fetchone()
         if not row:
             return
@@ -294,9 +299,9 @@ def create_app(
             result["model_calls"] = details.get("model_call", 0)
         if stage == "EVIDENCE_RECEIVED" and details.get("observation"):
             result.setdefault("evidence", []).append(details["observation"])
-            result["telecom_calls"] = len(result["evidence"])
+            result["telecom_calls"] = sum(e.get("request_made", True) for e in result["evidence"])
         result.setdefault("progress", []).append(event)
-        result["progress"] = result["progress"][-20:]
+        result["progress"] = result["progress"][-64:]
         db.execute("UPDATE runs SET result=? WHERE session=? AND id=?", (json.dumps(result), sid, run_id))
         db.commit()
 
@@ -381,7 +386,7 @@ def create_app(
                     add_progress(sid, body.request_id, **event)
 
                 async with httpx.AsyncClient(transport=external_transport) as external:
-                    result.update(await investigate(investigation_context, NokiaGateway(nokia_key, external), subjects,
+                    result.update(await investigate(investigation_context, NokiaGateway(nokia_key, external, nokia_availability), subjects,
                                                     external, gemini_key,
                                                     should_stop=lambda: run_cancelled_for_session(sid, body.request_id),
                                                     on_progress=report if connected else None))
@@ -412,7 +417,7 @@ def create_app(
     async def run_enrollment(body, sid, data, connected=False):
         if data["mode"] == "NOKIA_SANDBOX":
             async with httpx.AsyncClient(transport=external_transport) as external:
-                gateway = NokiaGateway(nokia_key, external)
+                gateway = NokiaGateway(nokia_key, external, nokia_availability)
                 evidence = []
                 for tool, phone in (("number_verification", "+99999991000"),
                                     ("sim_swap", "+99999991001")):
@@ -455,7 +460,7 @@ def create_app(
                          "Connected enrollment review completed", decision=decision)
         return finish_for_session(sid, {"id": body.request_id, "decision": decision,
             "evidence": evidence, "pre_call_score": None, "final_risk_score": None,
-            "telecom_calls": 2 if data["mode"] == "NOKIA_SANDBOX" else 0, "model_calls": 0,
+            "telecom_calls": sum(e.get("request_made", True) for e in evidence) if data["mode"] == "NOKIA_SANDBOX" else 0, "model_calls": 0,
             "decision_source": "MANDATORY_ENROLLMENT_POLICY", "reasons": ["Fresh Number Verification and SIM Swap are required for device trust"],
             "agent_trace": [{"actor": "POLICY", "tool": e["tool"], "reason": "Mandatory fresh enrollment check", "status": e["status"]} for e in evidence]})
 

@@ -50,7 +50,7 @@ Timing below is a rehearsal suggestion, not a verified hackathon time allowance.
 
 ### 8. What is proved
 
-"We passed 36 synthetic acceptance cases and 103 automated tests: 79 backend and adapter tests plus 24 browser tests. Five integrated network capabilities have recorded successful Nokia sandbox responses. Our latest takeover investigation used three context-eligible Nokia tools and four Gemini turns. These numbers prove software behavior and integration. They do not yet prove a real-world fraud reduction percentage. That is the purpose of the pilot."
+"We passed 36 synthetic acceptance cases and 114 automated tests: 88 backend and adapter tests plus 26 browser tests. Five integrated network capabilities have recorded successful Nokia sandbox responses. Our latest takeover investigation used three context-eligible Nokia tools and four Gemini turns. These numbers prove software behavior and integration. They do not yet prove a real-world fraud reduction percentage. That is the purpose of the pilot."
 
 ### 9. Why this category
 
@@ -104,7 +104,7 @@ Final order: 1-13 main narrative; 14 commercial sensitivity; 15 fraud-type bench
 | 2 required checks | Implemented behavior | Fresh Number Verification and SIM Swap for setup/new phone. These are logical capabilities, not exactly two HTTP requests. |
 | Up to 5 tools | Implemented bound | Maximum evidence tools in one live investigation. A budget exhaustion triggers recoverable failure rather than more calls. |
 | 36/36 | Acceptance result | 12 journeys times 3 synthetic markets. Exact expected decisions, tool plans and evidence status. Not detection accuracy. Rerun during deck generation. |
-| 103/103 | Recorded QA result | 79 backend/adapter and 24 browser tests rerun on 10 Sep. |
+| 114/114 | Recorded QA result | 88 backend/adapter and 26 browser tests rerun on 10 Sep. |
 | 5 APIs | Recorded sandbox evidence | Integrated SIM Swap, Number Verification, Device Swap, Roaming, Reachability each have historical successful simulator responses. Not a current uptime promise or production operator coverage. |
 | 3 tools / 4 turns | Recorded live case | Latest local Nokia/Gemini takeover investigation; completed in under 10 seconds end to end. Not representative production latency. |
 | 25% loss reduction | Hypothesis | Scenario to validate on a defined portfolio; not derived from the FICO percentage. |

@@ -4,7 +4,27 @@ from urllib.parse import parse_qs
 import httpx
 import pytest
 
-from app.services.nokia import NokiaGateway
+from app.services.nokia import NokiaAvailability, NokiaGateway
+
+
+def test_expired_cooldown_allows_a_new_check_without_claiming_quota_reset(monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr("app.services.nokia.time.time", lambda: now[0])
+    responses = iter([httpx.Response(429, headers={"Retry-After": "invalid"}),
+                      httpx.Response(200, json={"swapped": False})])
+
+    async def run():
+        availability = NokiaAvailability()
+        async with httpx.AsyncClient(transport=httpx.MockTransport(lambda r: next(responses))) as client:
+            gateway = NokiaGateway("test-key", client, availability)
+            result = await gateway.check("sim_swap", "+99999991000")
+            assert result["retry_after_seconds"] == 60
+            assert (await gateway.check("sim_swap", "+99999991000"))["request_made"] is False
+            now[0] += 61
+            assert availability.snapshot()["status"] == "RETRY_AVAILABLE"
+            assert availability.snapshot()["reset_confirmed"] is False
+            assert (await gateway.check("sim_swap", "+99999991000"))["status"] == "SUCCESS"
+    asyncio.run(run())
 
 
 def test_sim_swap_preserves_provider_result_without_inventing_swap_age():
