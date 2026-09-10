@@ -75,7 +75,7 @@ Live evidence is documented in [NOKIA_SANDBOX_VERIFICATION.md](NOKIA_SANDBOX_VER
 
 ## Remaining Boundaries
 
-- Public deployment remains on the earlier fixture-only release until the new code and three private Render environment values are deployed and verified.
+- The new code is pushed to GitHub main, but the public check still found the earlier fixture-only release. Deploy the latest commit and configure the three private Render environment values before hosted connected verification. See [deployment verification](RENDER_VERIFICATION.md).
 - RapidAPI free-plan access has previously rate-limited the project. The connected mode therefore has strict hourly limits and preserves fixture mode as an explicit fallback; availability is not guaranteed.
 - Storage is an in-memory SQLite demonstration store. It is not durable, multi-instance, or an audit system.
 - Bank transaction context, payment execution, customer consent, operator production access, and hardware-bound device attestation are simulated or absent.

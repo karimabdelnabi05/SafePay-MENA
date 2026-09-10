@@ -2,7 +2,7 @@
 
 Use the existing `safepay-mena-demo` web service. No new Blueprint or project is needed.
 
-1. Confirm the latest release commit has deployed under the service's Events page.
+1. Confirm the latest release commit has deployed under the service's Deploys/Events page. The connected implementation is commit `93cc428` or a later main commit. If the service still serves the old release, use **Manual Deploy > Deploy latest commit** after updating the environment below. Do not use Restart service: that restarts the already-deployed commit.
 2. Open **Environment** for the service and add or edit these values:
 
 | Key | Value |
@@ -23,6 +23,8 @@ Use the existing `safepay-mena-demo` web service. No new Blueprint or project is
 The `sync: false` entries in `render.yaml` prompt only on initial Blueprint creation. For an existing Blueprint, add these secret values manually in the service's Environment page. [Render Blueprint specification](https://render.com/docs/blueprint-spec#prompting-for-secret-values)
 
 Render's environment save/deploy options are described in its [environment-variable guide](https://render.com/docs/configure-environment-variables#in-the-render-dashboard).
+
+The [manual deploy guide](https://render.com/docs/deploys#manual-deploys) distinguishes deploying the latest commit from restarting the existing one. If automatic deployment is desired, confirm the service is linked to this repository's `main` branch and uses **On Commit**. This repository currently has no GitHub Actions checks; Render's **After CI Checks Pass** setting does not deploy when zero checks are detected.
 
 ## Judge Access and Fallback
 

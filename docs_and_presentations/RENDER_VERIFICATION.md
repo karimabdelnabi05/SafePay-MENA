@@ -1,5 +1,17 @@
 # Render Deployment Verification
 
+## Release Check: 10 September 2026
+
+- Connected implementation commit `93cc428` was pushed and confirmed on GitHub main. Local verification passed 79 backend tests and 24 browser tests against a fresh server. Ruff, Bandit and pip-audit passed.
+- The committed source archive was extracted and all 79 backend tests passed there too. `dist/SafePay_MENA_Source.manifest.json` records the packaged commit and checksum; regenerate it after later commits.
+- At this public check, Render still served the previous release: the JavaScript did not match the pushed file and `GET /api/v1/live-access` returned 404.
+- Public health remained `healthy`, `FIXTURE_ONLY`, `nokia_configured=false`, `gemini_configured=false`, `production_networks=false`.
+- All 36 public fixture API journeys again passed, and the hosted evaluation returned 36 passed, zero failed. No external provider calls were made.
+- The public browser check reproduced the earlier first-load failure: an immediate review returned to `Ready for review` instead of completing. The corrected first-load behavior passed locally; it must not be reported as deployed yet.
+- Hosted connected verification remains pending. Use the existing service's Environment settings and **Manual Deploy > Deploy latest commit** if auto-deploy has not started. See [activation steps](RENDER_CONNECTED_SETUP.md).
+
+The following sections preserve the earlier deployment baseline, not the status of the new code.
+
 Verified 9 September 2026: https://safepay-mena-demo.onrender.com/
 
 ## Hosted Deployment

@@ -19,7 +19,7 @@ The main judge experience must show genuine connected-sandbox execution, not jus
 
 Test transactions and Nokia simulator subscribers are acceptable inputs to this agreed design. Real Gemini execution and real HTTP requests to Nokia are required for the connected demonstration. Neither mode transfers real money or establishes production operator access.
 
-**Current status:** Protected access, quota enforcement and live progress are implemented and verified locally with genuine Gemini/Nokia sandbox calls. Render is still on the earlier `FIXTURE_ONLY` release until these changes are pushed, its three private environment values are added, and hosted verification passes. Do not describe the public URL as connected before that gate.
+**Current status:** Protected access, quota enforcement and live progress are implemented and verified locally with genuine Gemini/Nokia sandbox calls. The release is pushed to GitHub. All 79 backend and 24 browser tests pass locally, and the source ZIP passes the backend suite after extraction. Hosted connected execution still requires private Render environment values and verification. See [deployment verification](RENDER_VERIFICATION.md) for the observed public state; do not describe the public URL as connected before that gate.
 
 ## Form Checklist
 
@@ -31,13 +31,13 @@ An unchecked box means that field has not been confirmed as final and submitted.
 | [ ] | Description | Yes | Formatted text and links supported; no length limit supplied | Draft below describes current capabilities. Update after connected deployment is verified. |
 | [ ] | Parent Submission | Yes | Select an existing parent submission | User must select the original SafePay entry that advanced to Prototype Phase. Exact dropdown entry not supplied. |
 | [ ] | Theme | Yes | Select from the form's available themes | Exact options not supplied. Select the option matching payment fraud / fintech security with Open Gateway and agentic AI; do not invent an option label. |
-| [ ] | Snapshots | No asterisk shown | JPG, JPEG or PNG; up to 3 MB each. Image-count limit not supplied. | Existing screenshots are available. Refresh after the final UI; verify each file's size. |
+| [ ] | Snapshots | No asterisk shown | JPG, JPEG or PNG; up to 3 MB each. Image-count limit not supplied. | Refreshed desktop/mobile and actual local connected-result PNGs are ready; each is under 3 MB. Upload the chosen images. |
 | [ ] | Video URL | Yes | Product demo or pitch video URL | No final hosted video URL recorded. Record the actual connected workflow, publish a reviewer-accessible video and test access. |
-| [ ] | Presentation | Yes | .key, .odp, .odt, .pdf, .pps, .ppt or .pptx; max 50 MB | One PDF exists. Refresh claims, screenshots and demo link after final connected verification, then upload this single file. |
-| [ ] | Demo Link | Yes | Working demo or prototype URL | Render URL exists and fixture workflows were verified. Deploy the first-load fix and complete protected connected mode. |
-| [ ] | Repository URL | Yes | Source repository URL, such as GitHub or Bitbucket | Repository URL exists. Final local changes are not all pushed; align it with the release used for the demo/video. |
-| [ ] | Source Code | Yes | File upload, e.g. ZIP or APK; max 50 MB | A clean source ZIP has not been prepared. Package the final release separately from the repository link. |
-| [ ] | Instructions to Run | Yes | Steps reviewers can follow to test the project | Draft below. Add the actual judge-access procedure only after it exists and is verified. |
+| [ ] | Presentation | Yes | .key, .odp, .odt, .pdf, .pps, .ppt or .pptx; max 50 MB | Updated single 17-slide PDF is ready, under 0.2 MB, with sourced business numbers, actual local connected capture and final technical summary. |
+| [ ] | Demo Link | Yes | Working demo or prototype URL | Render URL exists. Confirm the release under Events and complete hosted connected activation using the setup guide. |
+| [ ] | Repository URL | Yes | Source repository URL, such as GitHub or Bitbucket | Connected-demo release pushed to main. Test reviewer access before submission. |
+| [ ] | Source Code | Yes | File upload, e.g. ZIP or APK; max 50 MB | `dist/SafePay_MENA_Source.zip` is prepared and tested after extraction. Its adjacent manifest records the exact commit and SHA-256. Upload the ZIP, not the manifest. |
+| [ ] | Instructions to Run | Yes | Steps reviewers can follow to test the project | Draft below includes the implemented access procedure. Verify hosted connected mode and provide the code privately. |
 
 The source-code upload is a separate required field: supplying a GitHub URL does not fill it. The video URL is also required, not merely an optional backup.
 
@@ -70,15 +70,16 @@ After connected deployment is verified, replace the current-public-deployment pa
 | Item | Location | Status |
 |---|---|---|
 | Demo | https://safepay-mena-demo.onrender.com/ | Deployed; fixture-only |
-| Repository | https://github.com/karimabdelnabi05/SafePay-MENA | Exists; final release sync pending |
+| Repository | https://github.com/karimabdelnabi05/SafePay-MENA | Connected-demo release pushed to main |
 | Single presentation PDF | [SafePay_MENA_Phase2_Pitch_Deck.pdf](SafePay_MENA_Phase2_Pitch_Deck.pdf) | Exists; 17 slides, under 50 MB at this review |
 | Editable presentation source | [SafePay_MENA_Phase2_Slides.html](SafePay_MENA_Phase2_Slides.html) | Source for the same PDF, not a second upload |
 | Speaker notes and evidence | [PHASE2_PITCH_NOTES.md](PHASE2_PITCH_NOTES.md) | Internal preparation |
-| Desktop screenshot | [safepay-desktop.png](../artifacts/safepay-desktop.png) | Existing fixture UI; refresh after changes |
-| Mobile screenshot | [safepay-mobile.png](../artifacts/safepay-mobile.png) | Existing fixture UI; refresh after changes |
+| Desktop screenshot | [safepay-desktop.png](../artifacts/safepay-desktop.png) | Refreshed fixture UI; under 3 MB |
+| Mobile screenshot | [safepay-mobile.png](../artifacts/safepay-mobile.png) | Refreshed fixture UI; under 3 MB |
+| Connected result screenshot | [safepay-connected-result.png](../artifacts/safepay-connected-result.png) | Actual local Gemini/Nokia run, not a hosted-production claim; under 3 MB |
 | Held-payment screenshot | [pitch-hold.png](../artifacts/pitch-hold.png) | Actual fixture outcome capture |
 | Video URL | Not yet available | Required |
-| Source ZIP | Not yet generated | Required; proposed filename `SafePay_MENA_Source.zip` |
+| Source ZIP | `dist/SafePay_MENA_Source.zip` | Prepared, under 1 MB; clean extraction passes all 79 backend tests |
 
 Recommended final snapshots: a completed payment decision, the genuine connected investigation trace, and the evaluation or mobile experience. No fabricated API-success image. Use only the number of snapshots the form permits.
 
@@ -98,11 +99,11 @@ Recommended final snapshots: a completed payment decision, the genuine connected
 ## Source ZIP Checklist
 
 - [ ] Package the same release as the repository and deployed demo; record its commit SHA.
-- [ ] Include `app/`, relevant `tests/`, `requirements.txt`, `requirements-dev.txt`, `pytest.ini`, `run_dashboard.py`, `render.yaml`, `.env.example`, `README.md` and any final files required to run it.
-- [ ] Include supporting documentation deliberately; do not zip the entire desktop/workspace.
-- [ ] Exclude `.git/`, `.env`, real keys, OAuth credentials, token/cookie files, virtual environments, caches, scratch artifacts, downloaded reference repositories, mentor materials and unrelated research.
-- [ ] Confirm the archive contains no removed mentor email or other unintended personal information.
-- [ ] Extract it into a clean directory and follow its run instructions successfully.
+- [x] Include `app/`, relevant `tests/`, `requirements.txt`, `requirements-dev.txt`, `pytest.ini`, `run_dashboard.py`, `render.yaml`, `.env.example`, `README.md` and any final files required to run it.
+- [x] Include supporting documentation deliberately; do not zip the entire desktop/workspace.
+- [x] Exclude `.git/`, `.env`, real keys, OAuth credentials, token/cookie files, virtual environments, caches, scratch artifacts, downloaded reference repositories, mentor materials and unrelated research.
+- [x] Confirm the tracked release and PDF text contain no current provider credentials or removed mentor reference; archive secret/path scan passed.
+- [x] Extract it into a clean directory and run all 79 backend tests successfully. The startup tests verify clean fixture-mode import.
 - [ ] Confirm size is below 50 MB and upload it in the Source Code field.
 
 ## Draft Instructions to Run
