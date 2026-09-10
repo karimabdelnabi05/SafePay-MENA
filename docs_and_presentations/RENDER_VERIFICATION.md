@@ -1,5 +1,13 @@
 # Render Deployment Verification
 
+## Post-Merge Submission Check: 10 September 2026
+
+PR #10 merged as `71d2ed2`. It only formats imports in the build scripts and local launcher. Subsequent public verification returned healthy with `SANDBOX_ENABLED`, both provider configuration flags true and `production_networks=false`. Hosted JavaScript and CSS matched the local application assets. A routine fixture payment completed with zero external calls, the Quality suite returned 36 passed and zero failed, and the mobile Quality view had no horizontal overflow. GitHub opened without authentication. This check made no Nokia or Gemini requests; the connected provider evidence below is from the earlier verified run.
+
+The tracked-file scan, including extracted PDF text, found no configured provider credentials, judge access code or removed personal reference. The final source archive receives a separate scan and extraction test during packaging; its adjacent manifest records the exact packaged commit.
+
+Validation provenance: the local 88 backend and 26 browser tests passed. Ruff import formatting was corrected in PR #10. The no-mistakes tool's review/test workers failed on Windows, so its corresponding stages were skipped after direct checks. GitHub reports no CI status checks on PR #10. The tool's `checks-passed` outcome is not evidence of a GitHub CI test run.
+
 ## Final Investigation Release: 10 September 2026
 
 The public Render service was verified after the investigation and quota release deployed.

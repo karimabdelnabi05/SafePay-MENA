@@ -19,7 +19,7 @@ The main judge experience must show genuine connected-sandbox execution, not jus
 
 Test transactions and Nokia simulator subscribers are acceptable inputs to this agreed design. Real Gemini execution and real HTTP requests to Nokia are required for the connected demonstration. Neither mode transfers real money or establishes production operator access.
 
-**Current status:** Protected access, quota enforcement and live progress are implemented and verified locally with genuine Gemini/Nokia sandbox calls. The release is pushed to GitHub. All 79 backend and 24 browser tests pass locally, and the source ZIP passes the backend suite after extraction. Hosted connected execution still requires private Render environment values and verification. See [deployment verification](RENDER_VERIFICATION.md) for the observed public state; do not describe the public URL as connected before that gate.
+**Current status (10 September 2026):** Protected connected access is deployed on Render. A hosted SIM-swap investigation returned BLOCK with successful HTTP 200 responses from SIM Swap, Number Verification and Device Swap. Local verification passed 88 backend and 26 browser tests. The 36-case fixture evaluation also passed on Render. See [deployment verification](RENDER_VERIFICATION.md). Source ZIP provenance is recorded in its adjacent manifest. Required form uploads and the video URL still need to be completed.
 
 ## Form Checklist
 
@@ -28,13 +28,13 @@ An unchecked box means that field has not been confirmed as final and submitted.
 | Done | Form field | Required | Accepted content / limit | Current status and remaining action |
 |---|---|---|---|---|
 | [ ] | Title | Yes | Clear, descriptive title; no character limit supplied | Draft below. Confirm final wording. |
-| [ ] | Description | Yes | Formatted text and links supported; no length limit supplied | Draft below describes current capabilities. Update after connected deployment is verified. |
+| [ ] | Description | Yes | Formatted text and links supported; no length limit supplied | Ready-to-paste wording below reflects the verified connected deployment. |
 | [ ] | Parent Submission | Yes | Select an existing parent submission | User must select the original SafePay entry that advanced to Prototype Phase. Exact dropdown entry not supplied. |
 | [ ] | Theme | Yes | Select from the form's available themes | Exact options not supplied. Select the option matching payment fraud / fintech security with Open Gateway and agentic AI; do not invent an option label. |
 | [ ] | Snapshots | No asterisk shown | JPG, JPEG or PNG; up to 3 MB each. Image-count limit not supplied. | Refreshed desktop/mobile and actual local connected-result PNGs are ready; each is under 3 MB. Upload the chosen images. |
 | [ ] | Video URL | Yes | Product demo or pitch video URL | No final hosted video URL recorded. Record the actual connected workflow, publish a reviewer-accessible video and test access. |
 | [ ] | Presentation | Yes | .key, .odp, .odt, .pdf, .pps, .ppt or .pptx; max 50 MB | Updated single 17-slide PDF is ready, under 0.2 MB, with sourced business numbers, actual local connected capture and final technical summary. |
-| [ ] | Demo Link | Yes | Working demo or prototype URL | Render URL exists. Confirm the release under Events and complete hosted connected activation using the setup guide. |
+| [ ] | Demo Link | Yes | Working demo or prototype URL | Render connected sandbox is deployed and verified. Use the URL below. |
 | [ ] | Repository URL | Yes | Source repository URL, such as GitHub or Bitbucket | Connected-demo release pushed to main. Test reviewer access before submission. |
 | [ ] | Source Code | Yes | File upload, e.g. ZIP or APK; max 50 MB | `dist/SafePay_MENA_Source.zip` is prepared and tested after extraction. Its adjacent manifest records the exact commit and SHA-256. Upload the ZIP, not the manifest. |
 | [ ] | Instructions to Run | Yes | Steps reviewers can follow to test the project | Draft below includes the implemented access procedure. Verify hosted connected mode and provide the code privately. |
@@ -47,15 +47,15 @@ The source-code upload is a separate required field: supplying a GitHub URL does
 
 ## Draft Description
 
-The following wording reflects the current state. Revise the deployment paragraph after the connected hosted workflow is implemented and verified.
+The following wording reflects the verified hosted prototype.
 
 > SafePay MENA is a working prototype that helps banks and wallets investigate risky payments while keeping routine payments free of unnecessary network checks.
 >
 > It combines transaction context with mobile-network evidence to support clear outcomes: approve, hold, block or retry. Demonstrated journeys include suspicious transfers, SIM-related account takeover, stolen-card attempts, legitimate travel, first-time setup and new-device registration, with market contexts for Egypt, Saudi Arabia and the UAE.
 >
-> Routine payments follow a local screening path without calling an AI model or telecom API. In the implemented local connected-sandbox mode, a bounded Gemini agent chooses relevant Nokia Network as Code APIs, observes their responses and selects further checks when needed. Integrated capabilities include SIM Swap, Number Verification, Device Swap, Roaming and Reachability. Enforced policy controls the final decision, and unknown evidence is not treated as a clean result.
+> Routine payments follow a local screening path without calling an AI model or telecom API. In connected-sandbox mode, a bounded Gemini agent chooses relevant CAMARA APIs through Nokia Network as Code, observes their responses and selects further checks when needed. Integrated capabilities include SIM Swap, Number Verification, Device Swap, Roaming and Reachability. Enforced policy controls the final decision, and unknown evidence is not treated as a clean result.
 >
-> The current public deployment provides repeatable simulated scenarios and telecom responses. Local connected-sandbox execution is documented in the repository; protected hosted access is being prepared. No real payment is executed, and Nokia tests use simulator subscribers rather than production customer data.
+> The hosted prototype offers protected connected access with actual Gemini execution and Nokia sandbox HTTP requests, plus an explicitly labeled fixture mode for repeatable testing. Judges can follow tool selection, returned evidence, provider failures and the enforced decision, and export an investigation trace. The separate 36-case Quality suite checks software behavior using fixtures. No real payment is executed, and Nokia tests use simulator subscribers rather than production customer data.
 >
 > Our business proposal is a platform subscription plus investigation-based usage pricing. The presentation separates published market evidence, measured prototype results and financial assumptions to be validated in a bank pilot.
 >
@@ -63,13 +63,13 @@ The following wording reflects the current state. Revise the deployment paragrap
 >
 > Repository: https://github.com/karimabdelnabi05/SafePay-MENA
 
-After connected deployment is verified, replace the current-public-deployment paragraph with wording that precisely explains the available modes and how judges access them. Do not publish an access credential in the description or repository.
+Provide the judge access code through a reviewer-only channel. Do not publish it in the description or repository.
 
 ## File and Link Locations
 
 | Item | Location | Status |
 |---|---|---|
-| Demo | https://safepay-mena-demo.onrender.com/ | Deployed; fixture-only |
+| Demo | https://safepay-mena-demo.onrender.com/ | Deployed; protected connected sandbox and repeatable fixtures |
 | Repository | https://github.com/karimabdelnabi05/SafePay-MENA | Connected-demo release pushed to main |
 | Single presentation PDF | [SafePay_MENA_Phase2_Pitch_Deck.pdf](SafePay_MENA_Phase2_Pitch_Deck.pdf) | Exists; 17 slides, under 50 MB at this review |
 | Editable presentation source | [SafePay_MENA_Phase2_Slides.html](SafePay_MENA_Phase2_Slides.html) | Source for the same PDF, not a second upload |
@@ -79,7 +79,7 @@ After connected deployment is verified, replace the current-public-deployment pa
 | Connected result screenshot | [safepay-connected-result.png](../artifacts/safepay-connected-result.png) | Actual local Gemini/Nokia run, not a hosted-production claim; under 3 MB |
 | Held-payment screenshot | [pitch-hold.png](../artifacts/pitch-hold.png) | Actual fixture outcome capture |
 | Video URL | Not yet available | Required |
-| Source ZIP | `dist/SafePay_MENA_Source.zip` | Prepared, under 1 MB; clean extraction passes all 79 backend tests |
+| Source ZIP | `dist/SafePay_MENA_Source.zip` | Prepared, under 50 MB; clean extraction passes all 88 backend tests; exact commit in adjacent manifest |
 
 Recommended final snapshots: a completed payment decision, the genuine connected investigation trace, and the evaluation or mobile experience. No fabricated API-success image. Use only the number of snapshots the form permits.
 
@@ -103,7 +103,7 @@ Recommended final snapshots: a completed payment decision, the genuine connected
 - [x] Include supporting documentation deliberately; do not zip the entire desktop/workspace.
 - [x] Exclude `.git/`, `.env`, real keys, OAuth credentials, token/cookie files, virtual environments, caches, scratch artifacts, downloaded reference repositories, mentor materials and unrelated research.
 - [x] Confirm the tracked release and PDF text contain no current provider credentials or removed mentor reference; archive secret/path scan passed.
-- [x] Extract it into a clean directory and run all 79 backend tests successfully. The startup tests verify clean fixture-mode import.
+- [x] Extract it into a clean directory and run all 88 backend tests successfully. The startup tests verify clean fixture-mode import.
 - [ ] Confirm size is below 50 MB and upload it in the Source Code field.
 
 ## Draft Instructions to Run
@@ -111,16 +111,16 @@ Recommended final snapshots: a completed payment decision, the genuine connected
 ### Hosted Prototype: Available Now
 
 1. Open https://safepay-mena-demo.onrender.com/ and allow the service to load.
-2. Wait for the scenario selector to populate before submitting a review on the current deployment. The corrected release will keep the form disabled until it is ready.
+2. Wait for the sample situations to load; the review button enables when ready.
 3. Select Egypt, Saudi Arabia or UAE.
 4. Choose a scenario and select **Review payment**, or **Verify device** for setup/new-phone scenarios.
-5. Inspect the outcome, risk scores and reasons. Expand **Network evidence** and **Agent and policy trace** for supporting details.
+5. Inspect the outcome, risk scores and reasons. Expand **Network evidence** and **Investigation details** for supporting observations and trace export.
 6. For a held payment, use **Cancel review** to demonstrate cancellation.
-7. Use **Run 36-case evaluation** to check the repeatable synthetic workflows.
+7. Open **Quality checks**, then run the evaluation to check 36 repeatable synthetic workflows.
 
-The currently deployed mode uses simulated inputs and telecom responses and makes no external Gemini/Nokia calls. No money moves.
+The default **Repeatable fixture** mode uses simulated inputs and telecom responses without external Gemini/Nokia calls. The connected option below makes provider requests. No money moves in either mode.
 
-### Connected Judge Experience: Use After Hosted Verification
+### Connected Judge Experience: Available Now
 
 1. Obtain the private judge access code from the submission instructions or team; no provider account is required.
 2. Open the demo and select **Connected: Nokia + Gemini** under **Evidence mode**.
@@ -174,7 +174,7 @@ Browser-test setup and commands are in the README. Final run instructions must b
 
 - [ ] All required fields above are completed.
 - [ ] Correct parent submission and actual theme dropdown option selected.
-- [ ] Final first-load fix and connected-demo changes deployed and verified.
+- [x] Final first-load fix and connected-demo changes deployed and verified.
 - [ ] Demo, video, presentation, repository and source ZIP describe the same release and mode boundaries.
 - [ ] No simulated response is presented as an actual Nokia result; no synthetic QA result is presented as real-world fraud accuracy.
 - [ ] Presentation is the single agreed PDF and under 50 MB.
