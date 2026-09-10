@@ -165,6 +165,20 @@ def test_judge_unlocks_connected_mode_and_watches_real_api_progress(action):
         expect(page.locator("#liveProgress")).to_be_visible()
         expect(page.locator("#progressList")).to_contain_text("Gemini selected sim swap")
         expect(page.locator("#progressList")).to_contain_text("Nokia sandbox returned SUCCESS")
+        alignment = page.locator(".progress-index").evaluate_all("""elements => elements.map(el => {
+            const circle = el.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const text = range.getBoundingClientRect();
+            return {
+                x: Math.abs(text.x + text.width / 2 - circle.x - circle.width / 2),
+                y: Math.abs(text.y + text.height / 2 - circle.y - circle.height / 2),
+                width: circle.width, height: circle.height
+            };
+        })""")
+        assert alignment
+        assert all(item["x"] <= 1 and item["y"] <= 1 for item in alignment), alignment
+        assert all(item["width"] == item["height"] == 22 for item in alignment)
         if action == "cancel":
             page.get_by_role("button", name="Cancel review", exact=True).click()
             expect(page.locator("#outcomeTitle")).to_have_text("Review cancelled")
