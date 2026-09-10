@@ -2,6 +2,7 @@
 
 import uvicorn
 
+
 def main():
     print("=" * 70)
     print("  SafePay MENA - Adaptive Telecom Evidence")

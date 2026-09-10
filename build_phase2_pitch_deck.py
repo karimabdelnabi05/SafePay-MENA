@@ -6,17 +6,17 @@ Run --capture to refresh actual app screenshots using fixture mode only.
 import argparse
 import json
 import os
-from pathlib import Path
 import socket
 import subprocess
 import sys
 import time
 import urllib.request
+from pathlib import Path
 
+import pypdfium2 as pdfium
 from PIL import Image, ImageDraw
 from playwright.sync_api import expect, sync_playwright
 from pypdf import PdfReader
-import pypdfium2 as pdfium
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "docs_and_presentations/SafePay_MENA_Phase2_Slides.html"
