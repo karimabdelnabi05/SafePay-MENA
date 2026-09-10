@@ -38,6 +38,21 @@
           <div class="error" id="formError" role="alert" tabindex="-1"></div>
           <fieldset><legend>Market</legend><div class="segments" id="countrySegments"></div></fieldset>
           <div class="mode-row"><label for="modeSelect">Evidence mode</label><select class="mode-select" id="modeSelect"><option value="FIXTURE">Repeatable fixture</option></select></div>
+          <section class="live-access" id="liveAccessPanel" aria-labelledby="liveAccessTitle" hidden>
+            <div class="live-access-head">
+              <div><strong id="liveAccessTitle">Connected sandbox</strong><span>Protected Nokia and Gemini access</span></div>
+              <span class="connection-state" id="liveConnectionState">Locked</span>
+            </div>
+            <div class="access-fields" id="liveAccessFields">
+              <label for="accessCodeInput">Judge access code</label>
+              <div class="access-row">
+                <input id="accessCodeInput" type="password" maxlength="128" autocomplete="current-password">
+                <button class="secondary compact" id="unlockButton" type="button">Unlock connected mode</button>
+              </div>
+              <p class="access-error" id="accessError" role="alert"></p>
+            </div>
+            <p class="live-access-status" id="liveAccessStatus">Connected mode is locked.</p>
+          </section>
           <div class="field"><label for="scenarioSelect">Scenario</label><select id="scenarioSelect" required></select><span class="helper" id="scenarioHelp">Loading scenarios...</span></div>
           <div class="field"><label for="channelSelect">Payment channel</label><select id="channelSelect"><option value="INSTANT_PAYMENT">Instant account transfer</option><option value="CARD_CHECKOUT">Card checkout</option><option value="WALLET_TRANSFER">Wallet transfer</option></select></div>
           <div class="field-row">
@@ -45,24 +60,32 @@
             <div class="field"><label for="recipientSelect">Recipient relationship</label><select id="recipientSelect"><option value="family">Family / known</option><option value="new_payee">New payee</option><option value="merchant">Merchant</option><option value="wallet">Wallet</option></select></div>
           </div>
           <div class="context-strip" id="railContext">Egypt · InstaPay / IPN</div>
-          <button class="primary" id="reviewButton" type="submit">Review payment</button>
+          <button class="primary" id="reviewButton" type="submit" disabled>Review payment</button>
           <span class="helper">No payment is executed. Live mode is restricted to Nokia's documented simulator subjects.</span>
         </form>
       </section>
 
       <section class="panel outcome" aria-labelledby="outcomeTitle">
-        <div class="outcome-main" id="outcomeMain" data-state="READY" aria-live="polite" aria-atomic="true">
+        <div class="outcome-main" id="outcomeMain" data-state="READY" aria-live="polite" aria-atomic="true" tabindex="-1">
           <div class="eyebrow" id="outcomeEyebrow">Decision workspace</div>
           <h2 id="outcomeTitle">Ready for review</h2>
           <p class="outcome-copy" id="outcomeCopy">Choose a scenario and review the payment. Technical evidence stays available below without obscuring the decision.</p>
         </div>
+        <section class="live-progress" id="liveProgress" aria-labelledby="liveProgressTitle" hidden>
+          <div class="live-progress-head">
+            <div><span class="live-indicator" aria-hidden="true"></span><h3 id="liveProgressTitle">Connected investigation</h3></div>
+            <span id="progressStage">Queued</span>
+          </div>
+          <ol class="progress-list" id="progressList" aria-live="polite"></ol>
+          <p>Nokia responses are from documented simulator subjects. Bank context remains synthetic and no payment moves.</p>
+        </section>
         <div class="metrics" aria-label="Decision metrics">
           <div class="metric"><span>Pre-call score</span><strong id="preScore">-</strong></div>
           <div class="metric"><span>Final risk score</span><strong id="finalScore">-</strong></div>
           <div class="metric"><span>Agent turns + CAMARA tools</span><strong id="externalCalls">0</strong></div>
         </div>
         <div class="reason-block"><h3>Why this happened</h3><ul class="reason-list" id="reasonList"><li>The review has not started.</li></ul></div>
-        <div class="actions" id="resultActions" hidden><button class="danger-button" id="cancelButton" type="button">Cancel review</button></div>
+        <div class="actions" id="resultActions" hidden><button class="secondary" id="resumeButton" type="button" hidden>Reconnect to review</button><button class="danger-button" id="cancelButton" type="button">Cancel review</button></div>
         <details><summary>Network evidence</summary><div class="details-body" id="evidenceBody"><p class="empty">No network evidence requested.</p></div></details>
         <details><summary>Agent and policy trace</summary><div class="details-body" id="traceBody"><p class="empty">No agent investigation was needed.</p></div></details>
       </section>

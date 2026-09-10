@@ -2,9 +2,9 @@
 
 ## Before recording
 
-- Start the app in fixture mode for a repeatable presentation.
+- Verify connected access before recording, then begin the recording in fixture mode.
 - Keep the browser at 100% zoom and use a desktop viewport.
-- Confirm the status reads `Service ready` and the badge reads `FIXTURE DEMO`.
+- Confirm the status reads `Service ready`. Enter the judge code before recording or hide the unlock step.
 - Keep a separately recorded, sanitized Nokia sandbox trace available if the live quota is unavailable.
 - Do not describe fixtures as live operator data or claim that a payment is executed.
 
@@ -42,15 +42,15 @@ Show **Why this happened**, then cancel the held review.
 
 ## 1:40-2:10 - SIM and device takeover
 
-Select **SIM-swap takeover** and click **Review payment**.
+Select **Connected: Nokia + Gemini**, unlock with the private judge code off-camera, then select **SIM-swap takeover** and click **Review payment**.
 
 "Here an unusual session combines with recent SIM and device changes. SafePay blocks the payment. Each observation shows its tool, source, status, and returned boolean. The system never invents an exact SIM-swap age from a boolean response."
 
-Open **Network evidence** and **Agent and policy trace**. Explain that fixture mode is repeatable; live mode lets Gemini choose tools against Nokia's sandbox when quotas are available.
+Show the live timeline as Gemini selects tools and Nokia returns observations. Open **Network evidence** to inspect source, HTTP status and latency. State that bank inputs and subscriber identities are simulated, while Gemini and Nokia HTTP requests are real. Tool order can vary.
 
 ## 2:10-2:30 - Fail closed
 
-Select **Network unavailable** and click **Review payment**.
+Switch explicitly to **Repeatable fixture**, select **Network unavailable** and click **Review payment**.
 
 "Timeouts, malformed responses, authorization failures, and rate limits become unknown evidence. Unknown never becomes safe. The result is RETRY, so the payment is not automatically released."
 
@@ -68,8 +68,8 @@ Click **Run 36-case evaluation**.
 
 When live mode is available, state these boundaries before running it:
 
-- Gemini selects from five allowlisted tools.
+- Five capabilities are integrated; Gemini selects from the contextually eligible subset and completed tools are removed.
 - Phone subjects and endpoint paths remain server controlled.
 - Nokia calls use only documented simulator subjects.
 - Simulator results are not production MENA operator observations.
-- The free RapidAPI plan can return HTTP 429; SafePay will display unknown evidence and return RETRY.
+- The free RapidAPI plan can return HTTP 429; SafePay displays unknown evidence. Missing required evidence returns RETRY unless independent observations already justify BLOCK.

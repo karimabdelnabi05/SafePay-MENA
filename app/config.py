@@ -37,5 +37,21 @@ _load_env_file()
 class Settings(BaseModel):
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     NOKIA_RAPIDAPI_KEY: str = os.getenv("NOKIA_RAPIDAPI_KEY", "")
+    SAFEPAY_JUDGE_ACCESS_CODE: str = os.getenv("SAFEPAY_JUDGE_ACCESS_CODE", "")
+
+    @property
+    def live_run_limit(self):
+        return _positive_int("SAFEPAY_LIVE_RUN_LIMIT", 4)
+
+    @property
+    def live_global_limit(self):
+        return _positive_int("SAFEPAY_LIVE_GLOBAL_LIMIT", 12)
+
+
+def _positive_int(name, default):
+    try:
+        return max(1, int(os.getenv(name, str(default))))
+    except ValueError:
+        return default
 
 settings = Settings()

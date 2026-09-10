@@ -1,6 +1,7 @@
 import asyncio
 import json
 import sqlite3
+import time
 
 import httpx
 import pytest
@@ -286,7 +287,7 @@ def test_model_cannot_turn_rate_limited_nokia_evidence_into_a_network_block():
         assert result["evidence"][0]["http_status"] == 429
 
 
-def test_live_agent_that_exhausts_its_tool_budget_fails_closed():
+def test_live_agent_cannot_query_device_swap_for_a_travel_only_context():
     requested = iter(["sim_swap", "device_swap", "roaming", "reachability", "number_verification"])
 
     def external(request):
@@ -314,6 +315,8 @@ def test_live_agent_that_exhausts_its_tool_budget_fails_closed():
         assert result["agent_proposal"] is None
         assert result["decision"] == "RETRY"
         assert result["decision_source"] == "POLICY_FAIL_CLOSED"
+        assert result["agent_error"] == "ValueError"
+        assert [e["tool"] for e in result["evidence"]] == ["sim_swap"]
 
 
 def test_live_agent_rejects_a_repeated_tool_without_a_second_telecom_call():
@@ -572,6 +575,159 @@ def test_public_demo_exposes_catalog_and_blocks_unapproved_live_spending():
         assert client.post("/api/v1/sessions", json={"mode": "NOKIA_SANDBOX"}).status_code == 403
         assert client.post("/api/v1/payments", json={"request_id": "forged", "amount": 1}).status_code == 401
         assert client.get("/api/v1/telecom/nokia-probe").status_code in (404, 410)
+
+
+def test_connected_judge_run_requires_access_reports_progress_and_uses_nokia():
+    model_calls = 0
+    declared_tools = []
+
+    def external(request):
+        nonlocal model_calls
+        if request.url.host == "generativelanguage.googleapis.com":
+            model_calls += 1
+            body = json.loads(request.content)
+            declared_tools.append({item["name"] for item in body["tools"][0]["functionDeclarations"]})
+            call = (
+                {"name": "sim_swap", "args": {"reason": "Check the recent SIM state"}}
+                if model_calls == 1
+                else {"name": "number_verification", "args": {"reason": "Verify the bound number"}}
+                if model_calls == 2
+                else {"name": "finish", "args": {"decision": "HOLD", "reason": "Review the evidence"}}
+            )
+            return httpx.Response(200, json={
+                "candidates": [{"content": {"role": "model", "parts": [{"functionCall": call}]}}],
+            })
+        if request.url.path.endswith("clientcredentials"):
+            return httpx.Response(200, json={"client_id": "client"})
+        if "well-known" in request.url.path:
+            return httpx.Response(200, json={"fast_flow_csp_auth_endpoint":
+                "https://nb-auth.nac-runtime-stg-eu.g002.saas.nokia.com/oauth2/v1/retrieve_csp_auth_url"})
+        if request.url.path.endswith("retrieve_csp_auth_url"):
+            params = dict(request.url.params)
+            return httpx.Response(302, headers={
+                "location": params["redirect_uri"] + "?code=code&state=" + params["state"],
+            })
+        if request.url.path.endswith("/verify"):
+            return httpx.Response(200, json={"devicePhoneNumberVerified": True})
+        return httpx.Response(200, json={"swapped": False})
+
+    app = create_app(
+        database=":memory:",
+        allow_live=True,
+        external_transport=httpx.MockTransport(external),
+        nokia_key="test",
+        gemini_key="test",
+        judge_access_code="judges-only",
+        live_run_limit=1,
+        live_global_limit=2,
+    )
+    with TestClient(app) as client:
+        catalog = client.get("/api/v1/catalog").json()
+        assert catalog["live_enabled"] is True
+        assert catalog["live_access_required"] is True
+        assert client.post("/api/v1/sessions", json={"mode": "NOKIA_SANDBOX"}).status_code == 403
+        assert client.get("/api/v1/live-access").json() == {
+            "available": True,
+            "authorized": False,
+            "remaining": 0,
+            "global_remaining": 2,
+            "expires_at": None,
+        }
+        assert client.post("/api/v1/live-access", json={"code": "wrong"}).status_code == 401
+        assert client.post("/api/v1/live-access", json={"code": "\u062e\u0637\u0623"}).status_code == 401
+        unlocked = client.post("/api/v1/live-access", json={"code": "judges-only"})
+        assert unlocked.status_code == 200
+        assert unlocked.json()["authorized"] is True
+        assert unlocked.json()["remaining"] == 1
+
+        session = client.post("/api/v1/sessions", json={
+            "scenario": "sim_swap", "mode": "NOKIA_SANDBOX",
+        })
+        assert session.status_code == 200
+        assert client.post("/api/v1/payments", json={
+            "request_id": "quota-bypass", "amount": 200, "recipient": "new_payee",
+        }).status_code == 409
+        started = client.post("/api/v1/live-payments", json={
+            "request_id": "connected-judge-run",
+            "amount": 200,
+            "recipient": "new_payee",
+        })
+        assert started.status_code == 202
+        assert started.json()["decision"] == "PENDING"
+
+        result = None
+        for _ in range(100):
+            result = client.get("/api/v1/runs/connected-judge-run").json()
+            if result["decision"] != "PENDING":
+                break
+            time.sleep(0.01)
+
+        assert result["decision"] == "HOLD"
+        assert result["decision_source"] == "GEMINI_WITH_POLICY"
+        assert declared_tools[0] == {"sim_swap", "number_verification", "device_swap", "finish"}
+        assert declared_tools[-1] == {"device_swap", "finish"}
+        assert result["evidence"][0]["source"] == "NOKIA_SANDBOX"
+        assert {item["stage"] for item in result["progress"]} >= {
+            "QUEUED", "LOCAL_SCREEN", "AGENT_DECISION", "API_SELECTED",
+            "EVIDENCE_RECEIVED", "POLICY_DECISION", "COMPLETE",
+        }
+        quota = client.get("/api/v1/live-access").json()
+        assert quota["remaining"] == 0
+        assert client.post("/api/v1/live-access", json={"code": "judges-only"}).json()["remaining"] == 0
+        assert client.post("/api/v1/live-payments", json={
+            "request_id": "over-quota", "amount": 200, "recipient": "new_payee",
+        }).status_code == 429
+
+
+def test_judge_can_cancel_a_detached_connected_run_before_nokia_is_called():
+    model_started = asyncio.Event()
+    release_model = asyncio.Event()
+    calls = {"model": 0, "nokia": 0}
+
+    async def external(request):
+        if request.url.host == "generativelanguage.googleapis.com":
+            calls["model"] += 1
+            model_started.set()
+            await release_model.wait()
+            return httpx.Response(200, json={
+                "candidates": [{"content": {"role": "model", "parts": [{"functionCall": {
+                    "name": "sim_swap", "args": {"reason": "Check the SIM state"},
+                }}]}}],
+            })
+        calls["nokia"] += 1
+        return httpx.Response(200, json={"swapped": False})
+
+    async def run():
+        app = create_app(
+            database=":memory:", allow_live=True,
+            external_transport=httpx.MockTransport(external),
+            nokia_key="test", gemini_key="test", judge_access_code="judges-only",
+        )
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        ):
+            assert (await client.post("/api/v1/live-access", json={"code": "judges-only"})).status_code == 200
+            await client.post("/api/v1/sessions", json={
+                "scenario": "sim_swap", "mode": "NOKIA_SANDBOX",
+            })
+            started = await client.post("/api/v1/live-payments", json={
+                "request_id": "cancel-detached", "amount": 200, "recipient": "new_payee",
+            })
+            assert started.status_code == 202
+            await model_started.wait()
+            progress = (await client.get("/api/v1/runs/cancel-detached")).json()
+            assert progress["pre_call_score"] == 55
+            assert "Unusual authenticated session" in progress["reasons"]
+            cancelled = await client.post("/api/v1/runs/cancel-detached/cancel")
+            release_model.set()
+            await asyncio.sleep(0)
+
+            assert cancelled.json()["decision"] == "CANCELLED"
+            assert (await client.get("/api/v1/runs/cancel-detached")).json()["decision"] == "CANCELLED"
+            assert calls == {"model": 1, "nokia": 0}
+
+    asyncio.run(run())
 
 
 def test_session_payment_velocity_cannot_keep_taking_zero_call_path():

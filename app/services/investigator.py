@@ -17,15 +17,39 @@ TOOL_DESCRIPTIONS = {
 }
 
 
-async def investigate(context, gateway, subjects, client, key, model="gemini-3.5-flash-lite", should_stop=None):
+async def investigate(
+    context,
+    gateway,
+    subjects,
+    client,
+    key,
+    model="gemini-3.5-flash-lite",
+    should_stop=None,
+    on_progress=None,
+):
     evidence, trace, calls, proposal = [], [], 0, None
-    tools = [{"name": name, "description": description, "parameters": {
+
+    async def emit(stage, actor, message, **details):
+        if on_progress:
+            await on_progress({"stage": stage, "actor": actor, "message": message, **details})
+
+    tool_declarations = {name: {"name": name, "description": description, "parameters": {
         "type": "OBJECT", "properties": {"reason": {"type": "STRING"}}, "required": ["reason"]}}
-        for name, description in TOOL_DESCRIPTIONS.items()]
-    tools.append({"name": "finish", "description": "Propose disposition after inspecting evidence. Policy validates it.",
-                  "parameters": {"type": "OBJECT", "properties": {
-                      "decision": {"type": "STRING", "enum": ["APPROVE", "HOLD", "BLOCK", "RETRY"]},
-                      "reason": {"type": "STRING"}}, "required": ["decision", "reason"]}})
+        for name, description in TOOL_DESCRIPTIONS.items()}
+    finish_declaration = {
+        "name": "finish",
+        "description": "Propose disposition after inspecting evidence. Policy validates it.",
+        "parameters": {"type": "OBJECT", "properties": {
+            "decision": {"type": "STRING", "enum": ["APPROVE", "HOLD", "BLOCK", "RETRY"]},
+            "reason": {"type": "STRING"}}, "required": ["decision", "reason"]},
+    }
+    eligible_tools = {"sim_swap", "number_verification"}
+    if context.get("session_anomaly"):
+        eligible_tools.add("device_swap")
+    if context.get("travel_expected"):
+        eligible_tools.add("roaming")
+    if context.get("connectivity_concern"):
+        eligible_tools.add("reachability")
     contents = [{"role": "user", "parts": [{"text": json.dumps({"context": context})}]}]
     instruction = (
         "You investigate a simulated payment for SafePay. Choose network tools from observable context, "
@@ -50,11 +74,18 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
                                   "reason": "The review was cancelled; no further external calls were made"})
                     break
                 calls += 1
+                await emit("AGENT_DECISION", "GEMINI",
+                           "Gemini is selecting the next permitted evidence action",
+                           model_call=calls)
                 response = await client.post(
                     f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                     headers={"x-goog-api-key": key}, json={
                         "systemInstruction": {"parts": [{"text": instruction}]}, "contents": contents,
-                        "tools": [{"functionDeclarations": tools}],
+                        "tools": [{"functionDeclarations": [
+                            tool_declarations[name]
+                            for name in TOOL_DESCRIPTIONS
+                            if name in eligible_tools and not any(e["tool"] == name for e in evidence)
+                        ] + [finish_declaration]}],
                         "toolConfig": {"functionCallingConfig": {"mode": "ANY"}},
                         "generationConfig": {"temperature": 0, "maxOutputTokens": 512},
                     }, timeout=12, follow_redirects=False)
@@ -75,7 +106,7 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
                     proposal = args["decision"]
                     trace.append({"actor": "GEMINI", "tool": "finish", "reason": str(args.get("reason", ""))[:300]})
                     break
-                if (name not in TOOL_DESCRIPTIONS or set(args) != {"reason"}
+                if (name not in eligible_tools or set(args) != {"reason"}
                         or not isinstance(args.get("reason"), str) or not args["reason"].strip()
                         or any(e["tool"] == name for e in evidence)):
                     raise ValueError("Unsupported, repeated, or invalid tool call")
@@ -84,8 +115,16 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
                     trace.append({"actor": "POLICY", "tool": "stop",
                                   "reason": "The review was cancelled before the selected tool could start"})
                     break
+                await emit("API_SELECTED", "GEMINI",
+                           f"Gemini selected {name.replace('_', ' ').title()}",
+                           tool=name, reason=str(args.get("reason", ""))[:300])
                 observation = await gateway.check(name, subjects[name], should_stop=should_stop)
                 evidence.append(observation)
+                await emit("EVIDENCE_RECEIVED", "NOKIA",
+                           f"Nokia sandbox returned {observation['status']}",
+                           tool=name, status=observation["status"], source=observation["source"],
+                           latency_ms=observation.get("latency_ms"), http_status=observation.get("http_status"),
+                           observation=observation)
                 trace.append({"actor": "GEMINI", "tool": name, "reason": str(args.get("reason", ""))[:300],
                               "status": observation["status"]})
                 contents.append(content)
@@ -113,6 +152,9 @@ async def investigate(context, gateway, subjects, client, key, model="gemini-3.5
     elif proposal in {"HOLD", "RETRY"} and decision == "APPROVE":
         decision = proposal
         reasons.append("Agent requested additional review")
+    await emit("POLICY_DECISION", "POLICY",
+               "Deterministic policy validated the agent proposal and observed evidence",
+               decision=decision)
     return {"decision": decision, "final_risk_score": score, "reasons": reasons,
             "evidence": evidence, "agent_trace": trace, "model_calls": calls,
             "telecom_calls": len(evidence), "agent_proposal": proposal, "agent_error": failure,

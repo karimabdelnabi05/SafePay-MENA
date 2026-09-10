@@ -9,6 +9,37 @@ BASE = os.getenv("SAFEPAY_BROWSER_URL")
 pytestmark = pytest.mark.skipif(not BASE, reason="Set SAFEPAY_BROWSER_URL for browser acceptance")
 
 
+@pytest.mark.parametrize("catalog_status", [200, 503])
+def test_review_waits_for_initial_catalog(catalog_status):
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1100, "height": 900})
+        waiting = []
+        sessions = []
+        page.route("**/api/v1/catalog", lambda route: waiting.append(route))
+        page.on("request", lambda request: sessions.append(request.url)
+                if request.url.endswith("/api/v1/sessions") else None)
+        page.goto(BASE, wait_until="domcontentloaded")
+        button = page.locator("#reviewButton")
+        expect(button).to_be_disabled()
+        page.locator("#reviewForm").dispatch_event("submit")
+        page.wait_for_timeout(100)
+        assert sessions == []
+        assert len(waiting) == 1
+        if catalog_status == 200:
+            waiting[0].fulfill(response=waiting[0].fetch())
+            expect(button).to_be_enabled()
+            button.click()
+            expect(page.locator("#outcomeTitle")).to_have_text("Payment approved")
+            assert len(sessions) == 1
+        else:
+            waiting[0].fulfill(status=503, json={"detail": "Unavailable"})
+            expect(page.locator("#formError")).to_contain_text("could not load")
+            expect(button).to_be_disabled()
+            assert sessions == []
+        browser.close()
+
+
 @pytest.mark.parametrize("width,height", [(1440, 1000), (375, 812), (812, 375)])
 def test_tester_can_complete_a_routine_payment_without_layout_overflow(width, height):
     with sync_playwright() as p:
@@ -55,6 +86,104 @@ def test_model_supplied_markup_is_rendered_as_text():
         expect(page.locator("#reasonList")).to_contain_text("<img id='xss'")
         expect(page.locator("#evidenceBody")).to_contain_text("No network evidence was returned")
         expect(page.locator("#evidenceBody")).not_to_contain_text("routine payment")
+        browser.close()
+
+
+@pytest.mark.parametrize("action", ["complete", "cancel", "reconnect"])
+def test_judge_unlocks_connected_mode_and_watches_real_api_progress(action):
+    catalog = {
+        "countries": {"EG": {"name": "Egypt", "currency": "EGP", "rail": "InstaPay / IPN"}},
+        "scenarios": [{"id": "sim_swap", "name": "SIM-swap takeover", "description": "Unusual session"}],
+        "live_enabled": True,
+        "live_access_required": True,
+    }
+    pending = {
+        "id": "live-run", "decision": "PENDING", "connected": True, "stage": "EVIDENCE_RECEIVED",
+        "progress": [
+            {"stage": "QUEUED", "actor": "SAFEPAY", "message": "Connected sandbox review queued"},
+            {"stage": "AGENT_DECISION", "actor": "GEMINI", "message": "Gemini is selecting the next permitted evidence action"},
+            {"stage": "API_SELECTED", "actor": "GEMINI", "message": "Gemini selected sim swap", "tool": "sim_swap"},
+            {"stage": "EVIDENCE_RECEIVED", "actor": "NOKIA", "message": "Nokia sandbox returned SUCCESS", "tool": "sim_swap", "status": "SUCCESS"},
+        ],
+    }
+    final = {
+        "id": "live-run", "decision": "HOLD", "pre_call_score": 55, "final_risk_score": 55,
+        "telecom_calls": 1, "model_calls": 2, "decision_source": "GEMINI_WITH_POLICY",
+        "reasons": ["Further review is needed before release"],
+        "evidence": [{"tool": "sim_swap", "source": "NOKIA_SANDBOX", "status": "SUCCESS",
+                      "subject": "+99999991000", "data": {"swapped": False}}],
+        "agent_trace": [{"actor": "GEMINI", "tool": "sim_swap", "reason": "Check recent SIM state", "status": "SUCCESS"}],
+        "progress": pending["progress"] + [
+            {"stage": "POLICY_DECISION", "actor": "POLICY", "message": "Policy validated the evidence", "decision": "HOLD"},
+            {"stage": "COMPLETE", "actor": "SAFEPAY", "message": "Connected investigation completed", "decision": "HOLD"},
+        ],
+    }
+    poll_count = 0
+
+    def route_api(route):
+        nonlocal poll_count
+        request = route.request
+        path = request.url.split("/api/v1/")[-1]
+        if path == "catalog":
+            body, status = catalog, 200
+        elif path == "health":
+            body, status = {"status": "healthy"}, 200
+        elif path == "live-access" and request.method == "GET":
+            body, status = {"available": True, "authorized": False, "remaining": 0,
+                            "global_remaining": 2, "expires_at": None}, 200
+        elif path == "live-access":
+            body, status = {"available": True, "authorized": True, "remaining": 1,
+                            "global_remaining": 2, "expires_at": 9999999999}, 200
+        elif path == "sessions":
+            body, status = {}, 200
+        elif path == "live-payments":
+            body, status = {"id": "live-run", "decision": "PENDING", "connected": True,
+                            "stage": "QUEUED", "progress": pending["progress"][:1]}, 202
+        elif path == "runs/live-run/cancel":
+            body, status = {**pending, "decision": "CANCELLED"}, 200
+        elif path == "runs/live-run":
+            poll_count += 1
+            body, status = (pending, 200) if poll_count == 1 or action == "cancel" else (final, 200)
+            if action == "reconnect" and poll_count == 2:
+                body, status = {"detail": "Connection interrupted"}, 503
+        else:
+            body, status = {"detail": "Unexpected route"}, 404
+        route.fulfill(status=status, content_type="application/json", body=json.dumps(body))
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1100, "height": 900}, reduced_motion="reduce")
+        page.route("**/api/v1/**", route_api)
+        page.goto(BASE)
+        page.locator("#modeSelect").select_option("NOKIA_SANDBOX")
+        expect(page.locator("#liveAccessPanel")).to_be_visible()
+        page.locator("#accessCodeInput").fill("judges-only")
+        page.get_by_role("button", name="Unlock connected mode", exact=True).click()
+        expect(page.locator("#liveAccessStatus")).to_contain_text("1 connected run remaining")
+
+        page.get_by_role("button", name="Review payment", exact=True).click()
+        expect(page.locator("#liveProgress")).to_be_visible()
+        expect(page.locator("#progressList")).to_contain_text("Gemini selected sim swap")
+        expect(page.locator("#progressList")).to_contain_text("Nokia sandbox returned SUCCESS")
+        if action == "cancel":
+            page.get_by_role("button", name="Cancel review", exact=True).click()
+            expect(page.locator("#outcomeTitle")).to_have_text("Review cancelled")
+            expect(page.locator("#modeSelect")).to_be_enabled()
+            page.locator("#modeSelect").select_option("FIXTURE")
+            page.wait_for_timeout(500)
+            expect(page.locator("#outcomeTitle")).to_have_text("Ready for review")
+            expect(page.locator("#liveProgress")).to_be_hidden()
+            browser.close()
+            return
+        if action == "reconnect":
+            expect(page.locator("#formError")).to_contain_text("Connection interrupted")
+            expect(page.locator("#reviewButton")).to_be_disabled()
+            page.get_by_role("button", name="Reconnect to review", exact=True).click()
+        expect(page.get_by_role("heading", name="Payment held", exact=True)).to_be_visible()
+        expect(page.locator("#evidenceBody")).to_contain_text("NOKIA_SANDBOX")
+        assert page.evaluate("document.activeElement.id") == "outcomeMain"
+        assert poll_count >= 2
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         browser.close()
 
 

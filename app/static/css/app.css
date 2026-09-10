@@ -36,7 +36,7 @@ summary:focus-visible, a:focus-visible {
   outline-offset: 2px;
 }
 .skip-link {
-  position: fixed;
+  position: absolute;
   left: 12px;
   top: -80px;
   z-index: 100;
@@ -93,7 +93,7 @@ summary:focus-visible, a:focus-visible {
 h1, h2, h3, p { margin-top: 0; }
 h1 {
   margin-bottom: 6px;
-  font-size: clamp(1.75rem, 4vw, 2.45rem);
+  font-size: 2rem;
   line-height: 1.15;
   letter-spacing: 0;
 }
@@ -207,6 +207,42 @@ input:hover, select:hover { border-color: #77867c; }
 }
 .mode-row label { margin: 0; }
 .mode-select { width: auto; min-width: 164px; }
+.live-access {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--accent);
+  background: #fff9e9;
+}
+.live-access-head,
+.live-progress-head,
+.live-progress-head > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.live-access-head strong { display: block; font-size: .88rem; }
+.live-access-head div > span { display: block; color: var(--muted); font-size: .75rem; }
+.connection-state {
+  padding: 3px 7px;
+  border: 1px solid #c9a452;
+  border-radius: 3px;
+  color: #614000;
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.connection-state[data-state="UNLOCKED"] {
+  border-color: #69a98e;
+  background: var(--success-bg);
+  color: var(--success);
+}
+.access-fields { margin-top: 14px; }
+.access-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.secondary.compact { min-height: 46px; white-space: nowrap; }
+.access-error { min-height: 0; margin: 6px 0 0; color: var(--danger); font-size: .78rem; }
+.access-error:empty { display: none; }
+.live-access-status { margin: 10px 0 0; color: var(--muted); font-size: .78rem; }
 .primary, .secondary, .danger-button {
   min-height: 48px;
   border-radius: 4px;
@@ -220,7 +256,7 @@ input:hover, select:hover { border-color: #77867c; }
 .secondary { background: white; color: var(--brand); border-color: var(--brand); }
 .secondary:hover { background: var(--surface-soft); }
 .danger-button { background: white; color: var(--danger); border-color: #d48b8b; }
-button:disabled { cursor: wait; opacity: .5; }
+button:disabled { cursor: not-allowed; opacity: .5; }
 .outcome { min-height: 328px; display: flex; flex-direction: column; }
 .outcome-main { padding: 28px 28px 20px; border-left: 6px solid var(--line); }
 .outcome-main[data-state="APPROVE"], .outcome-main[data-state="TRUST_ESTABLISHED"] {
@@ -245,6 +281,49 @@ button:disabled { cursor: wait; opacity: .5; }
 }
 .outcome-main h2 { margin-bottom: 8px; font-size: 1.55rem; line-height: 1.2; }
 .outcome-copy { margin-bottom: 0; max-width: 58ch; color: var(--muted); }
+.live-progress {
+  padding: 18px 22px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #f8faf8;
+}
+.live-progress-head { margin-bottom: 12px; }
+.live-progress-head h3 { margin: 0; font-size: .9rem; }
+.live-progress-head > span { color: var(--brand); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.live-indicator {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px #dceee7;
+}
+.progress-list { margin: 0; padding: 0; list-style: none; max-height: 320px; overflow-y: auto; }
+.progress-list li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #dce4de;
+}
+.progress-list li:last-child { border-bottom: 0; }
+.progress-index {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9aaba0;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 800;
+}
+.progress-list strong,
+.progress-list span,
+.progress-list small { display: block; }
+.progress-list strong { font-size: .78rem; }
+.progress-list div > span { color: var(--muted); font-size: .78rem; }
+.progress-list small { margin-top: 2px; color: #566c60; font-size: .7rem; }
+.live-progress > p { margin: 10px 0 0; color: var(--muted); font-size: .72rem; }
 .metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -341,7 +420,10 @@ th { color: var(--muted); font-size: .72rem; }
   .field-row { grid-template-columns: 1fr; gap: 0; }
   .mode-row { align-items: stretch; flex-direction: column; }
   .mode-select { width: 100%; }
+  .access-row { grid-template-columns: 1fr; }
+  .secondary.compact { width: 100%; }
   .panel-head, .panel-body, .outcome-main { padding-left: 16px; padding-right: 16px; }
+  .live-progress { padding-left: 16px; padding-right: 16px; }
   .metrics { grid-template-columns: 1fr; }
   .metric { border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 16px; }
   .metric:last-child { border-bottom: 0; }

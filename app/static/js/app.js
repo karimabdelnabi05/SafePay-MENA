@@ -1,11 +1,18 @@
 const state = {
   catalog: null,
+  ready: false,
   country: "EG",
   currentRun: null,
   sessionSignature: null,
   enrolled: false,
   pending: false,
   operationGeneration: 0,
+  liveAccess: {
+    authorized: false,
+    remaining: 0,
+    global_remaining: 0,
+    expires_at: null,
+  },
 };
 
 const byId = (id) => document.getElementById(id);
@@ -22,6 +29,16 @@ const decisionContent = {
   TRUST_ESTABLISHED: ["Device trusted", "Fresh Number Verification and SIM Swap checks completed for this setup."],
   CANCELLED: ["Review cancelled", "This review is closed and cannot release the payment."],
 };
+const toolLabels = {
+  sim_swap: "SIM Swap",
+  number_verification: "Number Verification",
+  device_swap: "Device Swap",
+  roaming: "Roaming",
+  reachability: "Reachability",
+  finish: "Finish",
+  stop: "Stop",
+};
+const toolLabel = (tool = "") => toolLabels[tool] || tool.replaceAll("_", " ");
 
 function setBusy(button, busy, label) {
   if (!button.dataset.label) button.dataset.label = button.textContent;
@@ -47,7 +64,9 @@ function renderReady() {
   byId("reasonList").innerHTML = "<li>The review has not started.</li>";
   byId("evidenceBody").innerHTML = '<p class="empty">No network evidence requested.</p>';
   byId("traceBody").innerHTML = '<p class="empty">No agent investigation was needed.</p>';
+  byId("liveProgress").hidden = true;
   byId("resultActions").hidden = true;
+  byId("resumeButton").hidden = true;
   document.querySelectorAll(".step").forEach((step, index) => step.classList.toggle("active", index === 0));
 }
 
@@ -70,9 +89,82 @@ function setFormLocked(locked) {
   byId("reviewForm").querySelectorAll("button, input, select").forEach((control) => {
     control.disabled = locked;
   });
+  if (!locked) updateReviewAvailability();
 }
 
-function renderPending(enrollment) {
+function connectedModeSelected() {
+  return byId("modeSelect").value === "NOKIA_SANDBOX";
+}
+
+function updateReviewAvailability() {
+  const accessBlocked = connectedModeSelected()
+    && (!state.liveAccess.authorized || state.liveAccess.remaining <= 0 || state.liveAccess.global_remaining <= 0);
+  byId("reviewButton").disabled = !state.ready || state.pending || accessBlocked || state.currentRun?.decision === "PENDING";
+}
+
+function updateLiveAccessUi() {
+  const selected = connectedModeSelected();
+  const panel = byId("liveAccessPanel");
+  panel.hidden = !selected;
+  if (!selected) {
+    updateReviewAvailability();
+    return;
+  }
+  const authorized = state.liveAccess.authorized;
+  byId("liveAccessFields").hidden = authorized;
+  byId("liveConnectionState").textContent = authorized ? "Unlocked" : "Locked";
+  byId("liveConnectionState").dataset.state = authorized ? "UNLOCKED" : "LOCKED";
+  if (!authorized) {
+    byId("liveAccessStatus").textContent = "Enter the judge code to use protected connected mode.";
+  } else if (state.liveAccess.remaining <= 0 || state.liveAccess.global_remaining <= 0) {
+    byId("liveAccessStatus").textContent = "Connected quota is temporarily exhausted. Fixture mode remains available.";
+  } else {
+    const count = state.liveAccess.remaining;
+    byId("liveAccessStatus").textContent = `${count} connected run${count === 1 ? "" : "s"} remaining this hour.`;
+  }
+  updateReviewAvailability();
+}
+
+function renderLiveProgress(result) {
+  if (result?.decision === "PENDING") {
+    byId("preScore").textContent = result.pre_call_score ?? "-";
+    byId("externalCalls").textContent = (result.model_calls || 0) + (result.telecom_calls || 0);
+    if (result.reasons?.length) {
+      byId("reasonList").innerHTML = result.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
+    }
+    if (result.evidence?.length) renderEvidence(result.evidence, result);
+  }
+  const progress = result?.progress || [];
+  const visibleProgress = progress.filter((item, index) => {
+    if (item.stage === "QUEUED") return progress.length === 1;
+    if (item.stage !== "AGENT_DECISION") return true;
+    return index === progress.length - 1;
+  });
+  const panel = byId("liveProgress");
+  panel.hidden = !result?.connected && !progress.length;
+  if (panel.hidden) return;
+  const stageNames = {
+    QUEUED: "Queued",
+    LOCAL_SCREEN: "Local screen",
+    AGENT_DECISION: "Agent choosing",
+    API_SELECTED: "API selected",
+    EVIDENCE_RECEIVED: "Evidence received",
+    POLICY_DECISION: "Policy decision",
+    COMPLETE: "Complete",
+    CANCELLED: "Cancelled",
+  };
+  byId("progressStage").textContent = stageNames[result.stage || progress.at(-1)?.stage] || "Running";
+  byId("progressList").innerHTML = visibleProgress.map((item, index) => {
+    const metadata = [item.tool ? toolLabel(item.tool) : null, item.status,
+      item.http_status ? `HTTP ${item.http_status}` : null,
+      item.latency_ms != null ? `${item.latency_ms} ms` : null]
+      .filter(Boolean).join(" | ");
+    return `<li data-stage="${escapeHtml(item.stage || "")}"><span class="progress-index">${index + 1}</span><div><strong>${escapeHtml(item.actor || "SAFEPAY")} | ${escapeHtml(stageNames[item.stage] || item.stage || "Update")}</strong><span>${escapeHtml(item.message || "Progress recorded")}</span>${metadata ? `<small>${escapeHtml(metadata)}</small>` : ""}</div></li>`;
+  }).join("");
+  if (result.decision === "PENDING") byId("progressList").scrollTop = byId("progressList").scrollHeight;
+}
+
+function renderPending(enrollment, connected = false) {
   byId("outcomeMain").dataset.state = "READY";
   byId("outcomeEyebrow").textContent = "Investigation running";
   byId("outcomeTitle").textContent = enrollment ? "Verifying device" : "Reviewing payment";
@@ -83,6 +175,13 @@ function renderPending(enrollment) {
   byId("reasonList").innerHTML = "<li>Waiting for the bounded investigation to complete.</li>";
   byId("evidenceBody").innerHTML = '<p class="empty">Evidence will appear when the review completes.</p>';
   byId("traceBody").innerHTML = '<p class="empty">The trace will appear when the review completes.</p>';
+  if (connected) {
+    renderLiveProgress({connected: true, stage: "QUEUED", progress: [{
+      stage: "QUEUED", actor: "SAFEPAY", message: "Preparing the protected connected investigation",
+    }]});
+  } else {
+    byId("liveProgress").hidden = true;
+  }
   byId("resultActions").hidden = true;
   document.querySelectorAll(".step").forEach((step, index) => step.classList.toggle("active", index < 2));
 }
@@ -124,7 +223,7 @@ function chooseCountry(code) {
   });
   const market = state.catalog.countries[code];
   byId("currencyHelp").textContent = market.currency;
-  byId("railContext").textContent = `${market.name} · ${market.rail}`;
+  byId("railContext").textContent = `${market.name} | ${market.rail}`;
   if (changed) invalidateSession();
 }
 
@@ -144,7 +243,10 @@ function renderEvidence(items = [], result = {}) {
   const rows = items.map((item) => {
     const value = Object.entries(item.data || {}).map(([key, val]) => `${key}: ${val}`).join(", ") || item.error || "No value";
     const subject = item.subject ? `<br><small>${escapeHtml(item.subject)}</small>` : "";
-    return `<tr><td><strong>${escapeHtml(item.tool.replaceAll("_", " "))}</strong>${subject}</td><td><span class="source-tag">${escapeHtml(item.source)}</span></td><td>${escapeHtml(item.status)}</td><td>${escapeHtml(value)}</td></tr>`;
+    const transport = [item.http_status ? `HTTP ${item.http_status}` : null,
+      item.latency_ms != null ? `${item.latency_ms} ms` : null].filter(Boolean).join(" | ");
+    const endpoint = item.endpoint ? `<br><small>${escapeHtml(item.endpoint)}</small>` : "";
+    return `<tr><td><strong>${escapeHtml(toolLabel(item.tool))}</strong>${subject}</td><td><span class="source-tag">${escapeHtml(item.source)}</span>${endpoint}</td><td><strong>${escapeHtml(item.status)}</strong>${transport ? `<br><small>${escapeHtml(transport)}</small>` : ""}</td><td>${escapeHtml(value)}</td></tr>`;
   }).join("");
   byId("evidenceBody").innerHTML = `<table><thead><tr><th>Observation</th><th>Source</th><th>Status</th><th>Returned value</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -158,13 +260,14 @@ function renderTrace(items = [], source = "") {
     return;
   }
   const rows = items.map((item) =>
-    `<li><strong>${escapeHtml(item.actor)} · ${escapeHtml(item.tool.replaceAll("_", " "))} ${item.status ? `· ${escapeHtml(item.status)}` : ""}</strong><span>${escapeHtml(item.reason || "Observation recorded")}</span></li>`
+    `<li><strong>${escapeHtml(item.actor)} | ${escapeHtml(toolLabel(item.tool))} ${item.status ? `| ${escapeHtml(item.status)}` : ""}</strong><span>${escapeHtml(item.reason || "Observation recorded")}</span></li>`
   ).join("");
   byId("traceBody").innerHTML = `<ol class="trace">${rows}</ol>`;
 }
 
 function renderResult(result) {
   state.currentRun = result;
+  byId("resumeButton").hidden = true;
   const content = decisionContent[result.decision] || ["Review complete", "The workflow returned a decision."];
   byId("outcomeMain").dataset.state = result.decision;
   byId("outcomeEyebrow").textContent = result.decision_source?.replaceAll("_", " ") || "Decision";
@@ -181,9 +284,11 @@ function renderResult(result) {
   byId("reasonList").innerHTML = reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
   renderEvidence(result.evidence, result);
   renderTrace(result.agent_trace, result.decision_source);
+  renderLiveProgress(result);
   byId("resultActions").hidden = !["HOLD", "RETRY", "VERIFY_DEVICE"].includes(result.decision);
   document.querySelectorAll(".step").forEach((step) => step.classList.add("active"));
   byId("outcomeMain").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  byId("outcomeMain").focus({preventScroll: true});
 }
 
 async function ensureSession(scenario) {
@@ -204,11 +309,107 @@ async function ensureSession(scenario) {
   state.enrolled = false;
 }
 
+async function refreshLiveAccess() {
+  if (!state.catalog?.live_enabled) return;
+  const response = await fetch("/api/v1/live-access");
+  if (!response.ok) throw new Error("Connected access status is unavailable.");
+  state.liveAccess = await response.json();
+  updateLiveAccessUi();
+}
+
+async function unlockConnectedMode() {
+  const button = byId("unlockButton");
+  const input = byId("accessCodeInput");
+  byId("accessError").textContent = "";
+  if (!input.value) {
+    byId("accessError").textContent = "Enter the judge access code.";
+    input.focus();
+    return;
+  }
+  setBusy(button, true, "Unlocking...");
+  try {
+    const response = await fetch("/api/v1/live-access", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({code: input.value}),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      const error = new Error(body.detail || "Connected mode could not be unlocked.");
+      error.status = response.status;
+      throw error;
+    }
+    state.liveAccess = body;
+    input.value = "";
+    updateLiveAccessUi();
+  } catch (error) {
+    byId("accessError").textContent = error.message;
+    input.focus();
+  } finally {
+    setBusy(button, false, "");
+  }
+}
+
+async function pollConnectedRun(runId, operation) {
+  const deadline = Date.now() + 60000;
+  while (Date.now() < deadline) {
+    if (operation !== state.operationGeneration) return null;
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    if (operation !== state.operationGeneration) return null;
+    const response = await fetch(`/api/v1/runs/${encodeURIComponent(runId)}`);
+    if (!response.ok) {
+      const error = new Error((await response.json()).detail || "Could not read connected progress.");
+      error.status = response.status;
+      throw error;
+    }
+    const result = await response.json();
+    if (operation !== state.operationGeneration) return null;
+    state.currentRun = result;
+    renderLiveProgress(result);
+    byId("resultActions").hidden = result.decision !== "PENDING";
+    if (result.decision !== "PENDING") return result;
+  }
+  throw new Error("The connected review is still running. Reconnect to read its result without starting another investigation.");
+}
+
+async function reconnectReview() {
+  if (state.pending || state.currentRun?.decision !== "PENDING") return;
+  const operation = ++state.operationGeneration;
+  setFormLocked(true);
+  byId("resumeButton").hidden = true;
+  showError("");
+  try {
+    const result = await pollConnectedRun(state.currentRun.id, operation);
+    if (result && operation === state.operationGeneration) {
+      state.enrolled = result.decision === "TRUST_ESTABLISHED" || state.enrolled;
+      if (state.enrolled) byId("reviewButton").dataset.label = "Continue to payment";
+      renderResult(result);
+    }
+  } catch (error) {
+    if (operation === state.operationGeneration) {
+      showError(error.message);
+      byId("resumeButton").hidden = false;
+    }
+  } finally {
+    if (operation === state.operationGeneration) {
+      setFormLocked(false);
+      byId("reviewButton").textContent = byId("reviewButton").dataset.label;
+    }
+  }
+}
+
 async function startAndRun(event) {
   event.preventDefault();
+  if (!state.ready || state.pending) return;
   showError("");
   const button = byId("reviewButton");
   const scenario = byId("scenarioSelect").value;
+  const connected = connectedModeSelected();
+  if (connected && !state.liveAccess.authorized) {
+    updateLiveAccessUi();
+    byId("accessCodeInput").focus();
+    return;
+  }
   const enrollment = ["first_setup", "new_device", "enrollment_outage"].includes(scenario) && !state.enrolled;
   const amount = Number(byId("amountInput").value);
   if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000) {
@@ -220,11 +421,14 @@ async function startAndRun(event) {
   setFormLocked(true);
   button.dataset.label = enrollment ? "Verify device" : (state.enrolled ? "Continue to payment" : "Review payment");
   button.textContent = enrollment ? "Verifying device..." : "Reviewing payment...";
-  renderPending(enrollment);
+  renderPending(enrollment, connected);
+  state.currentRun = null;
   try {
     await ensureSession(scenario);
     const requestId = `${enrollment ? "enroll" : "payment"}-${Date.now()}`;
-    const path = enrollment ? "/api/v1/enrollments" : "/api/v1/payments";
+    const path = connected
+      ? (enrollment ? "/api/v1/live-enrollments" : "/api/v1/live-payments")
+      : (enrollment ? "/api/v1/enrollments" : "/api/v1/payments");
     const payload = enrollment
       ? { request_id: requestId }
       : {
@@ -243,8 +447,18 @@ async function startAndRun(event) {
       error.status = response.status;
       throw error;
     }
-    const result = await response.json();
+    let result = await response.json();
     if (operation !== state.operationGeneration) return;
+    if (connected && response.status === 202) {
+      state.liveAccess.remaining = Math.max(0, state.liveAccess.remaining - 1);
+      state.liveAccess.global_remaining = Math.max(0, state.liveAccess.global_remaining - 1);
+      updateLiveAccessUi();
+      state.currentRun = result;
+      renderLiveProgress(result);
+      byId("resultActions").hidden = false;
+      result = await pollConnectedRun(result.id, operation);
+      if (!result || operation !== state.operationGeneration) return;
+    }
     if (result.decision === "TRUST_ESTABLISHED") {
       state.enrolled = true;
       button.dataset.label = "Continue to payment";
@@ -258,7 +472,15 @@ async function startAndRun(event) {
     if (operation !== state.operationGeneration) return;
     if (error.status === 401) clearSessionState();
     showError(`${error.message} Check the selected mode and retry.`);
-    renderReady();
+    if (state.currentRun?.decision === "PENDING") {
+      byId("resultActions").hidden = false;
+      byId("resumeButton").hidden = false;
+    } else {
+      renderReady();
+    }
+    if (connected && [401, 403, 429].includes(error.status)) {
+      await refreshLiveAccess().catch(() => {});
+    }
   } finally {
     if (operation === state.operationGeneration) {
       setFormLocked(false);
@@ -278,9 +500,16 @@ async function cancelCurrent() {
     const result = await response.json();
     if (operation === state.operationGeneration) renderResult(result);
   } catch (error) {
-    if (operation === state.operationGeneration) showError(error.message);
+    if (operation === state.operationGeneration) {
+      showError(error.message);
+      byId("resumeButton").hidden = state.currentRun?.decision !== "PENDING";
+    }
   } finally {
     setBusy(button, false, "");
+    if (operation === state.operationGeneration && state.pending) {
+      setFormLocked(false);
+      byId("reviewButton").textContent = byId("reviewButton").dataset.label;
+    }
   }
 }
 
@@ -300,7 +529,26 @@ async function runEvaluation() {
   }
 }
 
+function handleModeChange() {
+  if (state.pending) return;
+  const connected = connectedModeSelected();
+  const fixtureOnly = new Set(["provider_outage", "enrollment_outage"]);
+  Array.from(byId("scenarioSelect").options).forEach((option) => {
+    option.disabled = connected && fixtureOnly.has(option.value);
+  });
+  if (byId("scenarioSelect").selectedOptions[0]?.disabled) {
+    const replacement = Array.from(byId("scenarioSelect").options).find((option) => !option.disabled);
+    if (replacement) byId("scenarioSelect").value = replacement.value;
+  }
+  invalidateSession();
+  updateScenarioContext();
+  updateLiveAccessUi();
+  byId("environmentBadge").textContent = connected ? "CONNECTED SANDBOX SELECTED" : "REPEATABLE FIXTURE";
+  if (connected) refreshLiveAccess().catch(() => {});
+}
+
 async function init() {
+  setFormLocked(true);
   try {
     const [catalogResponse, healthResponse] = await Promise.all([
       fetch("/api/v1/catalog"),
@@ -310,7 +558,7 @@ async function init() {
     state.catalog = await catalogResponse.json();
     const health = await healthResponse.json();
     byId("healthText").textContent = health.status === "healthy" ? "Service ready" : "Service unavailable";
-    byId("environmentBadge").textContent = state.catalog.live_enabled ? "FIXTURE + NOKIA SANDBOX" : "FIXTURE DEMO";
+    byId("environmentBadge").textContent = state.catalog.live_enabled ? "CONNECTED SANDBOX AVAILABLE" : "FIXTURE DEMO";
     byId("countrySegments").innerHTML = Object.entries(state.catalog.countries).map(([code, market]) =>
       `<button class="segment" type="button" data-country="${escapeHtml(code)}" aria-pressed="${code === state.country}">${escapeHtml(market.name)}</button>`
     ).join("");
@@ -318,13 +566,18 @@ async function init() {
       `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`
     ).join("");
     if (state.catalog.live_enabled) {
-      byId("modeSelect").insertAdjacentHTML("beforeend", '<option value="NOKIA_SANDBOX">Nokia sandbox + Gemini</option>');
+      byId("modeSelect").insertAdjacentHTML("beforeend", '<option value="NOKIA_SANDBOX">Connected: Nokia + Gemini</option>');
+      await refreshLiveAccess().catch(() => {
+        byId("accessError").textContent = "Connected access is unavailable. Fixture mode remains available.";
+      });
     }
     document.querySelectorAll(".segment").forEach((button) =>
       button.addEventListener("click", () => chooseCountry(button.dataset.country))
     );
     chooseCountry(state.country);
     updateScenarioContext();
+    state.ready = true;
+    setFormLocked(false);
   } catch (error) {
     byId("healthText").textContent = "Service unavailable";
     showError("SafePay could not load its scenario catalog. Refresh after the service is running.");
@@ -337,7 +590,15 @@ byId("scenarioSelect").addEventListener("change", () => {
   invalidateSession();
   updateScenarioContext();
 });
-byId("modeSelect").addEventListener("change", invalidateSession);
+byId("modeSelect").addEventListener("change", handleModeChange);
+byId("unlockButton").addEventListener("click", unlockConnectedMode);
+byId("accessCodeInput").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    unlockConnectedMode();
+  }
+});
 byId("cancelButton").addEventListener("click", cancelCurrent);
+byId("resumeButton").addEventListener("click", reconnectReview);
 byId("evaluationButton").addEventListener("click", runEvaluation);
 init();

@@ -1,241 +1,96 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SafePay MENA - Phase 2 Pitch</title>
-  <style>
-    :root {
-      --ink: #17211b;
-      --muted: #536158;
-      --line: #cad4cd;
-      --paper: #ffffff;
-      --soft: #f2f5f2;
-      --green: #086c4f;
-      --green-soft: #e6f3ed;
-      --amber: #b77900;
-      --amber-soft: #fff4d7;
-      --red: #a52c2c;
-      --red-soft: #fbeaea;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #dfe4e0; color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
-    .slide {
-      position: relative;
-      width: 13.333in;
-      height: 7.5in;
-      margin: 0 auto 20px;
-      padding: .48in .58in .42in;
-      overflow: hidden;
-      background: var(--paper);
-      page-break-after: always;
-    }
-    .slide:last-child { page-break-after: auto; }
-    .topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: .24in; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
-    .mark { width: 30px; height: 30px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 5px; }
-    .phase { color: var(--muted); font-size: 13px; font-weight: 700; }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { max-width: 9.7in; margin-bottom: .18in; font-size: 48px; line-height: 1.04; letter-spacing: 0; }
-    h2 { margin-bottom: .24in; font-size: 31px; line-height: 1.1; letter-spacing: 0; }
-    h3 { margin-bottom: 8px; font-size: 18px; letter-spacing: 0; }
-    p, li, td, th { font-size: 16px; line-height: 1.38; }
-    .lede { max-width: 10.7in; color: var(--muted); font-size: 23px; line-height: 1.35; }
-    .eyebrow { margin-bottom: 10px; color: var(--green); font-size: 13px; font-weight: 800; text-transform: uppercase; }
-    .band { margin: .25in -.58in 0; padding: .28in .58in; background: var(--ink); color: white; }
-    .band p { margin: 0; font-size: 21px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .24in; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .18in; }
-    .panel { border: 1px solid var(--line); border-radius: 6px; padding: .2in; background: var(--paper); }
-    .panel.soft { background: var(--soft); }
-    .panel.green { border-left: 6px solid var(--green); background: var(--green-soft); }
-    .panel.amber { border-left: 6px solid var(--amber); background: var(--amber-soft); }
-    .panel.red { border-left: 6px solid var(--red); background: var(--red-soft); }
-    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
-    .number { color: var(--green); font-size: 34px; font-weight: 850; line-height: 1; }
-    .label { margin-top: 7px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
-    .flow { display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr 36px 1fr; align-items: stretch; margin-top: .25in; }
-    .node { min-height: 1.55in; border: 1px solid var(--line); border-top: 5px solid var(--green); padding: .18in; background: white; }
-    .arrow { display: grid; place-items: center; color: var(--green); font-size: 28px; font-weight: 800; }
-    .split { display: grid; grid-template-columns: .95fr 1.2fr; gap: .28in; align-items: center; }
-    .product-shot { width: 100%; max-height: 5.5in; object-fit: contain; object-position: top; border: 1px solid var(--line); }
-    table { width: 100%; border-collapse: collapse; }
-    th { padding: 9px 10px; background: var(--ink); color: white; text-align: left; }
-    td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    tr:nth-child(even) td { background: var(--soft); }
-    .tag { display: inline-block; padding: 4px 7px; border-radius: 3px; background: var(--green-soft); color: var(--green); font-size: 12px; font-weight: 800; }
-    .tag.amber { background: var(--amber-soft); color: #735000; }
-    .tag.red { background: var(--red-soft); color: var(--red); }
-    ul.clean { margin: 8px 0 0; padding-left: 20px; }
-    ul.clean li { margin-bottom: 6px; }
-    .callout { margin-top: .2in; padding: .14in .18in; border-left: 5px solid var(--amber); background: var(--amber-soft); font-weight: 650; }
-    .footer { position: absolute; left: .58in; right: .58in; bottom: .18in; display: flex; justify-content: space-between; color: #6b776f; font-size: 11px; }
-    .hero { display: flex; min-height: 5.55in; flex-direction: column; justify-content: center; }
-    .closing .hero { min-height: 4.85in; }
-    .hero .proof { display: flex; gap: 10px; margin-top: .22in; }
-    .proof span { padding: 7px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--soft); font-size: 13px; font-weight: 750; }
-    .market { min-height: 2.15in; }
-    .market strong { display: block; margin-bottom: 5px; font-size: 22px; }
-    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: .16in; margin-bottom: .22in; }
-    .metric { min-height: 1.18in; border-top: 5px solid var(--green); padding: .16in; background: var(--soft); }
-    .small { color: var(--muted); font-size: 13px; }
-    @page { size: 13.333in 7.5in; margin: 0; }
-    @media print {
-      body { background: white; }
-      .slide { margin: 0; }
-    }
-  </style>
-</head>
-<body>
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">GSMA MENA Ignite - Phase 2</div></div>
-    <div class="hero">
-      <div class="eyebrow">Adaptive telecom evidence for payment decisions</div>
-      <h1>Keep routine payments instant. Investigate risk before money moves.</h1>
-      <p class="lede">SafePay adds CAMARA network observations to bank context only when risk warrants it, using bounded AI tool orchestration and deterministic release policy.</p>
-      <div class="proof"><span>Working FastAPI prototype</span><span>Nokia sandbox verified</span><span>Egypt - Saudi Arabia - UAE</span></div>
-    </div>
-    <div class="footer"><span>Prototype: synthetic bank context and simulator subscribers</span><span>1 / 10</span></div>
-  </section>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SafePay MENA | GSMA Phase 2 Submission</title>
+<style>
+:root{--ink:#152720;--muted:#53645e;--green:#067556;--mint:#dbf1e7;--blue:#2462b0;--ice:#eaf1fb;--gold:#a86900;--red:#b23d42;--line:#d5dfda;--paper:#fbfcfb}
+*{box-sizing:border-box;letter-spacing:0}body{margin:0;background:#dce2df;color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.slide{width:1600px;height:900px;position:relative;margin:24px auto;background:var(--paper);padding:48px 76px 0;break-after:page;overflow:hidden}.slide:last-child{break-after:auto}
+header{display:flex;justify-content:space-between;align-items:center;height:38px;font-size:17px;font-weight:650}.brand{display:flex;gap:12px;align-items:center}.brand b{display:grid;place-items:center;width:32px;height:32px;border-radius:5px;background:var(--green);color:#fff;font-size:23px}.section{font-size:14px;text-transform:uppercase;color:var(--muted)}
+.content{margin-top:42px}.eyebrow{font-size:15px;color:var(--green);text-transform:uppercase;font-weight:750;margin-bottom:14px}h1,h2,h3,p{margin:0}h1{font-size:96px;line-height:1.06;font-weight:750}h2{font-size:49px;line-height:1.15;font-weight:720;max-width:1400px}h3{font-size:25px;line-height:1.25;font-weight:700}p{font-size:23px;line-height:1.45}.lead{font-size:25px;line-height:1.45;color:var(--muted);margin-top:16px}.small{font-size:18px;line-height:1.45}.tiny{font-size:15px;line-height:1.45}.muted{color:var(--muted)}.green{color:var(--green)}.blue{color:var(--blue)}.red{color:var(--red)}.gold{color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:64px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}.mt24{margin-top:24px}.mt32{margin-top:32px}.mt40{margin-top:40px}.mt48{margin-top:48px}
+.stat{font-size:96px;line-height:1.05;font-weight:750;white-space:nowrap}.stat.medium{font-size:74px}.stat-label{font-size:23px;line-height:1.35;margin-top:16px;max-width:400px}.stat-note{font-size:17px;color:var(--muted);margin-top:15px;line-height:1.45}.rule{border-top:1px solid var(--line);padding-top:24px}
+.band{background:var(--ink);color:#fff;padding:23px 30px;font-size:24px;line-height:1.4}.band.light{background:var(--mint);color:var(--ink)}.band.blueband{background:var(--ice);color:var(--ink)}.label{font-size:15px;line-height:1.4;text-transform:uppercase;font-weight:750;color:var(--muted);margin-bottom:15px}.pill{display:inline-block;font-size:14px;font-weight:750;text-transform:uppercase;padding:7px 11px;border-radius:3px;background:var(--ice);color:var(--blue)}
+footer{position:absolute;bottom:28px;left:76px;right:76px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;gap:25px;font-size:13px;line-height:1.5;color:var(--muted)}footer .sources{max-width:1310px}footer a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}footer .page{white-space:nowrap}
+.dark{background:var(--ink);color:#fff}.dark .section,.dark .muted,.dark .lead,.dark footer{color:#bfcec7}.dark .eyebrow,.dark .green{color:#70d8b3}.dark footer{border-color:#476052}.dark .brand b{background:#70d8b3;color:var(--ink)}
+.cover .content{margin-top:58px}.cover-line{font-size:42px;line-height:1.28;margin-top:21px}.cover-proof{display:flex;gap:80px;margin-top:48px;padding-top:26px;border-top:1px solid #476052}.cover-proof strong{font-size:46px;display:block;color:#70d8b3}.cover-proof span{display:block;font-size:18px;margin-top:7px;color:#d5e2db}.cover-bottom{display:flex;justify-content:space-between;align-items:end;margin-top:37px}
+.country{font-size:17px;text-transform:uppercase;font-weight:750;margin-bottom:27px}.country:before{content:"";display:inline-block;width:26px;height:5px;background:var(--green);margin:0 12px 4px 0}.country.sa:before{background:var(--blue)}.country.ae:before{background:var(--gold)}.market .grid3{margin-top:50px}.market .band{margin-top:45px}.market .stat-label{min-height:64px}
+.cost-layout{display:grid;grid-template-columns:.95fr 1.15fr;gap:75px;margin-top:35px}.cost-number{font-size:122px;line-height:1.1;font-weight:750;color:var(--red)}.cost-bars{display:flex;height:48px;margin-top:26px;gap:5px}.cost-bars .lost{width:20.04%;background:var(--red)}.cost-bars .other{flex:1;background:#ebafb2}.bar-caption{display:flex;justify-content:space-between;gap:20px;margin-top:12px}.attack{display:grid;grid-template-columns:45px 1fr;gap:15px;border-bottom:1px solid var(--line);padding:18px 0}.attack:first-child{padding-top:0}.attack b{font-size:28px;color:var(--red)}.attack p{font-size:20px;margin-top:6px}
+.outcomes{margin-top:25px}.outcome{border-top:5px solid var(--green);padding-top:16px}.outcome.hold{border-color:var(--gold)}.outcome.block{border-color:var(--red)}.outcome .amount{font-size:40px;margin:10px 0;font-weight:700}.outcome h3{font-size:32px}.outcome p{font-size:21px}.outcome .action{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);font-size:21px;font-weight:650}.mandatory{display:flex;gap:38px;align-items:center;margin-top:24px;padding:17px 26px;background:var(--ice)}.mandatory b{font-size:53px;color:var(--blue)}
+.product-layout{display:grid;grid-template-columns:1.12fr .88fr;gap:64px;margin-top:31px;align-items:start}.product-shot{display:block;width:100%;height:500px;object-fit:contain;object-position:top left}.product-point{display:grid;grid-template-columns:50px 1fr;gap:18px;margin:22px 0}.product-point b{font-size:35px;color:var(--green)}.product-point p{font-size:21px;margin-top:6px}
+.path{display:grid;grid-template-columns:1fr 45px 1.2fr 45px 1fr;align-items:stretch;margin-top:34px}.path-step{border-top:4px solid var(--green);padding-top:22px}.path-step.middle{border-color:var(--blue)}.path-step h3{font-size:25px}.path-step p{font-size:20px;margin-top:14px}.arrow{align-self:center;text-align:center;font-size:33px;color:var(--muted)}.question{border-left:4px solid var(--blue);padding:9px 0 9px 18px;margin-top:14px;font-size:20px;line-height:1.4}.agent-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:45px;margin-top:35px;border-top:1px solid var(--line);padding-top:23px}.agent-stats strong{font-size:39px;display:block}.agent-stats p{font-size:19px;margin-top:5px}
+.proof-grid{margin-top:40px}.proof-grid .stat{font-size:82px}.proof-detail{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:38px}.check-row{padding:12px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:20px}.check-row strong{color:var(--green)}
+.comparison{margin-top:38px}.external{padding-right:46px;border-right:1px solid var(--line)}.external .stat{font-size:90px}.compare-row{padding:16px 0;border-bottom:1px solid var(--line)}.compare-row h3{font-size:23px}.compare-row p{font-size:19px;margin-top:7px}
+.waterfall{display:grid;grid-template-columns:1fr 60px 1fr 60px 1.1fr;align-items:center;margin-top:43px}.waterfall .operator{text-align:center;font-size:47px;color:var(--muted)}.waterfall .stat{font-size:83px}.waterfall .result{background:var(--mint);padding:30px}.roi-bottom{display:grid;grid-template-columns:.9fr 1.1fr;gap:55px;margin-top:33px}.roi-bottom p{font-size:20px}.break-even{display:flex;gap:25px;align-items:center}.break-even b{font-size:61px;color:var(--green)}
+.price-equation{display:flex;align-items:center;justify-content:space-between;gap:25px;margin-top:30px;border-bottom:1px solid var(--line);padding-bottom:26px}.price-equation strong{font-size:55px}.price-equation p{font-size:18px;margin-top:7px}.price-equation .operator{font-size:33px;color:var(--muted)}.economics{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;margin-top:28px}.economics h3{font-size:23px}.money-row{display:flex;justify-content:space-between;gap:20px;padding:11px 0;border-bottom:1px solid var(--line);font-size:19px}.margin-chart{display:flex;height:54px;margin:21px 0 13px}.margin-chart span{width:50%;background:var(--blue)}.margin-chart span+span{background:var(--green)}
+.go-layout{display:grid;grid-template-columns:1fr 1fr;gap:75px;margin-top:33px}.route-row{display:grid;grid-template-columns:39px 1fr;gap:17px;padding:14px 0}.route-row b{font-size:25px;color:var(--green)}.route-row p{font-size:19px;margin-top:6px}.revenue-bar{display:grid;grid-template-columns:82px 1fr 102px;gap:15px;align-items:center;margin:24px 0;font-size:19px}.bar-track{height:40px;background:var(--ice)}.bar-track div{height:100%;background:var(--blue)}
+.ask-numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:65px;margin-top:45px}.ask-numbers .stat{color:#70d8b3;font-size:86px}.ask-numbers .stat-label{font-size:24px}.ask-numbers .small{margin-top:15px;color:#bfcec7}.pilot-targets{display:flex;justify-content:space-between;gap:40px;margin-top:40px;padding-top:24px;border-top:1px solid #476052}.pilot-targets p{font-size:19px;max-width:450px}.pilot-targets strong{color:#70d8b3}.closing-line{font-size:32px;margin-top:33px}
+.architecture{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:37px}.architecture>div{border-top:4px solid var(--green);padding-top:20px}.architecture h3{font-size:22px}.architecture p{font-size:18px;margin-top:12px}.tech-bottom{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;margin-top:38px}.tech-bottom p{font-size:18px;margin-top:10px}.api-list{font-size:20px!important;line-height:1.7}.architecture small{font-size:15px;display:block;margin-top:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;margin-top:20px;font-size:18px}th{text-align:left;color:var(--muted);font-weight:650;font-size:16px;padding:12px 9px;border-bottom:2px solid var(--line)}td{padding:13px 9px;border-bottom:1px solid var(--line)}tr.base td{background:var(--mint);font-weight:700}.sensitivity{gap:60px;margin-top:34px}.sensitivity h3{font-size:24px}.sensitivity .small{margin-top:16px}.formula{margin-top:27px;background:var(--ice);padding:22px;font-size:19px;line-height:1.55}
+.source-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 55px;margin-top:20px}.source-item{border-top:1px solid var(--line);padding-top:10px}.source-item h3{font-size:19px}.source-item p{font-size:16px;line-height:1.4;margin-top:6px}.source-item a{color:var(--blue);text-decoration:none}.source-note{font-size:17px;margin-top:17px;padding:15px 24px;background:var(--mint)}
+.slide:nth-of-type(3) .grid3{margin-top:35px}.slide:nth-of-type(15) .band{font-size:21px;padding:18px 25px}.slide:nth-of-type(16) h2{font-size:45px}
+.fraud-table td{padding:12px 12px;font-size:18px;line-height:1.4}.fraud-rate{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:18px}.fraud-rate strong{font-size:28px;color:var(--blue)}.fraud-rate .bar-track{height:25px}
+@page{size:1600px 900px;margin:0}@media print{body{background:white}.slide{margin:0}}
+</style></head><body>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">The decision gap</div></div>
-    <h2>Payment systems and mobile networks see different pieces of the same attack</h2>
-    <div class="grid-2">
-      <div class="panel amber">
-        <h3>The payment provider sees</h3>
-        <ul class="clean"><li>Amount and recipient relationship</li><li>Payment channel and customer history</li><li>Session and transaction anomalies</li><li>Customer-reported scam context</li></ul>
-      </div>
-      <div class="panel green">
-        <h3>The mobile network can observe</h3>
-        <ul class="clean"><li>Recent SIM change</li><li>Number association through supported authorization</li><li>Recent device change</li><li>Roaming and reachability status</li></ul>
-      </div>
-    </div>
-    <div class="band"><p>SafePay orchestrates those observations as evidence. It does not treat any single signal as proof of fraud or payment intent.</p></div>
-    <div class="footer"><span>No active-call or Scam Signal API is claimed</span><span>2 / 10</span></div>
-  </section>
+<section class="slide dark cover"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">GSMA MENA Ignite / Phase 2</div></header><main class="content">
+<div class="eyebrow">Fraud decision support for banks and wallets</div><h1>SafePay MENA</h1><p class="cover-line">Safer instant payments.<br>Fewer unnecessary checks.</p><p class="lead">An AI investigator uses mobile-network evidence to help banks<br>decide when a payment can proceed, needs review, or should stop.</p>
+<div class="cover-proof"><div><strong>0</strong><span>external calls on the routine path</span></div><div><strong>36 / 36</strong><span>synthetic acceptance cases passed</span></div><div><strong>3</strong><span>markets represented in the demo</span></div></div><div class="cover-bottom"><p class="small">Karim Mohamed Abdelnabi<br><span class="muted">Working prototype / September 2026</span></p><p class="small muted">Egypt &nbsp; / &nbsp; Saudi Arabia &nbsp; / &nbsp; UAE</p></div>
+</main><footer><span class="sources">Prototype evidence: local acceptance evaluation and QA report, 9 Sep 2026. Market contexts are simulated.</span><span class="page">01 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">How it works</div></div>
-    <h2>Decision-first orchestration avoids unnecessary calls</h2>
-    <div class="flow">
-      <div class="node"><div class="eyebrow">1 - Context</div><h3>Payment intent</h3><p>Amount, channel, recipient relationship, session anomalies, and market.</p></div>
-      <div class="arrow">&rarr;</div>
-      <div class="node"><div class="eyebrow">2 - Screen</div><h3>Local pre-check</h3><p>Routine traffic approves without Gemini or CAMARA calls.</p></div>
-      <div class="arrow">&rarr;</div>
-      <div class="node"><div class="eyebrow">3 - Investigate</div><h3>Bounded agent</h3><p>Gemini selects relevant allowlisted CAMARA tools and inspects results.</p></div>
-      <div class="arrow">&rarr;</div>
-      <div class="node"><div class="eyebrow">4 - Decide</div><h3>Deterministic policy</h3><p>APPROVE, HOLD, BLOCK, or RETRY with an inspectable trace.</p></div>
-    </div>
-    <div class="callout">Mandatory exception: first setup and a new phone always require fresh Number Verification and SIM Swap checks before device trust.</div>
-    <div class="footer"><span>Fixture mode repeats the paths without external requests</span><span>3 / 10</span></div>
-  </section>
+<section class="slide market"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">01 / Why now</div></header><main class="content"><div class="eyebrow">Published market facts</div><h2>Instant payments are becoming everyday infrastructure.</h2><p class="lead">The opportunity is to protect the moment a customer pays, inside the apps they already use.</p>
+<div class="grid3"><div><div class="country">Egypt</div><div class="stat green">1.5bn</div><p class="stat-label">IPN transactions<br>reported for 2024</p><p class="stat-note">Nearly 1.5 billion transactions,<br>worth approximately EGP 2.9 trillion. [1]</p></div><div><div class="country sa">Saudi Arabia</div><div class="stat blue">85%</div><p class="stat-label">of retail payments<br>were electronic in 2025</p><p class="stat-note">14.6 billion electronic transactions<br>across national payment systems. [2]</p></div><div><div class="country ae">United Arab Emirates</div><div class="stat gold">12.5m+</div><p class="stat-label">registered Aani users<br>reported in April 2026</p><p class="stat-note">74 connected financial institutions;<br>average transfers within 3 seconds. [3]</p></div></div><div class="band">SafePay's customer is the bank or wallet behind the payment. The consumer keeps their existing app.</div>
+</main><footer><span class="sources">[1] <a href="https://www.cbe.org.eg/en/news-publications/news/2024/12/30/12/31/cbe-extending-the-exemption-of-individuals-from-instapay-for-a-renewable-period-of-3-months">CBE, 30 Dec 2024</a> &nbsp; [2] <a href="https://sama.gov.sa/en-US/MediaCenter/News/Pages/news-1139.aspx">SAMA, 12 Apr 2026</a> &nbsp; [3] <a href="https://aep.ae/en/news-media/press-releasesarticles/aani-delivers-a-transformational-leap-in-the-uae-s-digital-payments-landscape-125-million-users-and-instant-transfers-in-3-seconds/">Al Etihad Payments, 10 Apr 2026</a>. Different measures and periods; not summed into a market-size estimate.</span><span class="page">02 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Working prototype</div></div>
-    <div class="split">
-      <div>
-        <h2>A focused payment-review workspace</h2>
-        <ul class="clean"><li>Market, use case, channel, amount, and recipient context</li><li>Separate pre-call and final risk scores</li><li>Visible source labels for fixtures and Nokia sandbox evidence</li><li>Expandable agent and policy trace</li><li>Built-in 36-case acceptance evaluation</li></ul>
-        <div class="callout">No payment is executed. The interface demonstrates the decision layer that a bank or payment provider would call.</div>
-      </div>
-      <img class="product-shot" src="../artifacts/safepay-desktop.png" alt="SafePay MENA payment review interface">
-    </div>
-    <div class="footer"><span>Responsive Chromium coverage: desktop, portrait, and landscape</span><span>4 / 10</span></div>
-  </section>
+<section class="slide market"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">The problem / Regional scam exposure</div></header><main class="content"><div class="eyebrow">Visa Stay Secure 2025 / surveyed adults in each country</div><h2>More than 4 in 10 respondents had been scam victims.</h2><p class="lead">Share answering yes when asked whether they had <b>ever</b> been the victim of a scam.</p>
+<div class="grid3"><div><div class="country">Egypt</div><div class="stat green">43%</div><p class="stat-label">of respondents</p><div class="bar-track mt24"><div style="width:43%;height:100%;background:var(--green)"></div></div><p class="stat-note">600 adults surveyed</p></div><div><div class="country sa">Saudi Arabia</div><div class="stat blue">43%</div><p class="stat-label">of respondents</p><div class="bar-track mt24"><div style="width:43%;height:100%;background:var(--blue)"></div></div><p class="stat-note">300 adults surveyed</p></div><div><div class="country ae">United Arab Emirates</div><div class="stat gold">49%</div><p class="stat-label">of respondents</p><div class="bar-track mt24"><div style="width:49%;height:100%;background:var(--gold)"></div></div><p class="stat-note">300 adults surveyed</p></div></div>
+<div class="band">Scams affect customers across all three target markets. Protection must preserve their confidence in everyday payments.</div><p class="small muted mt24">Self-reported lifetime experience. These figures are not annual loss rates, percentages of fraudulent payments, or a measure of SafePay's addressable fraud.</p>
+</main><footer><span class="sources">[9] <a href="https://km.visamiddleeast.com/content/dam/VCOM/regional/cemea/genericmena/pay-with-visa/security-and-assistance/stay-secure-2024/stay-secure-report.pdf">Visa Stay Secure 2025, pp. 5 and 13</a>. Wakefield Research; fieldwork 4-15 Dec 2024. Weighted online survey of 5,800 adults across 17 markets. Bars use a 0-100% scale.</span><span class="page">03 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Fraud and trust journeys</div></div>
-    <h2>One decision layer, multiple payment risks</h2>
-    <table>
-      <thead><tr><th>Journey</th><th>Why SafePay acts</th><th>Expected disposition</th></tr></thead>
-      <tbody>
-        <tr><td>Everyday payment</td><td>Known recipient, usual amount, established device</td><td><span class="tag">APPROVE - zero calls</span></td></tr>
-        <tr><td>First setup / new phone</td><td>Device trust has not been established</td><td><span class="tag amber">VERIFY, then continue</span></td></tr>
-        <tr><td>Suspicious transfer</td><td>Customer reports bank-transfer instructions from a caller</td><td><span class="tag amber">HOLD</span></td></tr>
-        <tr><td>SIM / device takeover</td><td>Network changes combine with session and payment anomalies</td><td><span class="tag red">BLOCK</span></td></tr>
-        <tr><td>Card leakage / CNP</td><td>Checkout cannot verify the expected number and device context</td><td><span class="tag red">BLOCK</span></td></tr>
-        <tr><td>Planned travel</td><td>Roaming is expected and identity evidence is clean</td><td><span class="tag">APPROVE</span></td></tr>
-        <tr><td>Provider unavailable</td><td>Required evidence is missing or rate-limited</td><td><span class="tag amber">RETRY - never fail open</span></td></tr>
-      </tbody>
-    </table>
-    <div class="footer"><span>Payment channels: instant account transfer, card checkout, wallet transfer</span><span>5 / 10</span></div>
-  </section>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">02 / The problem</div></header><main class="content"><div class="eyebrow">The loss goes beyond the stolen payment</div><h2>AED 1 lost to fraud can cost a financial institution AED 4.99.</h2><div class="cost-layout"><div><div class="label">UAE financial services / survey benchmark</div><div class="cost-number">4.99<span style="font-size:48px">x</span></div><p class="mt24">Total cost per dirham lost, including<br>the original loss and associated costs.</p><div class="cost-bars"><div class="lost"></div><div class="other"></div></div><div class="bar-caption"><span class="small"><b>AED 1.00</b><br>Original loss</span><span class="small"><b>AED 3.99</b><br>Additional costs, implied</span></div><p class="tiny muted mt24">LexisNexis / Forrester, July 2023 survey, published 2024.<br>Institutional survey average; not a SafePay savings multiplier. [4]</p></div><div><div class="attack"><b>01</b><div><h3>The customer is deceived</h3><p>A scammer convinces the real account holder to send money. A valid identity can still make an unsafe payment.</p></div></div><div class="attack"><b>02</b><div><h3>The account is taken over</h3><p>A changed SIM or device can add evidence that the person making the payment has changed.</p></div></div><div class="attack"><b>03</b><div><h3>Stolen card details are used</h3><p>A checkout can look plausible while the session and registered mobile number do not match.</p></div></div><p class="small green mt24"><b>The decision needs both payment context and fresh identity evidence.</b></p></div></div>
+</main><footer><span class="sources">[4] <a href="https://risk.lexisnexis.com/global/-/media/files/financial%20services/infographics/lnrs_emea_fraud_infographic_v2-nxr16395-00-0324-en-us.pdf">LexisNexis Risk Solutions, True Cost of Fraud EMEA infographic (2024)</a>. EMEA survey base: 541 decision-makers. AED 3.99 = 4.99 minus original AED 1.</span><span class="page">04 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Open Gateway implementation</div></div>
-    <h2>Five Nokia Network as Code tools behind one restricted gateway</h2>
-    <table>
-      <thead><tr><th>CAMARA capability</th><th>Prototype use</th><th>Verified boundary</th></tr></thead>
-      <tbody>
-        <tr><td>SIM Swap</td><td>Observe a change inside the requested window</td><td>Boolean only; exact age is not invented</td></tr>
-        <tr><td>Number Verification</td><td>Check the expected number association</td><td>Bound OAuth state and allowlisted redirects</td></tr>
-        <tr><td>Device Swap</td><td>Add device-change evidence for anomalous sessions</td><td>Not equivalent to app-device ownership</td></tr>
-        <tr><td>Roaming</td><td>Add travel context when relevant</td><td>Roaming alone is not fraud</td></tr>
-        <tr><td>Reachability</td><td>Retrieve availability when selected</td><td>Unreachability alone is not fraud</td></tr>
-      </tbody>
-    </table>
-    <div class="callout">Live checks use only Nokia's documented <code>+99999991000</code> and <code>+99999991001</code> simulator subjects. Production MENA operator coverage is not claimed.</div>
-    <div class="footer"><span>Observed through network-as-code.p.rapidapi.com</span><span>6 / 10</span></div>
-  </section>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">03 / The solution</div></header><main class="content"><div class="eyebrow">One decision before the bank releases the payment</div><h2>Let normal payments through. Act when the evidence changes.</h2><p class="lead">SafePay screens the context first, investigates elevated risk, and returns a clear action.</p><div class="grid3 outcomes"><div class="outcome"><div class="label">Familiar recipient / established session</div><div class="amount">EGP 200</div><h3 class="green">Approve</h3><p class="mt24">Routine context stays on the local path. No extra network or AI request.</p><div class="action">Customer benefit: no added verification step.</div></div><div class="outcome hold"><div class="label">Customer reports a suspicious bank call</div><div class="amount">SAR 5,000</div><h3 class="gold">Hold for review</h3><p class="mt24">Even a matching mobile number does not prove the customer is acting freely.</p><div class="action">Customer benefit: a chance to stop and reconsider.</div></div><div class="outcome block"><div class="label">Unusual session + SIM and device changes</div><div class="amount">AED 1,200</div><h3 class="red">Block the attempt</h3><p class="mt24">Combined warning signals meet the protective policy for this attempt.</p><div class="action">Bank benefit: stop a risky release with reasons.</div></div></div><div class="mandatory"><b>2</b><p class="small"><strong>Required checks at first setup or a new phone:</strong> verify the mobile number and check for a recent SIM change.<br>When required evidence is unavailable, return a retry instead of treating it as clear.</p></div>
+</main><footer><span class="sources">Illustrative payment amounts using implemented synthetic scenario behavior. No money is moved. Suspicious-call context is supplied by the demo; SafePay does not detect active calls.</span><span class="page">05 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Agentic AI</div></div>
-    <h2>The agent chooses evidence; policy controls consequences</h2>
-    <div class="grid-3">
-      <div class="panel green"><h3>Context-aware selection</h3><p>The model receives transaction facts and pre-screen reasons, never the canned scenario label.</p></div>
-      <div class="panel amber"><h3>Bounded execution</h3><p>Five allowlisted tools, fixed schemas, no model-selected phone or URL, no repeat calls, and a hard evidence budget.</p></div>
-      <div class="panel red"><h3>Fail-closed policy</h3><p>Missing required evidence prevents release. Independently supported blocks remain blocked; the model cannot fabricate an observation.</p></div>
-    </div>
-    <div class="band"><p>Accepted tool calls, evidence status, summarized failures, and the final policy source are exposed in the result trace.</p></div>
-    <div class="footer"><span>Model: Gemini function calling; network: Nokia sandbox</span><span>7 / 10</span></div>
-  </section>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">04 / Working product</div></header><main class="content"><div class="eyebrow">Actual prototype / connected Nokia sandbox</div><h2>Judges can watch the agent choose evidence in real time.</h2><div class="product-layout"><div><img class="product-shot" src="../artifacts/pitch-connected.png" alt="Actual SafePay connected sandbox run showing Gemini tool selection and successful Nokia evidence"><p class="tiny muted mt24">Actual 10 September app capture: protected local connected run.<br>Gemini selected three checks; Nokia returned three sandbox successes.</p></div><div><div class="product-point"><b>1</b><div><h3>See the payment action first</h3><p>Approve, hold, block, or retry stays prominent. The user does not need to interpret technical output.</p></div></div><div class="product-point"><b>2</b><div><h3>Follow orchestration as it happens</h3><p>The timeline separates local screening, Gemini selection, Nokia evidence and enforced policy.</p></div></div><div class="product-point"><b>3</b><div><h3>Inspect only when needed</h3><p>Judges and analysts can expand returned observations and the bounded agent trace.</p></div></div><div class="band light mt32"><strong>Live walkthrough:</strong> zero-call routine payment &rarr; connected takeover review.</div></div></div>
+</main><footer><span class="sources">Connected capture used synthetic bank facts and Nokia simulator subjects; no production payment or subscriber was accessed. Desktop and mobile journeys were browser-tested. [6, 7]</span><span class="page">06 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Quality evidence</div></div>
-    <h2>Tests verify decisions, orchestration, failure handling, and experience</h2>
-    <div class="metric-row">
-      <div class="metric"><div class="number">36</div><div class="label">In-product cases</div></div>
-      <div class="metric"><div class="number">3</div><div class="label">MENA market contexts</div></div>
-      <div class="metric"><div class="number">60</div><div class="label">Parallel isolated reviews</div></div>
-      <div class="metric"><div class="number">5</div><div class="label">CAMARA tools</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="panel"><h3>Automated boundaries</h3><ul class="clean"><li>HTTP API and idempotency</li><li>Nokia response validation and OAuth state</li><li>Agent call budgets and invalid tool requests</li><li>Rate limits, timeouts, and malformed providers</li></ul></div>
-      <div class="panel"><h3>Browser acceptance</h3><ul class="clean"><li>All major scenario outcomes</li><li>Enrollment continuation and retry</li><li>Cancellation and stale-state clearing</li><li>Desktop, mobile portrait, and landscape overflow</li></ul></div>
-    </div>
-    <div class="callout">Measured behavior is software QA against fixtures and sandbox APIs, not a claim of real-world fraud detection accuracy.</div>
-    <div class="footer"><span>Evidence and tests are included in the public repository</span><span>8 / 10</span></div>
-  </section>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">05 / Why an AI agent</div></header><main class="content"><div class="eyebrow">Ask the next useful question</div><h2>The agent chooses which evidence to request, then adapts.</h2><p class="lead">Open Gateway lets an approved bank workflow ask the mobile network for relevant risk signals.</p><div class="path"><div class="path-step"><div class="label">Screen</div><h3>Does this payment need a closer look?</h3><p>Amount, payee relationship, unusual activity and customer-reported context determine escalation.</p><div class="question">Routine? Finish locally.</div></div><div class="arrow">&rarr;</div><div class="path-step middle"><div class="label">Investigate / observe / choose again</div><h3>Which answer would change the decision?</h3><div class="question">SIM changed + unusual session?<br>Check the device change.</div><div class="question">Travel explains the context?<br>Check roaming when relevant.</div></div><div class="arrow">&rarr;</div><div class="path-step"><div class="label">Decide</div><h3>Return an action with evidence.</h3><p>The agent proposes an outcome. Enforced policy controls the final result and preserves missing evidence.</p><div class="question">A model cannot approve past the policy.</div></div></div><div class="agent-stats"><div><strong class="green">0 calls</strong><p>Routine payments bypass AI and network tools.</p></div><div><strong class="blue">Up to 5 tools</strong><p>Bounded investigation; stop when evidence is sufficient.</p></div><div><strong class="gold">2 mandatory checks</strong><p>First setup and new-device trust follow an enforced rule.</p></div></div>
+</main><footer><span class="sources">Implemented Gemini function-calling behavior in local live-sandbox mode. Public fixture mode uses deterministic tool plans. A logical tool can require multiple HTTP requests, especially OAuth. [6, 7]</span><span class="page">07 / 17</span></footer></section>
 
-  <section class="slide">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Scale and commercial path</div></div>
-    <h2>Deploy once per payment provider; configure by market and operator</h2>
-    <div class="grid-3">
-      <div class="panel market"><strong>Egypt</strong><span class="tag">EGP</span><p>Prototype context for InstaPay / IPN payment journeys.</p></div>
-      <div class="panel market"><strong>Saudi Arabia</strong><span class="tag">SAR</span><p>Prototype context for sarie payment journeys.</p></div>
-      <div class="panel market"><strong>United Arab Emirates</strong><span class="tag">AED</span><p>Prototype context for Aani and card-checkout journeys.</p></div>
-    </div>
-    <div class="grid-2" style="margin-top:.2in">
-      <div class="panel green"><h3>Buyer</h3><p>Banks, wallets, processors, and instant-payment applications integrate a decision API before release.</p></div>
-      <div class="panel amber"><h3>Commercial model to validate</h3><p>Platform fee plus usage-based investigated transactions, aligned to operator API economics and measured pilot value.</p></div>
-    </div>
-    <div class="footer"><span>Pricing, operator coverage, and savings require pilot validation</span><span>9 / 10</span></div>
-  </section>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">06 / What we have proved</div></header><main class="content"><div class="eyebrow">Measured software behavior + recorded Nokia sandbox evidence</div><h2>A working prototype with repeatable acceptance tests.</h2><div class="grid3 proof-grid"><div><div class="stat green">36 / 36</div><p class="stat-label">synthetic acceptance<br>cases passed</p><p class="stat-note">12 journeys across Egypt,<br>Saudi Arabia and the UAE.</p></div><div><div class="stat blue">103 / 103</div><p class="stat-label">automated tests passed<br>in the 10 September QA run</p><p class="stat-note">79 backend / adapter tests<br>and 24 browser tests.</p></div><div><div class="stat gold">5 APIs</div><p class="stat-label">integrated, with recorded<br>Nokia sandbox successes</p><p class="stat-note">SIM, number, device,<br>roaming and reachability.</p></div></div><div class="proof-detail"><div><h3>We test the difficult paths too</h3><div class="check-row"><span>Provider evidence unavailable</span><strong>Retry</strong></div><div class="check-row"><span>Clean identity + suspicious transfer</span><strong>Hold</strong></div><div class="check-row"><span>Expected travel with clear evidence</span><strong>Approve</strong></div></div><div class="rule"><h3>Real integration, explicit scope</h3><p class="small mt24">The latest live takeover run used <b>3 context-eligible Nokia tools</b>, across <b>4 Gemini turns</b>, and returned <b>BLOCK</b>.</p><p class="small muted mt24">These results establish control flow and integration. Fraud-loss reduction and production performance require a bank pilot.</p></div></div>
+</main><footer><span class="sources">[6] Automated QA, 10 Sep 2026; 36-case acceptance rerun during deck build. [7] Nokia verification, 8-10 Sep 2026. Protected connected mode also preserves explicit fixture fallback.</span><span class="page">08 / 17</span></footer></section>
 
-  <section class="slide closing">
-    <div class="topline"><div class="brand"><span class="mark">S</span>SafePay MENA</div><div class="phase">Pilot ask</div></div>
-    <div class="hero">
-      <div class="eyebrow">What we need next</div>
-      <h1>Validate SafePay with one operator and one payment provider.</h1>
-      <div class="grid-3">
-        <div class="panel green"><h3>1 - Connect</h3><p>Confirm available APIs, consent flow, simulator-to-production differences, and operator coverage.</p></div>
-        <div class="panel amber"><h3>2 - Pilot</h3><p>Replay consented, labeled fraud and legitimate cases in a bank sandbox with agreed controls.</p></div>
-        <div class="panel red"><h3>3 - Measure</h3><p>API latency, intervention rate, false positives, prevented loss, customer friction, and unit economics.</p></div>
-      </div>
-    </div>
-    <div class="band"><p>SafePay MENA: network evidence when it matters, deterministic control before money moves.</p></div>
-    <div class="footer"><span>Live prototype and source repository available for evaluation</span><span>10 / 10</span></div>
-  </section>
-</body>
-</html>
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">07 / Why this approach</div></header><main class="content"><div class="eyebrow">External category evidence / SafePay differentiation</div><h2>Network-informed intervention has a business precedent.</h2><div class="grid2 comparison"><div class="external"><span class="pill">External UK pilot / FICO + Jersey Telecom</span><div class="grid2 mt40" style="gap:28px"><div><div class="stat blue">44%</div><p class="stat-label">lower scam losses</p></div><div><div class="stat blue">55%</div><p class="stat-label">fewer false positives</p></div></div><p class="small mt32">Vendor-reported results from the first bank pilot, published September 2024. [5]</p><p class="small muted mt24">That deployment used Scam Signal and customer intervention. SafePay has different signals and has not measured these outcomes.</p></div><div><h3>SafePay's implementation focus</h3><div class="compare-row"><h3>Selective investigations</h3><p>Routine payments avoid extra calls; elevated risk prompts the agent to select relevant evidence.</p></div><div class="compare-row"><h3>Multiple journeys, one decision workflow</h3><p>New-phone setup, takeover, card misuse, suspicious transfers and travel use a shared evidence model.</p></div><div class="compare-row"><h3>Visible reasons and controlled decisions</h3><p>Policy limits agent actions, records missing evidence, and supports repeatable evaluation.</p></div></div></div><div class="band light mt32">The commercial position: add network evidence to a bank's existing fraud workflow and measure the incremental value.</div>
+</main><footer><span class="sources">[5] <a href="https://investors.fico.com/news-releases/news-release-details/fico-and-jersey-telecom-collaborate-tackle-authorised-push/">FICO / JT announcement, 18 Sep 2024</a>. External results are not SafePay results, a MENA benchmark, or a guaranteed effect. No first-of-its-kind claim is made.</span><span class="page">09 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">08 / Value to a bank</div></header><main class="content"><div class="eyebrow">Illustrative monthly model / USD / assumptions to validate</div><h2>At 25% lower losses, a bank retains $12,000 a month.</h2><p class="lead">Example baseline: <b>$80,000/month</b> in fraud losses in the payment portfolio covered by the pilot.</p><div class="waterfall"><div><div class="stat green">$20k</div><p class="stat-label">avoided losses</p><p class="stat-note">$80,000 baseline &times; 25%<br>assumed reduction</p></div><div class="operator">&minus;</div><div><div class="stat red">$8k</div><p class="stat-label">SafePay monthly fee</p><p class="stat-note">Proposed platform + usage<br>at the volume on the next slide</p></div><div class="operator">=</div><div class="result"><div class="stat green">$12k</div><p class="stat-label">monthly benefit<br>after SafePay fees</p><p class="stat-note">Before bank implementation<br>and incremental operating costs</p></div></div><div class="roi-bottom"><div class="break-even"><b>10%</b><p>loss reduction covers the fee.<br><span class="muted">$8,000 &divide; $80,000 baseline losses.</span></p></div><div class="rule"><p><b>$144,000 annualized benefit</b> at the same monthly assumptions.<br><span class="muted">No SMS savings, recovery-cost multiplier or conversion uplift included.</span></p></div></div>
+</main><footer><span class="sources">[8] Proposed commercial model, not customer results. The 25% reduction is an unvalidated scenario, not derived from the FICO result. Deployment costs raise the actual break-even point. Sensitivity: slide 14.</span><span class="page">10 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">09 / Business model</div></header><main class="content"><div class="eyebrow">Proposed pricing / illustrative direct costs / USD per month</div><h2>Recurring platform revenue, plus usage when evidence is needed.</h2><div class="price-equation"><div><strong>$3,000</strong><p>monthly platform fee</p></div><div class="operator">+</div><div><strong>$0.05 <span style="font-size:27px">&times; 100,000</span></strong><p>billable investigations per month</p></div><div class="operator">=</div><div><strong class="green">$8,000</strong><p>monthly customer revenue</p></div></div><div class="economics"><div><h3>Cost of serving one modeled customer</h3><div class="money-row"><span>Network: 100k &times; 2.5 checks &times; $0.01</span><strong>$2,500</strong></div><div class="money-row"><span>AI budget: 100k &times; $0.005 per investigation</span><strong>$500</strong></div><div class="money-row"><span>Hosting + direct support allocation</span><strong>$1,000</strong></div><div class="money-row"><span><b>Total modeled direct cost</b></span><strong>$4,000</strong></div><p class="tiny muted mt24">Network prices and AI budgets are assumptions, not vendor quotes.<br>Paid retries and auth charges must fit the blended cost or be added.</p></div><div><div class="stat medium green">50%</div><p class="stat-label">modeled gross margin</p><div class="margin-chart"><span></span><span></span></div><p class="small"><span class="blue"><b>$4k direct costs</b></span> &nbsp; / &nbsp; <span class="green"><b>$4k gross profit</b></span></p><p class="small muted mt24">Assumes 1 million total decision events/month: 900k routine and 100k evidence investigations, including setup and new-device events. Mix is not yet measured.</p></div></div>
+</main><footer><span class="sources">[8] One billable investigation is one evidence workflow, not each CAMARA call. Includes mandatory enrollment workflows. Gross profit excludes R&amp;D, sales, general overhead and tax. Scope and overage terms require pilot negotiation.</span><span class="page">11 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">10 / Route to market</div></header><main class="content"><div class="eyebrow">Sell to one institution, reach its existing customers</div><h2>Start with one bank or wallet. Repeat the integration.</h2><div class="go-layout"><div><div class="route-row"><b>01</b><div><h3>Win a focused bank or wallet pilot</h3><p>Buyer: head of fraud or digital banking. Begin with new-device trust and suspicious payment review.</p></div></div><div class="route-row"><b>02</b><div><h3>Work with an operator or aggregator</h3><p>Confirm API coverage, permission flows and wholesale terms for the first target market.</p></div></div><div class="route-row"><b>03</b><div><h3>Expand after measured value</h3><p>Use the same decision interface with country-specific bank policy. Egypt, Saudi Arabia and UAE are demo contexts today.</p></div></div></div><div><span class="pill">Illustrative scale / not signed revenue</span><h3 class="mt24">Annual recurring revenue at $8k/month</h3><div class="revenue-bar"><span>1 client</span><div class="bar-track"><div style="width:10%"></div></div><strong>$96k</strong></div><div class="revenue-bar"><span>5 clients</span><div class="bar-track"><div style="width:50%"></div></div><strong>$480k</strong></div><div class="revenue-bar"><span>10 clients</span><div class="bar-track"><div style="width:100%"></div></div><strong>$960k</strong></div><p class="small muted">Each client is assumed to have the volume and pricing on slide 11. These are scenarios, not a sales forecast.</p></div></div><div class="band blueband mt32"><b>Operator opportunity:</b> 250,000 modeled network checks per client per month, creating $2,500 in provider spend at the assumed blended price.</div>
+</main><footer><span class="sources">[8] Scale arithmetic: clients &times; $8,000 &times; 12. Provider spend can include an aggregator share; it is not operator net revenue. Regional production coverage and commercial partnerships remain to be secured.</span><span class="page">12 / 17</span></footer></section>
+
+<section class="slide dark"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">11 / The next milestone</div></header><main class="content"><div class="eyebrow">The ask</div><h2>Help us prove the economics in a controlled bank pilot.</h2><div class="ask-numbers"><div><div class="stat">1 bank</div><p class="stat-label">or wallet partner</p><p class="small">A defined payment portfolio,<br>historical loss labels and a baseline.</p></div><div><div class="stat">1 operator</div><p class="stat-label">or network API partner</p><p class="small">Confirmed coverage, consent flow,<br>pricing and service expectations.</p></div><div><div class="stat">90 days</div><p class="stat-label">proposed pilot window</p><p class="small">Integrate, evaluate in shadow mode,<br>then test a controlled intervention.</p></div></div><div class="pilot-targets"><p><strong>Value target</strong><br>Test the 25% loss-reduction scenario against the bank's baseline.</p><p><strong>Experience guardrail</strong><br>No material increase in legitimate-payment abandonment.</p><p><strong>Commercial gate</strong><br>Validate provider availability, latency, investigation cost and margin.</p></div><p class="closing-line">Keep everyday payments easy.<br>Give risky payments the evidence they need.</p>
+</main><footer><span class="sources">Proposed pilot, subject to access and agreement. Fraud conclusions depend on enough labeled outcomes, not elapsed time alone. Prototype and code: <a href="https://github.com/karimabdelnabi05/SafePay-MENA">github.com/karimabdelnabi05/SafePay-MENA</a></span><span class="page">13 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">Appendix A / Commercial assumptions</div></header><main class="content"><div class="eyebrow">Make the assumptions testable</div><h2>The pilot must prove both savings and cost discipline.</h2><div class="grid2 sensitivity"><div><h3>Bank benefit depends on reduced losses</h3><p class="small muted">$80k covered monthly losses; $8k monthly SafePay fee.</p><table><thead><tr><th>Loss reduction</th><th>Avoided losses</th><th>After fee</th></tr></thead><tbody><tr><td>0%</td><td>$0</td><td class="red">-$8,000</td></tr><tr><td>10%</td><td>$8,000</td><td>$0</td></tr><tr class="base"><td>25% / base case</td><td>$20,000</td><td>$12,000</td></tr><tr><td>40%</td><td>$32,000</td><td>$24,000</td></tr></tbody></table><p class="small muted">Implementation, added reviews and false-positive losses reduce the actual benefit. The AED 4.99 multiplier is not applied.</p></div><div><h3>SafePay margin depends on network cost</h3><p class="small muted">250k checks; $500 AI; $1k hosting/support; $8k revenue.</p><table><thead><tr><th>Blended cost / check</th><th>Direct cost</th><th>Gross margin</th></tr></thead><tbody><tr><td>$0.005</td><td>$2,750</td><td>65.6%</td></tr><tr class="base"><td>$0.010 / base case</td><td>$4,000</td><td>50.0%</td></tr><tr><td>$0.020</td><td>$6,500</td><td>18.8%</td></tr><tr><td>$0.030</td><td>$9,000</td><td class="red">-12.5%</td></tr></tbody></table><p class="small muted">At $0.01/check, 4 checks per investigation instead of 2.5 reduce margin to 31.25%. AI cost includes all turns per investigation.</p></div></div><div class="formula"><b>Decision rule for a pilot:</b> net bank benefit = avoided losses &minus; SafePay fee &minus; added bank costs.<br><b>Break-even with bank costs:</b> ($8,000 + monthly added costs) &divide; $80,000. Prices, volumes and reduction rates are assumptions.</div>
+</main><footer><span class="sources">[8] Internally calculated scenarios. Fees cover 100k investigations at the modeled volume, including enrollment. Provider tariffs, paid retries, consent/auth charges and actual event mix require validation.</span><span class="page">14 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">Appendix B / Fraud-type evidence</div></header><main class="content"><div class="eyebrow">Global merchant benchmark / not a MENA fraud-loss breakdown</div><h2>Several fraud types can affect the same business.</h2><p class="lead">Share of surveyed merchants reporting each attack in the previous 12 months. [10]</p>
+<table class="fraud-table"><thead><tr><th style="width:26%">Reported attack type</th><th style="width:28%">Merchants reporting it</th><th>Relation to SafePay's use cases</th></tr></thead><tbody>
+<tr><td><b>Real-time payment fraud</b></td><td><div class="fraud-rate"><strong>45%</strong><div class="bar-track"><div style="width:45%"></div></div></div></td><td>Relevant to payment review; the category includes more than the scams modeled in our demo.</td></tr>
+<tr><td><b>Phishing / pharming / whaling</b></td><td><div class="fraud-rate"><strong>42%</strong><div class="bar-track"><div style="width:42%"></div></div></div></td><td>Credential deception can lead to unsafe transfers or takeover. SafePay does not detect phishing content.</td></tr>
+<tr><td><b>Card testing</b></td><td><div class="fraud-rate"><strong>33%</strong><div class="bar-track"><div style="width:33%"></div></div></div></td><td>Testing stolen card details is related to card misuse. This is not the share of all card leakage or CNP fraud.</td></tr>
+<tr><td><b>Account takeover</b></td><td><div class="fraud-rate"><strong>26%</strong><div class="bar-track"><div style="width:26%"></div></div></div></td><td>SIM and device changes can contribute evidence. SIM swap is one possible takeover mechanism.</td></tr>
+</tbody></table><div class="band blueband mt24"><b>SIM-swap fraud:</b> a documented attack mechanism, but no reliable MENA share was verified in this review. We do not assign it an invented percentage. [11]</div>
+<p class="small muted mt24">Categories overlap and do not add to 100%. These percentages measure merchants affected, not fraud incidents, losses or SafePay coverage.</p>
+</main><footer><span class="sources">[10] <a href="https://www.visaacceptance.com/content/dam/documents/campaign/fraud-report/global-fraud-report-2025.pdf">2025 Global eCommerce Payments &amp; Fraud Report, p. 23, Fig. 21</a>; fraud-professional sample n=576. [11] <a href="https://www.gsma.com/solutions-and-impact/technologies/security/scams/scam-advice-fraudulent-sim-swap/">GSMA: fraudulent SIM swap</a>. Bar scale: 0-100%.</span><span class="page">15 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">Appendix C / Sources and definitions</div></header><main class="content"><div class="eyebrow">Source trail / reviewed 10 September 2026</div><h2>Every number has a source, a measurement or an assumption.</h2><div class="source-grid"><div class="source-item"><h3>[1] Egypt payment scale</h3><p><a href="https://www.cbe.org.eg/en/news-publications/news/2024/12/30/12/31/cbe-extending-the-exemption-of-individuals-from-instapay-for-a-renewable-period-of-3-months">Central Bank of Egypt / IPN and InstaPay announcement</a><br>30 Dec 2024. Nearly 1.5bn IPN transactions; EGP 2.9tn in 2024. CBE's indexed site excerpt confirms these figures; the full page rejected automated access.</p></div><div class="source-item"><h3>[2] Saudi electronic payments</h3><p><a href="https://sama.gov.sa/en-US/MediaCenter/News/Pages/news-1139.aspx">SAMA / E-Payments Account for 85% of Total Retail Payments in 2025</a><br>12 Apr 2026. Retail e-payment share: 85%; electronic transaction volume: 14.6bn. This is not sarie-only volume.</p></div><div class="source-item"><h3>[3] UAE instant-payment adoption</h3><p><a href="https://aep.ae/en/news-media/press-releasesarticles/aani-delivers-a-transformational-leap-in-the-uae-s-digital-payments-landscape-125-million-users-and-instant-transfers-in-3-seconds/">Al Etihad Payments / Aani operational update</a><br>10 Apr 2026. More than 12.5m registered users, 74 financial institutions; average transfers within 3 seconds.</p></div><div class="source-item"><h3>[4] Cost of fraud</h3><p><a href="https://risk.lexisnexis.com/global/-/media/files/financial%20services/infographics/lnrs_emea_fraud_infographic_v2-nxr16395-00-0324-en-us.pdf">LexisNexis Risk Solutions / True Cost of Fraud EMEA</a><br>Published 2024; Forrester survey July 2023. UAE financial-services total cost multiplier: 4.99. EMEA sample: 541 decision-makers; UAE subset size not stated.</p></div><div class="source-item"><h3>[5] External evidence for network-informed intervention</h3><p><a href="https://investors.fico.com/news-releases/news-release-details/fico-and-jersey-telecom-collaborate-tackle-authorised-push/">FICO and Jersey Telecom / original pilot announcement</a><br>18 Sep 2024. First UK pilot bank reported 44% lower scam losses and 55% fewer false positives. Vendor report; different product and signals.</p></div><div class="source-item"><h3>[6, 7] SafePay prototype evidence</h3><p><a href="https://github.com/karimabdelnabi05/SafePay-MENA/blob/main/docs_and_presentations/PHASE2_QA_REPORT.md">QA report</a> / <a href="https://github.com/karimabdelnabi05/SafePay-MENA/blob/main/docs_and_presentations/NOKIA_SANDBOX_VERIFICATION.md">Nokia sandbox verification</a><br>8-10 Sep 2026. 103 automated tests; 36 synthetic acceptance cases; recorded successes for 5 integrated APIs. Rate-limit handling is documented.</p></div><div class="source-item"><h3>[8] Commercial model</h3><p>Internal illustrative model, 9 Sep 2026. Inputs and sensitivity are on slides 10-12 and 14. No signed pricing, measured bank ROI or acquired-customer count is asserted.</p></div><div class="source-item"><h3>Metric definitions</h3><p>An investigation is one workflow; a check is one logical network capability. Gross margin = (revenue - direct costs) / revenue. Risk scores are policy scores, not fraud probabilities.</p></div></div><div class="source-note"><b>Additional fraud sources:</b> [9] Visa Stay Secure 2025, pp. 5/13 (slide 3); [10] Global eCommerce Payments &amp; Fraud Report 2025, p. 23 (slide 15); [11] GSMA SIM-swap advice (slide 15). Direct source links appear on those slides.</div>
+</main><footer><span class="sources">One submission PDF: slides 1-13 tell the story; slides 14-17 support questions, with the technical summary last. Sources are clickable in the PDF.</span><span class="page">16 / 17</span></footer></section>
+
+<section class="slide"><header><div class="brand"><b>S</b>SafePay MENA</div><div class="section">Final technical summary / IT and cybersecurity</div></header><main class="content"><div class="eyebrow">Technical architecture and evidence boundaries</div><h2>Adaptive investigation. Enforced policy. Inspectable outcomes.</h2><div class="architecture"><div><div class="label">01 / Interface</div><h3>Web app + FastAPI</h3><p>Session, setup, payment review, cancellation and evaluation.</p><small>Bank facts and payment release are simulated.</small></div><div><div class="label">02 / Risk + agent</div><h3>Local screen + Gemini</h3><p>Routine bypass. Function-calling loop chooses and observes one tool at a time.</p><small>No scenario labels sent to the model.</small></div><div><div class="label">03 / Network access</div><h3>Nokia Network as Code</h3><p>CAMARA adapter; fixed hosts, validated responses, bound OAuth state.</p><small>Approved simulator subjects only.</small></div><div><div class="label">04 / Final decision</div><h3>Deterministic policy</h3><p>Evidence-based disposition, missing-data handling and stored result.</p><small>In-memory SQLite demonstration store.</small></div></div><div class="tech-bottom"><div class="rule"><h3>Five integrated network capabilities</h3><p class="api-list">SIM Swap &nbsp; / &nbsp; Number Verification &nbsp; / &nbsp; Device Swap<br>Roaming &nbsp; / &nbsp; Reachability</p><p>Number Verification checks the number association. It does not prove payment intent, card ownership or freedom from coercion.</p></div><div class="rule"><h3>Before a production pilot</h3><p>Provider permission and consent, production identity controls and quotas, durable audit storage, bank integration, calibrated thresholds and measured service levels.</p><p><b>Latest recorded takeover:</b> 4 Gemini turns, 3 Nokia calls, under 10 seconds end to end. This is one sandbox observation, not a performance benchmark.</p></div></div>
+</main><footer><span class="sources">[6, 7] Local implementation and Nokia verification, 10 Sep 2026. Connected execution uses simulator identities behind judge access and hourly limits. No production rail connection, active-call detection or regulatory certification is claimed.</span><span class="page">17 / 17</span></footer></section>
+</body></html>

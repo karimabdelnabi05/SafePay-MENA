@@ -21,13 +21,13 @@ No payment rail, production bank, production operator, or real subscriber is con
 | Model tool abuse | Tool names and schemas are allowlisted; repeated, malformed, or unsupported calls stop the investigation. |
 | Model-controlled routing | Phone subjects, hosts, URLs, and endpoint paths are selected outside the model. |
 | Model-controlled release | Gemini proposals cannot weaken a deterministic block or directly create one. It can request additional review. |
-| Missing provider evidence | Timeouts, non-boolean responses, authorization errors, and rate limits become `UNKNOWN`; required unknown evidence produces `RETRY`. |
+| Missing provider evidence | Timeouts, non-boolean responses, authorization errors, and rate limits become `UNKNOWN`; missing required evidence produces `RETRY` unless independent observed evidence already supports `BLOCK`. |
 | OAuth redirect abuse | Number Verification uses fresh state and nonce values, validates callback state, limits redirects, and allowlists Nokia HTTPS hosts. |
 | Scenario leakage | The scenario identifier is not included in Gemini context. The model receives observable transaction and risk context only. |
 | Duplicate submission | A request ID is idempotent inside a session; reuse for a different payload returns HTTP 409. |
 | Cross-session access | Runs are keyed by the random HTTP-only session cookie and are unavailable from another session. |
 | Browser injection | Dynamic reasons, evidence, and trace values are HTML-escaped before insertion. |
-| Public key spending | Live mode is disabled by default and requires `SAFEPAY_ENABLE_LIVE=true` plus both provider keys. |
+| Public key spending | Web startup requires the enable flag, both provider keys and a judge code of at least eight characters. An HttpOnly grant gates connected routes, with four runs per grant and twelve shared runs per hour by default. Legacy synchronous routes cannot bypass the protected routes. |
 
 ## Decision Trace
 
@@ -69,7 +69,7 @@ Provider keys, OAuth client secrets, authorization codes, and response bodies fr
 
 - SQLite state is in memory by default. It is not durable, shared across instances, or an immutable audit ledger.
 - Fixture deployments are anonymous and suitable only for demonstration traffic.
-- Enabling live mode on a public service would require authentication, quotas, concurrency controls, monitoring, and a persistent datastore.
+- Judge grants and hourly quotas are process-local, reset on restart, and are intended for one worker on a controlled hackathon deployment. Clearing cookies creates a new grant allowance; the shared hourly cap still applies. Production needs identity-based quotas, durable counters, monitoring and shared storage.
 - Nokia simulator subjects encode predetermined results and do not represent coherent real customers.
 - Number Verification establishes a number association, not payment intent, card ownership, or freedom from coercion.
 - Device Swap reports a network-observed change; it does not prove the app's registered-device identity.
@@ -79,11 +79,14 @@ Provider keys, OAuth client secrets, authorization codes, and response bodies fr
 
 ## Deployment Boundary
 
-The public judging deployment must remain fixture-only:
+Fixture mode works without secrets. Connected judging requires private service environment values:
 
 ```text
-SAFEPAY_ENABLE_LIVE=false
+SAFEPAY_ENABLE_LIVE=true
 SAFEPAY_DATABASE=:memory:
+NOKIA_RAPIDAPI_KEY=<private provider key>
+GEMINI_API_KEY=<private provider key>
+SAFEPAY_JUDGE_ACCESS_CODE=<private code, at least 8 characters>
 ```
 
-Live Nokia and Gemini checks should run locally with documented simulator subjects and controlled API quotas.
+Use one Uvicorn worker for the demonstration. Only documented simulator subjects are allowed. Share judge access through a private organizer channel; never publish provider keys or the access code in the repository.

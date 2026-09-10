@@ -87,7 +87,7 @@ The successful payment workflow used five Gemini turns and four logical Nokia to
 - Device Swap indicates a device-change event within a time window. It does not directly prove that a handset is the application's registered trusted device.
 - Simulator IDs encode predetermined per-API responses. They do not establish a coherent real customer's identity or attack history across APIs.
 - Production access and coverage for Egypt, Saudi Arabia, and the UAE remain unverified.
-- The current prototype now includes bounded Gemini tool orchestration, explicit source/subject labeling, pre-call screening, enrollment, unknown/failure handling, stored decisions, and HTTP/browser acceptance tests. Production readiness, calibrated fraud accuracy, authenticated public live access, and operator-specific consent remain future work.
+- The current prototype now includes bounded Gemini tool orchestration, explicit source/subject labeling, pre-call screening, enrollment, unknown/failure handling, stored decisions, protected judge access, hourly usage limits, live progress, and HTTP/browser acceptance tests. Hosted activation, production readiness, calibrated fraud accuracy, and operator-specific consent remain future work.
 - No additional user portal action was required to complete the tested simulator flows. Old exposed-key revocation remains a separate security housekeeping task; it has not been confirmed.
 
 ## Rate-limit QA follow-up - 9 September 2026
@@ -97,6 +97,16 @@ A later controlled run completed live first-time enrollment with successful Numb
 The adapter preserved those responses as `UNKNOWN` evidence without exposing provider bodies or credentials. The run also revealed that an earlier policy branch allowed a Gemini protective `BLOCK` proposal to strengthen a deterministic non-block when provider evidence was unavailable. That branch was removed: Gemini can now request review, but only deterministic evidence policy can produce `BLOCK`. A regression test reproduces HTTP 429 and requires `RETRY`.
 
 No further live calls were made after the limit was isolated. This result demonstrates failure handling, not successful availability of every tool on every run.
+
+## Protected connected judge-path verification - 10 September 2026
+
+The new protected, asynchronous browser path was exercised locally with the configured Gemini and Nokia credentials. The access code remained server-side, the browser received only an HttpOnly grant, and the UI polled stored progress while the provider work ran in the background.
+
+In the final controlled SIM-takeover run, Gemini autonomously selected SIM Swap, Number Verification and Device Swap from the contextually eligible tool set. All three Nokia sandbox observations returned `SUCCESS`. Deterministic policy returned `BLOCK` with a pre-call score of 80 and final risk score of 90. The run used four Gemini turns and three logical CAMARA calls and completed in under ten seconds end to end. This is one sandbox observation, not a production latency benchmark.
+
+An earlier run exposed that offering every supported API on every turn encouraged unnecessary Roaming and Reachability calls. The investigator now limits declarations by observable context and removes tools after use: Roaming is eligible only for travel context, Device Swap only for a session anomaly, and Reachability only for an explicit connectivity concern. Gemini still chooses the order and whether to finish; server policy controls eligibility, call budgets and the final disposition.
+
+Automated coverage now verifies access control, per-session quota enforcement, asynchronous progress, Nokia source labels, legacy-endpoint quota-bypass prevention, cancellation before a selected Nokia call, and fixture-mode regressions. Hosted deployment remains pending, so this section does not claim that the public Render URL is connected yet.
 
 ## Sources
 

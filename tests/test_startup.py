@@ -6,18 +6,23 @@ import sys
 import pytest
 
 
-@pytest.mark.parametrize(("live_flag", "nokia_key", "gemini_key", "expected"), [
-    ("false", "nokia", "gemini", False),
-    ("true", "nokia", "", False),
-    ("true", "", "gemini", False),
-    ("true", "nokia", "gemini", True),
+@pytest.mark.parametrize(("live_flag", "nokia_key", "gemini_key", "access_code", "expected"), [
+    ("false", "nokia", "gemini", "judges-only", False),
+    ("true", "nokia", "", "judges-only", False),
+    ("true", "", "gemini", "judges-only", False),
+    ("true", "nokia", "gemini", "", False),
+    ("true", "nokia", "gemini", "short", False),
+    ("true", "nokia", "gemini", "judges-only", True),
 ])
-def test_live_mode_requires_explicit_flag_and_both_credentials(live_flag, nokia_key, gemini_key, expected):
+def test_live_mode_requires_flag_credentials_and_access_code(
+    live_flag, nokia_key, gemini_key, access_code, expected,
+):
     environment = {
         **os.environ,
         "SAFEPAY_ENABLE_LIVE": live_flag,
         "NOKIA_RAPIDAPI_KEY": nokia_key,
         "GEMINI_API_KEY": gemini_key,
+        "SAFEPAY_JUDGE_ACCESS_CODE": access_code,
     }
     script = """
 import json

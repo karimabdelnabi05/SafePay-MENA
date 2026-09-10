@@ -60,6 +60,8 @@ SafePay does not claim an active-call API. Provider errors and malformed respons
 
 ## Run Locally
 
+Use Python 3.11 or newer.
+
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
     pip install -r requirements-dev.txt
@@ -67,7 +69,7 @@ SafePay does not claim an active-call API. Provider errors and malformed respons
 
 Open http://127.0.0.1:8000.
 
-Fixture mode works without credentials and is the default for public deployments.
+Fixture mode works without credentials and remains available on every deployment.
 
 ## Optional Live Sandbox
 
@@ -76,8 +78,9 @@ Create .env from .env.example, then set:
     SAFEPAY_ENABLE_LIVE=true
     NOKIA_RAPIDAPI_KEY=your_key
     GEMINI_API_KEY=your_key
+    SAFEPAY_JUDGE_ACCESS_CODE=choose_a_private_code
 
-Live mode is restricted to Nokia's documented +99999991000 and +99999991001 simulator subjects. Keep this mode local or behind an authenticated, quota-controlled environment.
+Connected mode is restricted to Nokia's documented +99999991000 and +99999991001 simulator subjects. It uses an HttpOnly judge-access grant and defaults to four runs per unlocked browser and twelve shared runs per hour. Override those limits with `SAFEPAY_LIVE_RUN_LIMIT` and `SAFEPAY_LIVE_GLOBAL_LIMIT`.
 
 ## Test
 
@@ -102,6 +105,9 @@ Browser acceptance can be run against a local server:
 | POST /api/v1/sessions | Start an isolated one-hour demo session |
 | POST /api/v1/enrollments | Establish fresh device trust |
 | POST /api/v1/payments | Screen a payment with independent recipient relationship and channel fields |
+| GET, POST, DELETE /api/v1/live-access | Read, unlock, or lock protected connected access |
+| POST /api/v1/live-enrollments | Start a quota-controlled connected enrollment run |
+| POST /api/v1/live-payments | Start a quota-controlled connected payment run |
 | GET /api/v1/runs/{id} | Retrieve the stored result |
 | POST /api/v1/runs/{id}/cancel | Cancel a pending or held run |
 | POST /api/v1/evaluations | Run the synthetic acceptance suite |
@@ -109,7 +115,7 @@ Browser acceptance can be run against a local server:
 
 ## Deploy
 
-The included render.yaml deploys a fixture-only FastAPI web service. No provider keys are required or configured.
+The included render.yaml declares protected connected mode. New Blueprints prompt for the Nokia key, Gemini key, and judge access code (at least eight characters). Existing services need these values entered manually in Environment. See [Render setup](docs_and_presentations/RENDER_CONNECTED_SETUP.md). If any required value is absent, startup safely exposes fixture mode only.
 
 [Deploy to Render](https://render.com/deploy?repo=https://github.com/karimabdelnabi05/SafePay-MENA)
 
@@ -117,7 +123,11 @@ Render's official FastAPI instructions use pip install -r requirements.txt and U
 
 ## Phase 2 Material
 
-- [Pitch deck](docs_and_presentations/SafePay_MENA_Phase2_Pitch_Deck.pdf)
+Build the required source upload from the committed release with `python build_submission.py` after installing development dependencies. It exports tracked files only, checks for accidental secrets, and runs the backend suite from the extracted ZIP. The output is `dist/SafePay_MENA_Source.zip` with a commit and SHA-256 manifest.
+
+- [Prototype submission checklist](docs_and_presentations/PROTOTYPE_SUBMISSION_CHECKLIST.md): all form fields, required uploads, draft text and remaining release work.
+- [Single submission presentation](docs_and_presentations/SafePay_MENA_Phase2_Pitch_Deck.pdf): 13 main slides plus financial, fraud-type and source evidence, ending with a technical summary in the same PDF.
+- [Presentation source](docs_and_presentations/SafePay_MENA_Phase2_Slides.html) and [speaker notes / evidence ledger](docs_and_presentations/PHASE2_PITCH_NOTES.md).
 - [Nokia sandbox verification](docs_and_presentations/NOKIA_SANDBOX_VERIFICATION.md)
 - [Phase 2 QA report](docs_and_presentations/PHASE2_QA_REPORT.md)
 - [Phase 2 rubric scorecard](docs_and_presentations/PHASE2_RUBRIC_SCORECARD.md)
