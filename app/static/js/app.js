@@ -525,7 +525,9 @@ async function runEvaluation() {
     const result = await response.json();
     byId("evaluationResult").textContent = `${result.passed} passed · ${result.failed} failed · ${result.mode} · ${result.elapsed_ms} ms (36/36 Policy Invariants Verified)`;
     if (matrix && tbody && Array.isArray(result.cases)) {
+      matrix.removeAttribute("hidden");
       matrix.hidden = false;
+      matrix.style.display = "block";
       const scenarioLabels = {
         routine: "Routine Low-Risk Transfer",
         first_setup: "First Account Enrollment",

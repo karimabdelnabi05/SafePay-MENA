@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SafePay MENA telecom evidence orchestration demo">
   <title>SafePay MENA</title>
-  <link rel="stylesheet" href="/static/css/app.css?v=1.2">
+  <link rel="stylesheet" href="/static/css/app.css?v=1.3">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to payment review</a>
@@ -98,7 +98,7 @@
         <p class="eval-result" id="evaluationResult" aria-live="polite"></p>
       </div>
       <button class="secondary" id="evaluationButton" type="button">Run 36-case evaluation</button>
-      <div id="evaluationMatrix" class="eval-matrix">
+      <div id="evaluationMatrix" class="eval-matrix" hidden>
         <div class="eval-matrix-header">
           <div>
             <strong class="eval-matrix-title">Regression Invariant Matrix (36 Cases)</strong>
@@ -122,50 +122,13 @@
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody id="evaluationTableBody">
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Routine Low-Risk Transfer</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">None (Policy screening)</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>First Account Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>New Device Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Urgent Social Engineering Scam</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>SIM-swap Account Takeover</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Stolen Card Checkout</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>SIM + Device Swap Attack</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Legitimate Roaming Travel</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">sim_swap, number_verification, roaming</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Rapid Velocity Burst</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Telecom Network Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Enrollment Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇪🇬 InstaPay (EG)</strong></td><td>Identity / MSISDN Mismatch</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Routine Low-Risk Transfer</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">None (Policy screening)</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>First Account Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>New Device Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Urgent Social Engineering Scam</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>SIM-swap Account Takeover</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Stolen Card Checkout</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>SIM + Device Swap Attack</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Legitimate Roaming Travel</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">sim_swap, number_verification, roaming</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Rapid Velocity Burst</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Telecom Network Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Enrollment Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇸🇦 sarie (SA)</strong></td><td>Identity / MSISDN Mismatch</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Routine Low-Risk Transfer</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">None (Policy screening)</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>First Account Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>New Device Enrollment</td><td><span class="eval-tag tag-trust">TRUST_ESTABLISHED</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Urgent Social Engineering Scam</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>SIM-swap Account Takeover</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Stolen Card Checkout</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>SIM + Device Swap Attack</td><td><span class="eval-tag tag-block">BLOCK</span></td><td class="eval-tools">sim_swap, number_verification, device_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Legitimate Roaming Travel</td><td><span class="eval-tag tag-approve">APPROVE</span></td><td class="eval-tools">sim_swap, number_verification, roaming</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Rapid Velocity Burst</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Telecom Network Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Enrollment Outage (Fail-Closed)</td><td><span class="eval-tag tag-retry">RETRY</span></td><td class="eval-tools">number_verification, sim_swap</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-              <tr><td><strong>🇦🇪 Aani (AE)</strong></td><td>Identity / MSISDN Mismatch</td><td><span class="eval-tag tag-hold">HOLD</span></td><td class="eval-tools">sim_swap, number_verification</td><td>4/4 Invariants</td><td><span class="eval-pass">✓ PASS</span></td></tr>
-            </tbody>
+            <tbody id="evaluationTableBody"></tbody>
           </table>
         </div>
       </div>
     </section>
     <p class="footer">Prototype uses simulated bank context. Nokia mode uses sandbox APIs and independent simulator subjects; production mobile networks and payment rails are not connected.</p>
   </main>
-  <script src="/static/js/app.js?v=1.2" defer></script>
+  <script src="/static/js/app.js?v=1.3" defer></script>
 </body>
 </html>

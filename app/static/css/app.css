@@ -388,6 +388,7 @@ th { color: var(--muted); font-size: .72rem; }
 .evaluation p { margin-bottom: 0; color: var(--muted); font-size: .84rem; }
 .eval-result { margin-top: 8px !important; color: var(--ink) !important; font-weight: 700; }
 .eval-matrix {
+  display: block;
   grid-column: 1 / -1;
   width: 100%;
   margin-top: 12px;
