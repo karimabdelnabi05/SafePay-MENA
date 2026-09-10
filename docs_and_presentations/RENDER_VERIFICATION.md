@@ -1,5 +1,17 @@
 # Render Deployment Verification
 
+## Final Investigation Release: 10 September 2026
+
+The public Render service was verified after the investigation and quota release deployed.
+
+- The served JavaScript asset matched the release exactly.
+- A single access-controlled SIM-swap investigation returned BLOCK. SIM Swap, Number Verification and Device Swap each returned SUCCESS with HTTP 200 from the Nokia sandbox; Gemini made four model requests.
+- The allowlisted trace export did not contain the configured Nokia key, Gemini key or judge access code.
+- The hosted Quality view returned 36 fixture cases passed and zero failed. This suite is regression evidence only and does not call live providers or measure fraud-model accuracy.
+- The 375 x 812 connected investigation and Quality views had no horizontal overflow.
+
+This is a working connected-sandbox prototype. It does not connect to a bank ledger or move funds, and one successful run does not establish production reliability or remaining provider quota.
+
 ## Connected Browser Review: 10 September 2026
 
 The later hosted deployment was verified as `SANDBOX_ENABLED`, with both providers configured. The earlier fixture-only observations below are historical.
