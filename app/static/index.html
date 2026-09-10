@@ -92,8 +92,40 @@
     </div>
 
     <section class="evaluation" aria-labelledby="evaluationTitle">
-      <div><h2 id="evaluationTitle">Acceptance evaluation</h2><p>Runs 36 synthetic workflow checks across Egypt, Saudi Arabia, and the UAE. This is software QA, not a fraud-accuracy claim.</p><p class="eval-result" id="evaluationResult" aria-live="polite"></p></div>
+      <div class="evaluation-intro">
+        <h2 id="evaluationTitle">Automated Policy & Rail Invariant Suite (36 Cases)</h2>
+        <p>Runs 36 internal HTTP integration tests across Egypt (InstaPay), Saudi Arabia (sarie), and UAE (Aani). Verifies deterministic policy decisions, CAMARA tool plans, and zero-leakage security boundaries without external carrier latency.</p>
+        <p class="eval-result" id="evaluationResult" aria-live="polite"></p>
+      </div>
       <button class="secondary" id="evaluationButton" type="button">Run 36-case evaluation</button>
+      <div id="evaluationMatrix" class="eval-matrix" hidden>
+        <div class="eval-matrix-header">
+          <div>
+            <strong class="eval-matrix-title">Regression Invariant Matrix (36 Cases)</strong>
+            <span class="eval-matrix-subtitle">3 rails × 12 scenario vectors verified across all policy contracts</span>
+          </div>
+          <div class="eval-matrix-badges">
+            <span class="eval-badge">🇪🇬 InstaPay (12)</span>
+            <span class="eval-badge">🇸🇦 sarie (12)</span>
+            <span class="eval-badge">🇦🇪 Aani (12)</span>
+          </div>
+        </div>
+        <div class="eval-matrix-scroll">
+          <table class="eval-table">
+            <thead>
+              <tr>
+                <th>Market</th>
+                <th>Scenario Vector</th>
+                <th>Verified Decision</th>
+                <th>CAMARA Tool Plan</th>
+                <th>Invariants Checked</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="evaluationTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
     <p class="footer">Prototype uses simulated bank context. Nokia mode uses sandbox APIs and independent simulator subjects; production mobile networks and payment rails are not connected.</p>
   </main>

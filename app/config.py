@@ -41,11 +41,11 @@ class Settings(BaseModel):
 
     @property
     def live_run_limit(self):
-        return _positive_int("SAFEPAY_LIVE_RUN_LIMIT", 4)
+        return _positive_int("SAFEPAY_LIVE_RUN_LIMIT", 12)
 
     @property
     def live_global_limit(self):
-        return _positive_int("SAFEPAY_LIVE_GLOBAL_LIMIT", 12)
+        return _positive_int("SAFEPAY_LIVE_GLOBAL_LIMIT", 48)
 
 
 def _positive_int(name, default):

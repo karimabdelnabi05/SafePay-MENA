@@ -80,7 +80,9 @@ Create .env from .env.example, then set:
     GEMINI_API_KEY=your_key
     SAFEPAY_JUDGE_ACCESS_CODE=choose_a_private_code
 
-Connected mode is restricted to Nokia's documented +99999991000 and +99999991001 simulator subjects. It uses an HttpOnly judge-access grant and defaults to four runs per unlocked browser and twelve shared runs per hour. Override those limits with `SAFEPAY_LIVE_RUN_LIMIT` and `SAFEPAY_LIVE_GLOBAL_LIMIT`.
+Connected mode is restricted to Nokia's documented +99999991000 and +99999991001 simulator subjects.
+It uses an HttpOnly judge-access grant and defaults to twelve runs per unlocked browser and 48 shared runs per hour.
+Override those limits with `SAFEPAY_LIVE_RUN_LIMIT` and `SAFEPAY_LIVE_GLOBAL_LIMIT`.
 
 ## Test
 

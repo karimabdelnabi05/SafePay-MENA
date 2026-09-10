@@ -11,8 +11,8 @@ Use the existing `safepay-mena-demo` web service. No new Blueprint or project is
 | `NOKIA_RAPIDAPI_KEY` | The working RapidAPI key used for Network as Code |
 | `GEMINI_API_KEY` | The working Gemini key |
 | `SAFEPAY_JUDGE_ACCESS_CODE` | A private code you choose; minimum 8 characters, preferably 16 or more |
-| `SAFEPAY_LIVE_RUN_LIMIT` | `4` |
-| `SAFEPAY_LIVE_GLOBAL_LIMIT` | `12` |
+| `SAFEPAY_LIVE_RUN_LIMIT` | `12` |
+| `SAFEPAY_LIVE_GLOBAL_LIMIT` | `48` |
 | `SAFEPAY_DATABASE` | `:memory:` |
 
 3. Select **Save, rebuild, and deploy** and wait for the service to become live.

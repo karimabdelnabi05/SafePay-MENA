@@ -387,6 +387,117 @@ th { color: var(--muted); font-size: .72rem; }
 .evaluation h2 { margin-bottom: 4px; font-size: 1rem; }
 .evaluation p { margin-bottom: 0; color: var(--muted); font-size: .84rem; }
 .eval-result { margin-top: 8px !important; color: var(--ink) !important; font-weight: 700; }
+.eval-matrix {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.eval-matrix-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.eval-matrix-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.eval-matrix-subtitle {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.eval-matrix-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.eval-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.eval-matrix-scroll {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.eval-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  text-align: left;
+}
+.eval-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-weight: 600;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  z-index: 1;
+}
+.eval-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+}
+.eval-table tr:last-child td {
+  border-bottom: none;
+}
+.eval-table tr:hover {
+  background: var(--surface-soft);
+}
+.eval-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+.eval-tag.tag-approve, .eval-tag.tag-trust {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.eval-tag.tag-block {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.eval-tag.tag-hold {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.eval-tag.tag-retry {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.eval-pass {
+  color: var(--success);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.eval-tools {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
 .error {
   display: none;
   margin-bottom: 16px;

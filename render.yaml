@@ -12,9 +12,9 @@ services:
       - key: SAFEPAY_DATABASE
         value: ":memory:"
       - key: SAFEPAY_LIVE_RUN_LIMIT
-        value: "4"
-      - key: SAFEPAY_LIVE_GLOBAL_LIMIT
         value: "12"
+      - key: SAFEPAY_LIVE_GLOBAL_LIMIT
+        value: "48"
       - key: NOKIA_RAPIDAPI_KEY
         sync: false
       - key: GEMINI_API_KEY
