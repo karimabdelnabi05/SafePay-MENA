@@ -1,5 +1,16 @@
 # Render Deployment Verification
 
+## Connected Browser Review: 10 September 2026
+
+The later hosted deployment was verified as `SANDBOX_ENABLED`, with both providers configured. The earlier fixture-only observations below are historical.
+
+- Routine payment: APPROVE, zero external calls.
+- SIM-swap takeover: BLOCK; Number Verification, SIM Swap and Device Swap all returned HTTP 200. Browser elapsed time was 6.53 seconds for this one run, not a performance benchmark.
+- Stolen card: BLOCK; three successful Nokia observations, 6.33 seconds.
+- Subsequent travel, suspicious transfer and first-setup attempts returned RETRY on unavailable evidence. Nokia SIM Swap and Roaming returned HTTP 429. Number Verification's older OAuth error handling lost the status of its failing intermediate request.
+- The 36-case fixture evaluation passed, but a controlled browser-only failed response exposed hard-coded PASS/4-of-4 labels. The expanded table overflowed a 375-pixel mobile viewport.
+- The investigation/UX release fixes those observed UI/diagnostic issues and adds conservative quota handling. It is documented in [release verification](INVESTIGATION_UX_RELEASE.md). See that document for the latest release's deployment status.
+
 ## Release Check: 10 September 2026
 
 - Connected implementation commit `93cc428` was pushed and confirmed on GitHub main. Local verification passed 79 backend tests and 24 browser tests against a fresh server. Ruff, Bandit and pip-audit passed.

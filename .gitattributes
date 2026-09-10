@@ -1,0 +1,2 @@
+# Keep draft workflow interviews in the repository, not in the judging source archive.
+/workflows export-ignore
