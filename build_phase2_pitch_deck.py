@@ -102,7 +102,7 @@ def build(capture=False):
         finally:
             browser.close()
     pdf = PdfReader(OUTPUT)
-    assert len(pdf.pages) == 17, f"Unexpected page count: {len(pdf.pages)}"
+    assert len(pdf.pages) == 19, f"Unexpected page count: {len(pdf.pages)}"
     for index, page in enumerate(pdf.pages, 1):
         assert len(page.extract_text()) > 120, f"Blank PDF page {index}"
         assert abs(float(page.mediabox.width) / float(page.mediabox.height) - 16 / 9) < 0.01

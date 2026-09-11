@@ -1,6 +1,6 @@
 # SafePay MENA: Submission Deck and Speaker Notes
 
-Prepared 10 September 2026. Submit **SafePay_MENA_Phase2_Pitch_Deck.pdf** only as the presentation. It contains 13 main slides plus 4 appendix slides; the technical summary is the final slide. This document is internal preparation, not a second presentation.
+Updated 11 September 2026. Submit **SafePay_MENA_Phase2_Pitch_Deck.pdf** only as the presentation. It contains 13 main slides plus 6 supporting slides, including team bio, guide tools and the final technical summary. This document is internal preparation, not a second presentation.
 
 The HTML file is the presentation source. Export with `py -3.14 build_phase2_pitch_deck.py`; use `--capture` to refresh app screenshots and the 36-case acceptance check. The build checks slide boundaries, footer clearance, loaded images, PDF page count and aspect ratio, and renders every PDF page for visual inspection. Development dependencies are Playwright (with Chromium), pypdf, pypdfium2 and Pillow; they are not application runtime dependencies.
 
@@ -14,11 +14,12 @@ The mentor debrief recommends a business-first narrative for a panel covering bu
 | Fintech / regional impact | Payment adoption in Egypt, Saudi Arabia and UAE; existing bank/wallet distribution | 2-3, 5, 12 |
 | Customer experience | Routine zero-call path, mandatory setup checks, clear actions and cancellation | 5-6 |
 | AI / innovation | Adaptive tool choice, observation-dependent investigation, external category precedent | 7, 9 |
-| IT / cybersecurity | Repeatable tests, recorded Nokia integration, enforced policy, missing-data behavior | 8, 17 |
+| IT / cybersecurity | Repeatable tests, recorded Nokia integration, enforced policy, missing-data behavior | 8, 18-19 |
+| Team and execution | Karim's project bio and responsibilities as the sole team member | 17 |
 
 ## Speaker Track
 
-Timing below is a rehearsal suggestion, not a verified hackathon time allowance. The main script is approximately five minutes at conversational pace. Leave additional time for a hands-on demo if the official slot permits it. Use the appendix for questions rather than narrating all 17 slides.
+Timing below is a rehearsal suggestion, not a verified hackathon time allowance. The main script is approximately five minutes at conversational pace. Leave additional time for a hands-on demo if the official slot permits it. Use the supporting slides for questions rather than narrating all 19 slides.
 
 ### 1. SafePay MENA
 
@@ -76,7 +77,7 @@ Timing below is a rehearsal suggestion, not a verified hackathon time allowance.
 
 Start in fixture mode with a routine payment to demonstrate zero external calls. Then unlock **Connected: Nokia + Gemini** and run SIM-swap takeover so the judges can follow actual tool selection and Nokia simulator responses. If provider quota is unavailable, state that clearly and use the actual connected capture on slide 6 before continuing with the explicit fixture fallback. Run the 36-case evaluation as a software-quality proof point, not a fraud-accuracy result.
 
-Demo URL: https://safepay-mena-demo.onrender.com/. Hosted connected activation must be verified separately; the PDF identifies its connected screenshot as a local run.
+Demo URL: https://safepay-mena-demo.onrender.com/. Hosted connected execution has been verified, including the 11 September recording with four model requests and three successful Nokia checks. The screenshot on slide 6 remains accurately identified as a local capture.
 
 ## Fraud Statistics Added in This Revision
 
@@ -86,7 +87,29 @@ These percentages are not shares of fraud incidents or losses, are not MENA rate
 
 The older local research's 65-75% social engineering, 15-20% card fraud, 5-10% eSIM and 3-5% physical SIM swap ranges are unsupported. Do not present them to judges. No SIM-swap percentage is assigned in this deck.
 
-Final order: 1-13 main narrative; 14 commercial sensitivity; 15 fraud-type benchmark; 16 sources; 17 technical summary. Present the close on slide 13; use the remaining slides for questions.
+Final order: 1-13 main narrative; 14 commercial sensitivity; 15 fraud-type benchmark; 16 sources; 17 team; 18 guide tools and orchestration; 19 technical summary. Present the close on slide 13; use the remaining slides for questions.
+
+## Organizer Requirement Coverage
+
+| Required point | Slides |
+|---|---|
+| Problem statement and context | 2-4 |
+| Proposed solution and API usage | 5, 7-8, 18-19 |
+| AI agent design, orchestration and tools from the Resource and Tooling Guide | 7, 18-19 |
+| Technical architecture | 19 |
+| Business model and monetization | 10-12, 14 |
+| Demo screenshots or video links | 6 (screenshot); 18 adds the working demo link |
+| Team bios and roles | 17 |
+
+Team size was confirmed by Karim. His bio describes his work on SafePay, without adding unprovided qualifications or employment history. The tooling mapping was checked against the supplied GSMA MENA Resource Guide PDF: Gemini in section 3, page 3; Nokia Network as Code in section 5, page 5; Render in section 6, page 5. The application uses a custom Python function-calling loop, not one of the optional agent frameworks listed in the guide.
+
+### 17. Team
+
+"I am Karim Mohamed Abdelnabi, the sole team member behind SafePay MENA. My role covers the product concept, payment-review experience, prototype integration, testing, deployment and business proposal. The next step is to work with a bank and network partner to validate the product in a controlled pilot."
+
+### 18. Tools from the organizer's guide
+
+"We use three tools listed in the guide: Gemini for model function calling, Nokia Network as Code for CAMARA sandbox evidence, and Render for the hosted prototype. A bounded Python loop manages orchestration. Gemini can request one or several tools in a turn; the backend validates and executes each check, returns the observations, and enforces the final policy."
 
 ## Evidence Ledger
 

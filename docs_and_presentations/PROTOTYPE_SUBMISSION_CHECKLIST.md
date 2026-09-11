@@ -33,7 +33,7 @@ An unchecked box means that field has not been confirmed as final and submitted.
 | [ ] | Theme | Yes | Select from the form's available themes | Exact options not supplied. Select the option matching payment fraud / fintech security with Open Gateway and agentic AI; do not invent an option label. |
 | [ ] | Snapshots | No asterisk shown | JPG, JPEG or PNG; up to 3 MB each. Image-count limit not supplied. | Refreshed desktop/mobile and actual local connected-result PNGs are ready; each is under 3 MB. Upload the chosen images. |
 | [ ] | Video URL | Yes | Product demo or pitch video URL | No final hosted video URL recorded. Record the actual connected workflow, publish a reviewer-accessible video and test access. |
-| [ ] | Presentation | Yes | .key, .odp, .odt, .pdf, .pps, .ppt or .pptx; max 50 MB | Updated single 17-slide PDF is ready, under 0.2 MB, with sourced business numbers, actual local connected capture and final technical summary. |
+| [ ] | Presentation | Yes | .key, .odp, .odt, .pdf, .pps, .ppt or .pptx; max 50 MB | Updated single 19-slide PDF is ready, under 0.2 MB, with sourced business numbers, actual local connected capture, solo-team bio, organizer-guide tools and final technical summary. |
 | [ ] | Demo Link | Yes | Working demo or prototype URL | Render connected sandbox is deployed and verified. Use the URL below. |
 | [ ] | Repository URL | Yes | Source repository URL, such as GitHub or Bitbucket | Connected-demo release pushed to main. Test reviewer access before submission. |
 | [ ] | Source Code | Yes | File upload, e.g. ZIP or APK; max 50 MB | `dist/SafePay_MENA_Source.zip` is prepared and tested after extraction. Its adjacent manifest records the exact commit and SHA-256. Upload the ZIP, not the manifest. |
@@ -71,7 +71,7 @@ Provide the judge access code through a reviewer-only channel. Do not publish it
 |---|---|---|
 | Demo | https://safepay-mena-demo.onrender.com/ | Deployed; protected connected sandbox and repeatable fixtures |
 | Repository | https://github.com/karimabdelnabi05/SafePay-MENA | Connected-demo release pushed to main |
-| Single presentation PDF | [SafePay_MENA_Phase2_Pitch_Deck.pdf](SafePay_MENA_Phase2_Pitch_Deck.pdf) | Exists; 17 slides, under 50 MB at this review |
+| Single presentation PDF | [SafePay_MENA_Phase2_Pitch_Deck.pdf](SafePay_MENA_Phase2_Pitch_Deck.pdf) | Exists; 19 slides, under 50 MB at this review |
 | Editable presentation source | [SafePay_MENA_Phase2_Slides.html](SafePay_MENA_Phase2_Slides.html) | Source for the same PDF, not a second upload |
 | Speaker notes and evidence | [PHASE2_PITCH_NOTES.md](PHASE2_PITCH_NOTES.md) | Internal preparation |
 | Desktop screenshot | [safepay-desktop.png](../artifacts/safepay-desktop.png) | Refreshed fixture UI; under 3 MB |
